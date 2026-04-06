@@ -29,7 +29,7 @@ const ItemSidebar = ({ title, content, isDouble, type }) => {
     navigate({
       pathname: location.pathname,
       search: createSearchParams({
-        "priceCode": code,
+        [type]: code,
       }).toString(),
     });
   };

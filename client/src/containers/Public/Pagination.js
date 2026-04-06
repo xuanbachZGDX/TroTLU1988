@@ -2,19 +2,23 @@ import React, { useEffect, useState } from "react";
 import { PageNumber } from "../../components";
 import { useSelector } from "react-redux";
 import icons from "../../utils/icons";
+import { useSearchParams } from "react-router-dom";
 
 const { GrLinkNext, GrLinkPrevious } = icons;
 
 const Pagination = ({ page }) => {
   const { count, posts } = useSelector((state) => state.post);
   const [arrPage, setArrPage] = useState([]);
-  const [currentPage, setCurrentPage] = useState(+page || 1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isHideEnd, setIsHideEnd] = useState(false);
   const [isHideStart, setIsHideStart] = useState(false);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    setCurrentPage(+page || 1);
-  }, [page]);
+    let page = searchParams.get("page");
+    page && +page !== currentPage && setCurrentPage(+page);
+    !page && setCurrentPage(1);
+  }, [currentPage, searchParams]);
 
   useEffect(() => {
     let maxPage = Math.ceil(count / process.env.REACT_APP_LIMIT_POSTS);
@@ -32,7 +36,6 @@ const Pagination = ({ page }) => {
     currentPage >= maxPage - 1 ? setIsHideEnd(true) : setIsHideEnd(false);
     currentPage <= 2 ? setIsHideStart(true) : setIsHideStart(false);
   }, [count, posts, currentPage]);
-  console.log(arrPage)
 
   return (
     <div className="flex items-center justify-center gap-2 py-5">
