@@ -11,7 +11,6 @@ const star = [1, 2, 3, 4, 5];
 
 const Intro = () => {
   const { categories } = useSelector((state) => state.app);
-  console.log(categories);
 
   return (
     <div className="w-3/5 bg-white rounded-md shadow-md p-4 flex-col flex justify-center items-center gap-4">

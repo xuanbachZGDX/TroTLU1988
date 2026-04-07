@@ -1,8 +1,10 @@
 import express from "express";
-require("dotenv").config();
+import dotenv from "dotenv";
 import cors from "cors";
 import initRoutes from "./src/routes";
 import connectDb from "./src/config/connectDatabase";
+
+dotenv.config();
 
 const app = express();
 
@@ -20,6 +22,6 @@ initRoutes(app);
 connectDb();
 
 const port = process.env.PORT || 8888;
-const listener = app.listen(port, () => {
-  console.log(`Server is running on the report ${listener.address().port}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
