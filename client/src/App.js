@@ -10,6 +10,7 @@ function App() {
           <Route path="*" element={<HomePage />} />
           <Route path={path.HOME__PAGE} element={<HomePage />} />
           <Route path={path.LOGIN} element={<Login />} />
+          <Route path={path.PHONG_TRO} element={<Rental />} />
           <Route path={path.NHA_NGUYEN_CAN} element={<Rental />} />
           <Route path={path.CAN_HO_CHUNG_CU} element={<Rental />} />
           <Route path={path.CAN_HO_MINI} element={<Rental />} />

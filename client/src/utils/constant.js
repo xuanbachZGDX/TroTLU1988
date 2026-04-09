@@ -2,6 +2,7 @@ export const path = {
   HOME: "/*",
   HOME__PAGE: ":page",
   LOGIN: "login",
+  PHONG_TRO: "phong-tro",
   NHA_NGUYEN_CAN: "nha-nguyen-can",
   CAN_HO_CHUNG_CU: "can-ho-chung-cu",
   CAN_HO_MINI: "can-ho-mini",

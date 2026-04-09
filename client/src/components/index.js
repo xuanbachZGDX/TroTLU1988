@@ -10,4 +10,6 @@ export { default as Intro } from "./Intro";
 export { default as Contact } from "./Contact";
 export { default as RelatePost } from "./RelatePost";
 export { default as SmallItem } from "./SmallItem";
+export { default as Modal } from "./Modal";
+
 

@@ -28,9 +28,7 @@ const Navigation = () => {
               >
                 <NavLink
                   to={
-                    item.value === "Phòng trọ"
-                      ? "/"
-                      : `/${formatVietnameseToString(item.value)}`
+                    `/${formatVietnameseToString(item.value)}`
                   }
                   className={({ isActive }) => (isActive ? active : notActive)}
                 >

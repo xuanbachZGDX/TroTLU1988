@@ -55,6 +55,11 @@ export const insertService = () =>
         { key: "Ở Ghép", val: "Ở ghép" },
       ];
 
+      const defaultPassword = hashPassword("123456");
+
+      const provinceCodes = [];
+      const labelCodes = [];
+
       for (const fileItem of allDataFiles) {
         const dataBody = fileItem.data.body || [];
         const categoryCode = fileItem.code;
@@ -78,13 +83,23 @@ export const insertService = () =>
 
         for (const item of dataBody) {
           let post_id = v4();
-          let labelCode = generateCode(item?.header?.table?.district?.content);
+          let labelValue = item?.header?.table?.district?.content?.trim();
+          let labelCode = generateCode(labelValue);
+          if (labelValue && labelCodes.every((l) => l.code !== labelCode)) {
+            labelCodes.push({ code: labelCode, value: labelValue });
+          }
+
           let attributeId = v4();
           let userId = v4();
           let imageId = v4();
           let overviewId = v4();
           let currentArea = getNumberFromString(item?.header?.class?.area);
           let currentPrice = getNumberFromString(item?.header?.class?.price);
+          let provinceValue = item?.header?.table?.city?.content?.trim() || item?.header?.table?.address?.content?.split(",")?.slice(-1)[0]?.trim();
+          let provinceCode = generateCode(provinceValue);
+          if (provinceValue && provinceCodes.every((p) => p.code !== provinceCode)) {
+            provinceCodes.push({ code: provinceCode, value: provinceValue });
+          }
 
           let targetGenders = "Tất cả";
           if (isRoommate) {
@@ -118,6 +133,7 @@ export const insertService = () =>
             priceCode: dataPrice.find(
               (price) => price.max > currentPrice && price.min <= currentPrice,
             )?.code,
+            provinceCode
           });
 
           await db.Attribute.create({
@@ -128,6 +144,8 @@ export const insertService = () =>
             hashtag: JSON.stringify(item?.highLight?.content || []),
           });
 
+
+
           await db.Image.create({
             id: imageId,
             image: JSON.stringify(
@@ -135,14 +153,6 @@ export const insertService = () =>
                 ? item.images.filter((img) => !!img)
                 : [],
             ),
-          });
-
-          await db.Label.findOrCreate({
-            where: { code: labelCode },
-            defaults: {
-              code: labelCode,
-              value: item?.header?.table?.district?.content,
-            },
           });
 
           await db.Overview.create({
@@ -161,11 +171,25 @@ export const insertService = () =>
           await db.User.create({
             id: userId,
             name: item?.contactInfo?.content?.name,
-            password: hashPassword("123456"),
+            password: defaultPassword,
             phone: item?.contactInfo?.content?.phone?.text || null,
             zalo: item?.contactInfo?.content?.zalo?.url || null,
           });
         }
+      }
+
+      for (const item of provinceCodes) {
+        await db.Province.findOrCreate({
+          where: { code: item.code },
+          defaults: item,
+        });
+      }
+
+      for (const item of labelCodes) {
+        await db.Label.findOrCreate({
+          where: { code: item.code },
+          defaults: item,
+        });
       }
 
       resolve("All files inserted successfully!");

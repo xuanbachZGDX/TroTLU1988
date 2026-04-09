@@ -1,5 +1,5 @@
 import { AiFillPlusCircle } from "react-icons/ai";
-import { GrNext, GrStar, GrLinkNext, GrLinkPrevious } from "react-icons/gr";
+import { GrNext, GrStar, GrLinkNext, GrLinkPrevious  } from "react-icons/gr";
 import { BsChevronRight, BsBookmarkStarFill } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { TbReportMoney } from "react-icons/tb";
