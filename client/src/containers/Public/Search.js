@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { SearchItem, Modal } from "../../components";
 import icons from "../../utils/icons";
 import { useSelector } from "react-redux";
+import { getCodePrice, getCodeArea } from "../../utils/Common/getCode";
 
 const {
   BsChevronRight,
@@ -22,11 +23,29 @@ const Search = () => {
     (state) => state.app,
   );
 
+  const [queries, setQueries] = useState({});
+
+  console.log(getCodePrice(prices));
+  console.log(getCodeArea(areas));
+
+  const [text, setText] = useState({
+    category: "",
+    province: "",
+    price: "",
+    area: "",
+  });
+
   const handleShowModal = (content, name) => {
     setContent(content);
     setName(name);
     setIsShowModal(true);
   };
+
+  const handleSubmit = useCallback((e, query) => {
+    e.stopPropagation();
+    setQueries((prev) => ({ ...prev, ...query }));
+    setIsShowModal(false);
+  }, []);
   return (
     <>
       <div className="p-[10px] w-3/5 my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
@@ -38,7 +57,8 @@ const Search = () => {
             IconBefore={<MdOutlineHouseSiding />}
             fontWeight
             IconAfter={<BsChevronRight color="rgb(156, 163, 175)" />}
-            text="Phòng trọ, nhà trọ"
+            text={queries.category}
+            defaultText={"Phòng trọ, nhà trọ"}
           />
         </span>
         <span
@@ -48,7 +68,8 @@ const Search = () => {
           <SearchItem
             IconBefore={<HiOutlineLocationMarker />}
             IconAfter={<BsChevronRight color="rgb(156, 163, 175)" />}
-            text="Toàn quốc"
+            text={queries.province}
+            defaultText={"Toàn quốc"}
           />
         </span>
         <span
@@ -58,7 +79,8 @@ const Search = () => {
           <SearchItem
             IconBefore={<TbReportMoney />}
             IconAfter={<BsChevronRight color="rgb(156, 163, 175)" />}
-            text="Chọn giá"
+            text={queries.price}
+            defaultText={"Chọn giá"}
           />
         </span>
         <span
@@ -68,7 +90,8 @@ const Search = () => {
           <SearchItem
             IconBefore={<RiCrop2Line />}
             IconAfter={<BsChevronRight color="rgb(156, 163, 175)" />}
-            text="Chọn diện tích"
+            text={queries.area}
+            defaultText={"Chọn diện tích"}
           />
         </span>
         <button
@@ -80,7 +103,13 @@ const Search = () => {
         </button>
       </div>
       {isShowModal && (
-        <Modal content={content} name={name} setIsShowModal={setIsShowModal} />
+        <Modal
+          handleSubmit={handleSubmit}
+          queries={queries}
+          content={content}
+          name={name}
+          setIsShowModal={setIsShowModal}
+        />
       )}
     </>
   );

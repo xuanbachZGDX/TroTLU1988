@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
 import icons from "../utils/icons";
+import { getNumberPrice, getNumberArea } from "../utils/Common/getNumber";
 
 const { GrLinkPrevious } = icons;
 
-const Modal = ({ setIsShowModal, content, name }) => {
+const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
   const [headLeft, setHeadLeft] = useState(0);
   const [headRight, setHeadRight] = useState(100);
   const [activeEle, setActiveEle] = useState("");
 
   useEffect(() => {
     const activeTrackEle = document.getElementById("track-active");
-    if (headRight < headLeft) {
-      activeTrackEle.style.left = `${headRight}%`;
-      activeTrackEle.style.right = `${100 - headLeft}%`;
-    } else {
-      activeTrackEle.style.left = `${headLeft}%`;
-      activeTrackEle.style.right = `${100 - headRight}%`;
+    if (activeTrackEle) {
+      if (headRight < headLeft) {
+        activeTrackEle.style.left = `${headRight}%`;
+        activeTrackEle.style.right = `${100 - headLeft}%`;
+      } else {
+        activeTrackEle.style.left = `${headLeft}%`;
+        activeTrackEle.style.right = `${100 - headRight}%`;
+      }
     }
   }, [headLeft, headRight]);
 
@@ -32,16 +35,20 @@ const Modal = ({ setIsShowModal, content, name }) => {
     }
   };
 
-  const handlePrice = (code, value) => {
+  const handleActive = (code, value) => {
     setActiveEle(code);
-    let arrMaxMin = getNumber(value);
+    let arrMaxMin = name === "price" ? getNumberPrice(value) : getNumberArea(value);
 
     if (arrMaxMin.length === 1) {
       if (arrMaxMin[0] === 1) {
         setHeadLeft(0);
         setHeadRight(convertHeadToTail(1));
       }
-      if (arrMaxMin[0] === 15) {
+      if (arrMaxMin[0] === 20) {
+        setHeadLeft(0);
+        setHeadRight(convertHeadToTail(20));
+      }
+      if (arrMaxMin[0] === 15 || arrMaxMin[0] === 90) {
         setHeadLeft(100);
         setHeadRight(100);
       }
@@ -52,20 +59,17 @@ const Modal = ({ setIsShowModal, content, name }) => {
     }
   };
 
-  const convertTailToHead = (percent) =>
-    (Math.ceil(Math.round(percent * 1.5) / 5) * 5) / 10;
+  const convertTailToHead = (percent) => {
+    return name === "price"
+      ? (Math.ceil(Math.round(percent * 1.5) / 5) * 5) / 10
+      : name === "area"
+        ? Math.ceil(Math.round(percent * 0.9) / 5) * 5
+        : 0;
+  };
 
-  const convertHeadToTail = (percent) => Math.floor((percent / 15) * 100);
-
-  const getNumber = (string) =>
-    string
-      .split(" ")
-      .map((item) => +item)
-      .filter((item) => !item === false);
-
-  const handleSubmit = () => {
-    console.log("Start", convertTailToHead(headLeft));
-    console.log("End", convertTailToHead(headRight));
+  const convertHeadToTail = (percent) => {
+    let target = name === "price" ? 15 : name === "area" ? 90 : 1;
+    return Math.floor((percent / target) * 100);
   };
 
   return (
@@ -106,6 +110,15 @@ const Modal = ({ setIsShowModal, content, name }) => {
                     name={name}
                     id={item.code}
                     value={item.code}
+                    checked={
+                      item.code === queries[`${name}Code`] ? true : false
+                    }
+                    onClick={(e) =>
+                      handleSubmit(e, {
+                        [name]: item.value,
+                        [`${name}Code`]: item.code,
+                      })
+                    }
                   />
                   <label htmlFor={item.code}>{item.value}</label>
                 </span>
@@ -117,7 +130,9 @@ const Modal = ({ setIsShowModal, content, name }) => {
           <div className="p-12 py-20">
             <div className="flex flex-col items-center justify-center relative">
               <div className="z-30 absolute top-[-48px] font-bold text-xl text-orange-600">
-                {`Từ ${headLeft <= headRight ? convertTailToHead(headLeft) : convertTailToHead(headRight)} -${headRight >= headLeft ? convertTailToHead(headRight) : convertTailToHead(headLeft)} triệu`}
+                {headLeft === 100 && headRight === 100
+                  ? `Trên ${convertTailToHead(headLeft)} ${name === "price" ? "triệu" : "m2"}`
+                  : `Từ ${headLeft <= headRight ? convertTailToHead(headLeft) : convertTailToHead(headRight)} -${headRight >= headLeft ? convertTailToHead(headRight) : convertTailToHead(headLeft)} ${name === "price" ? "triệu" : "m2"}`}
               </div>
               <div
                 onClick={handleClickTrack}
@@ -170,7 +185,11 @@ const Modal = ({ setIsShowModal, content, name }) => {
                     handleClickTrack(e, 100);
                   }}
                 >
-                  15 triệu
+                  {name === "price"
+                    ? "15 triệu"
+                    : name === "area"
+                      ? "Trên 90m2"
+                      : ""}
                 </span>
               </div>
             </div>
@@ -181,8 +200,8 @@ const Modal = ({ setIsShowModal, content, name }) => {
                   return (
                     <button
                       key={item.code}
-                      onClick={() => handlePrice(item.code, item.value)}
-                      className={`px-4 py-2 bg-gray-200 rounded-md cursor-pointer ${item.code === activeEle ? "bg-blue-500 text-white" : ""}`}
+                      onClick={() => handleActive(item.code, item.value)}
+                      className={`px-4 py-2 rounded-md cursor-pointer ${item.code === activeEle ? "bg-blue-500 text-white" : "bg-gray-200"}`}
                     >
                       {item.value}
                     </button>
@@ -192,13 +211,16 @@ const Modal = ({ setIsShowModal, content, name }) => {
             </div>
           </div>
         )}
-        <button
-          type="button"
-          className="w-full bg-orange-400 py-2 font-medium rounded-bl-md rounded-br-md"
-          onClick={handleSubmit}
-        >
-          Áp dụng
-        </button>
+        {name === "price" ||
+          (name === "area" && (
+            <button
+              type="button"
+              className="w-full bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
+              // onClick={handleSubmit}
+            >
+              ÁP DỤNG
+            </button>
+          ))}
       </div>
     </div>
   );
