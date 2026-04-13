@@ -14,17 +14,17 @@ const Modal = ({
   arrMinMax,
 }) => {
   const [headLeft, setHeadLeft] = useState(
-    name === "price"
-      ? arrMinMax?.priceArr?.[0] ?? 0
-      : name === "area"
-        ? arrMinMax?.areaArr?.[0] ?? 0
+    name === "price" && arrMinMax?.priceArr
+      ? (arrMinMax?.priceArr?.[0] ?? 0)
+      : name === "area" && arrMinMax?.areaArr
+        ? (arrMinMax?.areaArr?.[0] ?? 0)
         : 0,
   );
   const [headRight, setHeadRight] = useState(
-    name === "price"
-      ? arrMinMax?.priceArr?.[1] ?? 100
-      : name === "area"
-        ? arrMinMax?.areaArr?.[1] ?? 100
+    name === "price" && arrMinMax?.priceArr
+      ? (arrMinMax?.priceArr?.[1] ?? 100)
+      : name === "area" && arrMinMax?.areaArr
+        ? (arrMinMax?.areaArr?.[1] ?? 100)
         : 100,
   );
   const [activeEle, setActiveEle] = useState("");

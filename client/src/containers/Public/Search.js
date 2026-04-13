@@ -2,7 +2,9 @@ import React, { useCallback, useState } from "react";
 import { SearchItem, Modal } from "../../components";
 import icons from "../../utils/icons";
 import { useSelector } from "react-redux";
-import { getCodes, getCodesArea } from "../../utils/Common/getCode";
+import { useDispatch } from "react-redux";
+import * as actions from "../../store/actions";
+import { useNavigate, useLocation, createSearchParams } from "react-router-dom";
 
 const {
   BsChevronRight,
@@ -14,6 +16,7 @@ const {
 } = icons;
 
 const Search = () => {
+  const dispatch = useDispatch();
   const [isShowModal, setIsShowModal] = useState(false);
 
   const [content, setContent] = useState([]);
@@ -37,7 +40,25 @@ const Search = () => {
     setIsShowModal(false);
     arrMinMax && setArrMinMax((prev) => ({ ...prev, ...arrMinMax }));
   }, []);
-  console.log(queries);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleSearch = () => {
+    const queryCode = Object.entries(queries).filter((item) =>
+      item[0].includes("Code"),
+    );
+    let queryCodeObj = {};
+    queryCode.forEach((item) => {
+      queryCodeObj[item[0]] = item[1];
+    });
+
+    navigate({
+      pathname: location.pathname !== "/" && location.pathname !== "/cho-thue-phong-tro" && location.pathname !== "/cho-thue-can-ho" && location.pathname !== "/cho-thue-mat-bang" && location.pathname !== "/nha-cho-thue" ? "/" : location.pathname,
+      search: createSearchParams(queryCodeObj).toString(),
+    });
+  };
+
   return (
     <>
       <div className="p-[10px] w-3/5 my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
@@ -88,6 +109,7 @@ const Search = () => {
         </span>
         <button
           type="button"
+          onClick={handleSearch}
           className="outline-none py-2 px-4 flex-1 bg-secondary1 text-[13px] flex items-center justify-center gap-2 text-white font-medium"
         >
           <FiSearch />

@@ -15,28 +15,14 @@ const PageNumber = ({ text, currentPage, icon, setCurrentPage, type }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [paramsSearch] = useSearchParams();
-  let entries = paramsSearch.entries();
-
-  const append = (entries) => {
-    let params = [];
-    paramsSearch.append("page", +text);
-    for (let entry of entries) {
-      params.push(entry);
-    }
-    let a = {};
-    params?.forEach((i) => {
-      a = { ...a, [i[0]]: i[1] };
-    });
-
-    return a;
-  };
-
   const handleChangePage = () => {
-    if (!(text === "...")) {
+    if (text !== "...") {
       setCurrentPage(+text);
+      const newSearchParams = new URLSearchParams(paramsSearch);
+      newSearchParams.set("page", text);
       navigate({
         pathname: location.pathname,
-        search: createSearchParams(append(entries)).toString(),
+        search: newSearchParams.toString(),
       });
     }
   };

@@ -63,7 +63,7 @@ const Pagination = ({ page }) => {
         <PageNumber
           icon={<GrLinkNext />}
           setCurrentPage={setCurrentPage}
-          text={Math.ceil(count / posts.length)}
+          text={Math.ceil(count / process.env.REACT_APP_LIMIT_POSTS)}
         />
       )}
     </div>

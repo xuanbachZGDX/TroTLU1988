@@ -10,14 +10,18 @@ const List = ({ categoryCode }) => {
   const { posts } = useSelector((state) => state.post);
 
   useEffect(() => {
-    let params = [];
-    for (let entry of searchParams.entries()) {
-      params.push(entry);
-    }
     let searchParamsObject = {};
-    params?.forEach((i) => {
-      searchParamsObject = { ...searchParamsObject, [i[0]]: i[1] };
-    });
+    for (let [key, value] of searchParams.entries()) {
+      if (searchParamsObject[key]) {
+        if (Array.isArray(searchParamsObject[key])) {
+          searchParamsObject[key].push(value);
+        } else {
+          searchParamsObject[key] = [searchParamsObject[key], value];
+        }
+      } else {
+        searchParamsObject[key] = value;
+      }
+    }
 
     if (categoryCode) searchParamsObject.categoryCode = categoryCode;
     dispatch(getAllPostsLimit(searchParamsObject));
