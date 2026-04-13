@@ -14,8 +14,18 @@ export const getPosts = async (req, res) => {
 
 export const getPostsLimit = async (req, res) => {
   const { page, ...query } = req.query;
+  const cleanQuery = {};
+  
+  Object.keys(query).forEach(key => {
+    if (key.endsWith('[]')) {
+      cleanQuery[key.replace('[]', '')] = query[key];
+    } else {
+      cleanQuery[key] = query[key];
+    }
+  });
+
   try {
-    const response = await postService.getPostsLimitService(page, query);
+    const response = await postService.getPostsLimitService(page, cleanQuery);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
