@@ -1,12 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import icons from "../utils/icons";
 import { getNumberPrice, getNumberArea } from "../utils/Common/getNumber";
+import { getCodes, getCodesArea } from "../utils/Common/getCode";
 
 const { GrLinkPrevious } = icons;
 
-const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
-  const [headLeft, setHeadLeft] = useState(0);
-  const [headRight, setHeadRight] = useState(100);
+const Modal = ({
+  setIsShowModal,
+  content,
+  name,
+  handleSubmit,
+  queries,
+  arrMinMax,
+}) => {
+  const [headLeft, setHeadLeft] = useState(
+    name === "price"
+      ? arrMinMax?.priceArr?.[0] ?? 0
+      : name === "area"
+        ? arrMinMax?.areaArr?.[0] ?? 0
+        : 0,
+  );
+  const [headRight, setHeadRight] = useState(
+    name === "price"
+      ? arrMinMax?.priceArr?.[1] ?? 100
+      : name === "area"
+        ? arrMinMax?.areaArr?.[1] ?? 100
+        : 100,
+  );
   const [activeEle, setActiveEle] = useState("");
 
   useEffect(() => {
@@ -37,7 +57,8 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
 
   const handleActive = (code, value) => {
     setActiveEle(code);
-    let arrMaxMin = name === "price" ? getNumberPrice(value) : getNumberArea(value);
+    let arrMaxMin =
+      name === "price" ? getNumberPrice(value) : getNumberArea(value);
 
     if (arrMaxMin.length === 1) {
       if (arrMaxMin[0] === 1) {
@@ -72,6 +93,34 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
     return Math.floor((percent / target) * 100);
   };
 
+  const handleBeforeSubmit = (e) => {
+    let min = headLeft <= headRight ? headLeft : headRight;
+    let max = headLeft <= headRight ? headRight : headLeft;
+    let arrMinMaxFormatted = [convertTailToHead(min), convertTailToHead(max)];
+
+    const gaps =
+      name === "price"
+        ? getCodes(arrMinMaxFormatted, content)
+        : name === "area"
+          ? getCodesArea(arrMinMaxFormatted, content)
+          : [];
+
+    handleSubmit(
+      e,
+      {
+        [`${name}Code`]: gaps?.map((item) => item.code),
+        [name]:
+          min === 100 && max === 100
+            ? `Trên ${arrMinMaxFormatted[0]} ${name === "price" ? "triệu" : "m2"}`
+            : `Từ ${arrMinMaxFormatted[0]} - ${arrMinMaxFormatted[1]} ${
+                name === "price" ? "triệu" : "m2"
+              }`,
+      },
+      {
+        [`${name}Arr`]: [min, max],
+      },
+    );
+  };
   return (
     <div
       onClick={() => {
@@ -110,7 +159,7 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
                     name={name}
                     id={item.code}
                     value={item.code}
-                    checked={
+                    defaultChecked={
                       item.code === queries[`${name}Code`] ? true : false
                     }
                     onClick={(e) =>
@@ -211,19 +260,18 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
             </div>
           </div>
         )}
-        {name === "price" ||
-          (name === "area" && (
-            <button
-              type="button"
-              className="w-full bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
-              // onClick={handleSubmit}
-            >
-              ÁP DỤNG
-            </button>
-          ))}
+        {(name === "price" || name === "area") && (
+          <button
+            type="button"
+            className="w-full bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
+            onClick={handleBeforeSubmit}
+          >
+            ÁP DỤNG
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-export default Modal;
+export default memo(Modal);

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { SearchItem, Modal } from "../../components";
 import icons from "../../utils/icons";
 import { useSelector } from "react-redux";
-import { getCodePrice, getCodeArea } from "../../utils/Common/getCode";
+import { getCodes, getCodesArea } from "../../utils/Common/getCode";
 
 const {
   BsChevronRight,
@@ -22,18 +22,8 @@ const Search = () => {
   const { provinces, areas, prices, categories } = useSelector(
     (state) => state.app,
   );
-
   const [queries, setQueries] = useState({});
-
-  console.log(getCodePrice(prices));
-  console.log(getCodeArea(areas));
-
-  const [text, setText] = useState({
-    category: "",
-    province: "",
-    price: "",
-    area: "",
-  });
+  const [arrMinMax, setArrMinMax] = useState({});
 
   const handleShowModal = (content, name) => {
     setContent(content);
@@ -41,11 +31,13 @@ const Search = () => {
     setIsShowModal(true);
   };
 
-  const handleSubmit = useCallback((e, query) => {
+  const handleSubmit = useCallback((e, query, arrMinMax) => {
     e.stopPropagation();
     setQueries((prev) => ({ ...prev, ...query }));
     setIsShowModal(false);
+    arrMinMax && setArrMinMax((prev) => ({ ...prev, ...arrMinMax }));
   }, []);
+  console.log(queries);
   return (
     <>
       <div className="p-[10px] w-3/5 my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
@@ -106,6 +98,7 @@ const Search = () => {
         <Modal
           handleSubmit={handleSubmit}
           queries={queries}
+          arrMinMax={arrMinMax}
           content={content}
           name={name}
           setIsShowModal={setIsShowModal}
