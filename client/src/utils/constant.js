@@ -10,6 +10,7 @@ export const path = {
   O_GHEP: "o-ghep",
   MAT_BANG: "mat-bang",
   DETAIL_POST__TITLE__POSTID: "chi-tiet/:title/:postId",
+  SEARCH: "tim-kiem",
 };
 
 export const text = {

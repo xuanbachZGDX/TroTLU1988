@@ -1,6 +1,5 @@
 import React, { memo } from "react";
 import {
-  createSearchParams,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
@@ -20,10 +19,13 @@ const PageNumber = ({ text, currentPage, icon, setCurrentPage, type }) => {
       setCurrentPage(+text);
       const newSearchParams = new URLSearchParams(paramsSearch);
       newSearchParams.set("page", text);
-      navigate({
-        pathname: location.pathname,
-        search: newSearchParams.toString(),
-      });
+      navigate(
+        {
+          pathname: location.pathname,
+          search: newSearchParams.toString(),
+        },
+        { state: location.state },
+      );
     }
   };
   return (

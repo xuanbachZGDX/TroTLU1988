@@ -1,10 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SearchItem, Modal } from "../../components";
 import icons from "../../utils/icons";
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import * as actions from "../../store/actions";
-import { useNavigate, useLocation, createSearchParams } from "react-router-dom";
+import { useNavigate, createSearchParams, useLocation } from "react-router-dom";
+import { path } from "../../utils/constant";
 
 const {
   BsChevronRight,
@@ -16,7 +15,8 @@ const {
 } = icons;
 
 const Search = () => {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isShowModal, setIsShowModal] = useState(false);
 
   const [content, setContent] = useState([]);
@@ -27,11 +27,20 @@ const Search = () => {
   );
   const [queries, setQueries] = useState({});
   const [arrMinMax, setArrMinMax] = useState({});
+  const [defaultText, setDefaultText] = useState("");
 
-  const handleShowModal = (content, name) => {
+  useEffect(() => {
+    if (!location.pathname.includes(path.SEARCH)) {
+      setArrMinMax({});
+      setQueries({});
+    }
+  }, [location]);
+
+  const handleShowModal = (content, name, defaultText) => {
     setContent(content);
     setName(name);
     setIsShowModal(true);
+    setDefaultText(defaultText);
   };
 
   const handleSubmit = useCallback((e, query, arrMinMax) => {
@@ -41,29 +50,41 @@ const Search = () => {
     arrMinMax && setArrMinMax((prev) => ({ ...prev, ...arrMinMax }));
   }, []);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const handleSearch = () => {
-    const queryCode = Object.entries(queries).filter((item) =>
-      item[0].includes("Code"),
-    );
+    const queryCode = Object.entries(queries)
+      .filter((item) => item[0].includes("Code"))
+      .filter((item) => item[1]);
     let queryCodeObj = {};
     queryCode.forEach((item) => {
       queryCodeObj[item[0]] = item[1];
     });
+    const queryText = Object.entries(queries).filter(
+      (item) => !item[0].includes("Code"),
+    );
 
-    navigate({
-      pathname: location.pathname !== "/" && location.pathname !== "/cho-thue-phong-tro" && location.pathname !== "/cho-thue-can-ho" && location.pathname !== "/cho-thue-mat-bang" && location.pathname !== "/nha-cho-thue" ? "/" : location.pathname,
-      search: createSearchParams(queryCodeObj).toString(),
+    let queryTextObj = {};
+    queryText.forEach((item) => {
+      queryTextObj[item[0]] = item[1];
     });
+
+    let titleSearch = `${
+      queryTextObj.category ? queryTextObj.category : "Cho thuê tất cả"
+    } ${queryTextObj.province ? `tỉnh ${queryTextObj.province}` : ""}  ${queryTextObj.price ? `giá ${queryTextObj.price}` : ""} ${queryTextObj.area ? `diện tích ${queryTextObj.area}` : ""}`;
+
+    navigate(
+      {
+        pathname: `/${path.SEARCH}`,
+        search: createSearchParams(queryCodeObj).toString(),
+      },
+      { state: { titleSearch } },
+    );
   };
 
   return (
     <>
       <div className="p-[10px] w-3/5 my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
         <span
-          onClick={() => handleShowModal(categories, "category")}
+          onClick={() => handleShowModal(categories, "category", "Tìm tất cả")}
           className="flex-1 cursor-pointer"
         >
           <SearchItem
@@ -71,11 +92,11 @@ const Search = () => {
             fontWeight
             IconAfter={<BsChevronRight color="rgb(156, 163, 175)" />}
             text={queries.category}
-            defaultText={"Phòng trọ, nhà trọ"}
+            defaultText={"Tìm tất cả"}
           />
         </span>
         <span
-          onClick={() => handleShowModal(provinces, "province")}
+          onClick={() => handleShowModal(provinces, "province", "Toàn quốc")}
           className="flex-1 cursor-pointer"
         >
           <SearchItem
@@ -86,7 +107,7 @@ const Search = () => {
           />
         </span>
         <span
-          onClick={() => handleShowModal(prices, "price")}
+          onClick={() => handleShowModal(prices, "price", "Chọn giá")}
           className="flex-1 cursor-pointer"
         >
           <SearchItem
@@ -97,7 +118,7 @@ const Search = () => {
           />
         </span>
         <span
-          onClick={() => handleShowModal(areas, "area")}
+          onClick={() => handleShowModal(areas, "area", "Chọn diện tích")}
           className="flex-1 cursor-pointer"
         >
           <SearchItem
@@ -124,6 +145,7 @@ const Search = () => {
           content={content}
           name={name}
           setIsShowModal={setIsShowModal}
+          defaultText={defaultText}
         />
       )}
     </>

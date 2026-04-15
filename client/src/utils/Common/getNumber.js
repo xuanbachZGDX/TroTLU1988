@@ -7,5 +7,5 @@ export const getNumberPrice = (string) =>
 export const getNumberArea = (string) =>
   string
     .split(" ")
-    .map((item) => +item.match(/\d+/))
+    .map((item) => +item.match(/^\d+/))
     .filter((item) => item !== 0);

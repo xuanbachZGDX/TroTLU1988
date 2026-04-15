@@ -12,6 +12,7 @@ const Modal = ({
   handleSubmit,
   queries,
   arrMinMax,
+  defaultText,
 }) => {
   const [headLeft, setHeadLeft] = useState(
     name === "price" && arrMinMax?.priceArr
@@ -133,7 +134,7 @@ const Modal = ({
           e.stopPropagation();
           setIsShowModal(true);
         }}
-        className="w-2/5 bg-white rounded-md"
+        className="w-2/5 h-[500px] bg-white rounded-md relative"
       >
         <div className="h-[45px] flex items-center px-4 border-b border-gray-200">
           <span
@@ -148,6 +149,22 @@ const Modal = ({
         </div>
         {(name === "category" || name === "province") && (
           <div className="p-4 flex flex-col">
+            <span className="py-2 flex gap-2 items-center border-b border-gray-200">
+              <input
+                type="radio"
+                name={name}
+                id="default"
+                value={defaultText || ""}
+                checked={!queries[`${name}Code`] ? true : false}
+                onChange={(e) =>
+                  handleSubmit(e, {
+                    [name]: defaultText,
+                    [`${name}Code`]: null,
+                  })
+                }
+              />
+              <label htmlFor="default">{defaultText}</label>
+            </span>
             {content?.map((item) => {
               return (
                 <span
@@ -159,10 +176,10 @@ const Modal = ({
                     name={name}
                     id={item.code}
                     value={item.code}
-                    defaultChecked={
+                    checked={
                       item.code === queries[`${name}Code`] ? true : false
                     }
-                    onClick={(e) =>
+                    onChange={(e) =>
                       handleSubmit(e, {
                         [name]: item.value,
                         [`${name}Code`]: item.code,
@@ -263,7 +280,7 @@ const Modal = ({
         {(name === "price" || name === "area") && (
           <button
             type="button"
-            className="w-full bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
+            className="w-full absolute bottom-0 bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
             onClick={handleBeforeSubmit}
           >
             ÁP DỤNG

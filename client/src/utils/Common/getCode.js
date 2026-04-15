@@ -1,47 +1,37 @@
 import { getNumberPrice, getNumberArea } from "./getNumber";
 
+const MAX_RANGE = 99999999;
+
+const normalizeRange = (value, getNumbers) => {
+  const numbers = getNumbers(value);
+  const normalizedValue = value.toLowerCase();
+
+  if (normalizedValue.includes("dưới") || normalizedValue.includes("duoi")) {
+    return { min: 0, max: numbers[0] };
+  }
+
+  if (normalizedValue.includes("trên") || normalizedValue.includes("tren")) {
+    return { min: numbers[0], max: MAX_RANGE };
+  }
+
+  return {
+    min: numbers[0],
+    max: numbers[1],
+  };
+};
+
 export const getCodePrice = (total) => {
-  let arr = [];
-  return total.map((item) => {
-    let arrMaxMin = getNumberPrice(item.value);
-
-    if (arrMaxMin.length === 1) arr.push(arrMaxMin[0]);
-
-    let sortedArr = arr.sort();
-
-    return {
-      ...item,
-      min: sortedArr.indexOf(arrMaxMin[0]) === 0 ? 0 : arrMaxMin[0],
-      max:
-        sortedArr.indexOf(arrMaxMin[0]) === 0
-          ? arrMaxMin[0]
-          : sortedArr.indexOf(arrMaxMin[0]) === 1
-            ? 99999999
-            : arrMaxMin[1],
-    };
-  });
+  return total.map((item) => ({
+    ...item,
+    ...normalizeRange(item.value, getNumberPrice),
+  }));
 };
 
 export const getCodeArea = (total) => {
-  let arr = [];
-  return total.map((item) => {
-    let arrMaxMin = getNumberArea(item.value);
-
-    if (arrMaxMin.length === 1) arr.push(arrMaxMin[0]);
-
-    let sortedArr = arr.sort();
-
-    return {
-      ...item,
-      min: sortedArr.indexOf(arrMaxMin[0]) === 0 ? 0 : arrMaxMin[0],
-      max:
-        sortedArr.indexOf(arrMaxMin[0]) === 0
-          ? arrMaxMin[0]
-          : sortedArr.indexOf(arrMaxMin[0]) === 1
-            ? 99999999
-            : arrMaxMin[1],
-    };
-  });
+  return total.map((item) => ({
+    ...item,
+    ...normalizeRange(item.value, getNumberArea),
+  }));
 };
 
 export const getCodes = (arrMinMax, prices) => {

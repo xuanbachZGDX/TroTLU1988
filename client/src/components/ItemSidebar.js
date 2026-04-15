@@ -2,16 +2,19 @@ import React, { memo } from "react";
 import icons from "../utils/icons";
 import { formatVietnameseToString } from "../utils/Common/formatVietnameseToString";
 import { Link } from "react-router-dom";
-import * as actions from "../store/actions";
-import { useDispatch } from "react-redux";
-import { createSearchParams, useNavigate, useLocation } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 
 const { GrNext } = icons;
 
 const ItemSidebar = ({ title, content, isDouble, type }) => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const formatContent = () => {
     const oddEle = content?.filter((item, index) => index % 2 !== 0);
@@ -26,12 +29,29 @@ const ItemSidebar = ({ title, content, isDouble, type }) => {
   };
 
   const handleFilterPosts = (code) => {
-    navigate({
-      pathname: location.pathname,
-      search: createSearchParams({
-        [type]: code,
-      }).toString(),
-    });
+    let currentQuery = {};
+    for (let [key, value] of searchParams.entries()) {
+      if (currentQuery[key]) {
+        if (Array.isArray(currentQuery[key])) {
+          currentQuery[key].push(value);
+        } else {
+          currentQuery[key] = [currentQuery[key], value];
+        }
+      } else {
+        currentQuery[key] = value;
+      }
+    }
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: createSearchParams({
+          ...currentQuery,
+          [type]: code,
+        }).toString(),
+      },
+      { state: location.state },
+    );
   };
 
   return (
