@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import db from "../models";
 
 export const getPostsService = () =>
@@ -31,8 +32,17 @@ export const getPostsLimitService = (page, query) =>
   new Promise(async (resolve, reject) => {
     try {
       let offset = !page || +page <= 1 ? 0 : +page - 1;
+      const formattedQuery = Object.entries(query).reduce((acc, [key, value]) => {
+        if (Array.isArray(value)) {
+          acc[key] = { [Op.in]: value };
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
       const response = await db.Post.findAndCountAll({
-        where: query,
+        where: formattedQuery,
         raw: true,
         nest: true,
         offset: offset * +process.env.LIMIT,
