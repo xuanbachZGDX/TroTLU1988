@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { v4 } from "uuid";
 import generateCode from "../utils/generateCode";
 import { dataPrice, dataArea } from "../utils/data";
-import { getNumberFromString } from "../utils/common";
+import { getNumberFromString, getNumberFromStringV2 } from "../utils/common";
 
 import nhatrothue from "../../data/nha-cho-thue.json";
 import canHoDichVu from "../../data/cho-thue-can-ho-dich-vu.json";
@@ -95,9 +95,17 @@ export const insertService = () =>
           let overviewId = v4();
           let currentArea = getNumberFromString(item?.header?.class?.area);
           let currentPrice = getNumberFromString(item?.header?.class?.price);
-          let provinceValue = item?.header?.table?.city?.content?.trim() || item?.header?.table?.address?.content?.split(",")?.slice(-1)[0]?.trim();
+          let provinceValue =
+            item?.header?.table?.city?.content?.trim() ||
+            item?.header?.table?.address?.content
+              ?.split(",")
+              ?.slice(-1)[0]
+              ?.trim();
           let provinceCode = generateCode(provinceValue);
-          if (provinceValue && provinceCodes.every((p) => p.code !== provinceCode)) {
+          if (
+            provinceValue &&
+            provinceCodes.every((p) => p.code !== provinceCode)
+          ) {
             provinceCodes.push({ code: provinceCode, value: provinceValue });
           }
 
@@ -133,7 +141,9 @@ export const insertService = () =>
             priceCode: dataPrice.find(
               (price) => price.max > currentPrice && price.min <= currentPrice,
             )?.code,
-            provinceCode
+            provinceCode,
+            areaNumber: getNumberFromStringV2(item?.header?.class?.area),
+            priceNumber: getNumberFromStringV2(item?.header?.class?.price),
           });
 
           await db.Attribute.create({
@@ -143,8 +153,6 @@ export const insertService = () =>
             published: item?.header?.class?.updated,
             hashtag: JSON.stringify(item?.highLight?.content || []),
           });
-
-
 
           await db.Image.create({
             id: imageId,

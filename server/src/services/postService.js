@@ -28,11 +28,15 @@ export const getPostsService = () =>
     }
   });
 
-export const getPostsLimitService = (page, query) =>
+export const getPostsLimitService = (
+  page,
+  query,
+  { priceNumber, areaNumber },
+) =>
   new Promise(async (resolve, reject) => {
     try {
       let offset = !page || +page <= 1 ? 0 : +page - 1;
-      const formattedQuery = Object.entries(query).reduce((acc, [key, value]) => {
+      const queries = Object.entries(query).reduce((acc, [key, value]) => {
         if (Array.isArray(value)) {
           acc[key] = { [Op.in]: value };
         } else {
@@ -40,9 +44,15 @@ export const getPostsLimitService = (page, query) =>
         }
         return acc;
       }, {});
+      if (priceNumber?.length === 2) {
+        queries.priceNumber = { [Op.between]: priceNumber };
+      }
+      if (areaNumber?.length === 2) {
+        queries.areaNumber = { [Op.between]: areaNumber };
+      }
 
       const response = await db.Post.findAndCountAll({
-        where: formattedQuery,
+        where: queries,
         raw: true,
         nest: true,
         offset: offset * +process.env.LIMIT,
