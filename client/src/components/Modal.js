@@ -98,7 +98,6 @@ const Modal = ({
     let min = headLeft <= headRight ? headLeft : headRight;
     let max = headLeft <= headRight ? headRight : headLeft;
     let arrMinMaxFormatted = [convertTailToHead(min), convertTailToHead(max)];
-
     const gaps =
       name === "price"
         ? getCodes(arrMinMaxFormatted, content)
@@ -106,10 +105,16 @@ const Modal = ({
           ? getCodesArea(arrMinMaxFormatted, content)
           : [];
 
+    const queryRange =
+      min === 100 && max === 100
+        ? [arrMinMaxFormatted[0], name === "price" ? 999 : 9999]
+        : arrMinMaxFormatted;
+
     handleSubmit(
       e,
       {
         [`${name}Code`]: gaps?.map((item) => item.code),
+        [`${name}Number`]: queryRange,
         [name]:
           min === 100 && max === 100
             ? `Trên ${arrMinMaxFormatted[0]} ${name === "price" ? "triệu" : "m2"}`

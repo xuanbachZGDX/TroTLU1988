@@ -52,14 +52,14 @@ const Search = () => {
 
   const handleSearch = () => {
     const queryCode = Object.entries(queries)
-      .filter((item) => item[0].includes("Code"))
+      .filter((item) => item[0].includes("Number") || item[0].includes("Code"))
       .filter((item) => item[1]);
     let queryCodeObj = {};
     queryCode.forEach((item) => {
       queryCodeObj[item[0]] = item[1];
     });
     const queryText = Object.entries(queries).filter(
-      (item) => !item[0].includes("Code"),
+      (item) => !item[0].includes("Code") && !item[0].includes("Number"),
     );
 
     let queryTextObj = {};
@@ -67,7 +67,7 @@ const Search = () => {
       queryTextObj[item[0]] = item[1];
     });
 
-    let titleSearch = `${
+    const titleSearch = `${
       queryTextObj.category ? queryTextObj.category : "Cho thuê tất cả"
     } ${queryTextObj.province ? `tỉnh ${queryTextObj.province}` : ""}  ${queryTextObj.price ? `giá ${queryTextObj.price}` : ""} ${queryTextObj.area ? `diện tích ${queryTextObj.area}` : ""}`;
 
@@ -76,7 +76,7 @@ const Search = () => {
         pathname: `/${path.SEARCH}`,
         search: createSearchParams(queryCodeObj).toString(),
       },
-      { state: { titleSearch } },
+      { state: { titleSearch, queryTextObj } },
     );
   };
 

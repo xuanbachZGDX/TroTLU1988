@@ -1,13 +1,14 @@
 import { ItemSidebar, RelatePost } from "../../components";
 import { List, Pagination } from "./index";
 import { useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const SearchDetail = () => {
   const { prices, areas, categories, provinces } = useSelector(
     (state) => state.app,
   );
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const getSingleLabel = (collection, key) => {
     const value = searchParams.get(key);
@@ -27,8 +28,12 @@ const SearchDetail = () => {
 
   const categoryText = getSingleLabel(categories, "categoryCode");
   const provinceText = getSingleLabel(provinces, "provinceCode");
-  const priceText = getMultiLabel(prices, "priceCode", "gia");
-  const areaText = getMultiLabel(areas, "areaCode", "dien tich");
+  const priceText =
+    location.state?.queryTextObj?.price ||
+    getMultiLabel(prices, "priceCode", "gia");
+  const areaText =
+    location.state?.queryTextObj?.area ||
+    getMultiLabel(areas, "areaCode", "dien tich");
   const titleSearch = [
     categoryText || "Cho thue tat ca",
     provinceText ? `tinh ${provinceText}` : "",
