@@ -16,6 +16,10 @@ module.exports = {
         600: "600px",
         1200: "1200",
       },
+      minWidth: {
+        300: "300",
+        200: "200",
+      },
       cursor: {
         pointer: "pointer",
       },
