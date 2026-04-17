@@ -8,6 +8,7 @@ import {
   SearchDetail,
 } from "./containers/Public";
 import { path } from "./utils/constant";
+import { CreatePost, System } from "./containers/System";
 
 function App() {
   return (
@@ -30,6 +31,13 @@ function App() {
             element={<DetailPost />}
           />
           <Route path={"chi-tiet/*"} element={<DetailPost />} />
+        </Route>
+
+        <Route path={path.SYSTEM} element={<System />}>
+          <Route index element={<CreatePost />} />
+          <Route path={path.CREATE_POST} element={<CreatePost />} />
+          <Route path={path.MANAGE_POST} element={<CreatePost />} />
+          <Route path={path.PROFILE} element={<CreatePost />} />
         </Route>
       </Routes>
     </div>

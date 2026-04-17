@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import logo from "../../assets/logo-phongtro.png";
-import { Button } from "../../components";
+import { Button, User } from "../../components";
 import icons from "../../utils/icons";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { path } from "../../utils/constant";
@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import * as actions from "../../store/actions";
 import menuManage from "../../utils/menuManage";
 
-const { AiFillPlusCircle, AiOutlineLogout } = icons;
+const { AiFillPlusCircle, AiOutlineLogout, BsChevronDown } = icons;
 
 const Header = () => {
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ const Header = () => {
   const [searchParams] = useSearchParams();
   const headerRef = useRef();
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const { currentData } = useSelector((state) => state.user);
   const [isShowMenu, setIsShowMenu] = useState(false);
   const handleLogin = useCallback(
     (flag) => {
@@ -63,13 +62,14 @@ const Header = () => {
             </div>
           )}
           {isLoggedIn && (
-            <div className="flex items-center gap-1 relative">
-              <small>{currentData?.name || ""}</small>
+            <div className="flex items-center gap-3 relative">
+              <User />
               <Button
                 text={"Quản lý tài khoản"}
                 textColor="text-white"
                 bgColor="bg-blue-700"
                 px="px-4"
+                IcAfter={BsChevronDown}
                 onClick={() => setIsShowMenu((prev) => !prev)}
               />
               {isShowMenu && (

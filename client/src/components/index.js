@@ -11,5 +11,7 @@ export { default as Contact } from "./Contact";
 export { default as RelatePost } from "./RelatePost";
 export { default as SmallItem } from "./SmallItem";
 export { default as Modal } from "./Modal";
+export { default as User } from "./User";
+
 
 
