@@ -4,7 +4,7 @@ const { ImPencil2 } = icons;
 const { MdManageSearch } = icons;
 const { FaRegUserCircle } = icons;
 
-const menuManage = [
+const menuSidebar = [
   {
     id: 1,
     text: "Đăng tin cho thuê",
@@ -19,10 +19,16 @@ const menuManage = [
   },
   {
     id: 3,
-    text: "Thông tin tài khoản",
-    path: "/he-thong/thong-tin-tai-khoan",
+    text: "Sửa thông tin cá nhân",
+    path: "/he-thong/sua-thong-tin-ca-nhan",
+    icons: <FaRegUserCircle />,
+  },
+  {
+    id: 4,
+    text: "Liên hệ",
+    path: "/he-thong/lien-he",
     icons: <FaRegUserCircle />,
   },
 ];
 
-export default menuManage;
+export default menuSidebar;

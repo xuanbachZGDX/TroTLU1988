@@ -16,12 +16,6 @@ const Home = () => {
     dispatch(actions.getProvinces());
   }, [dispatch]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      isLoggedIn && dispatch(actions.getCurrent());
-    }, 1000);
-  }, [dispatch, isLoggedIn]);
-
   return (
     <div className="w-full flex gap-6 flex-col items-center h-full">
       <Header />
