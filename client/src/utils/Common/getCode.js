@@ -2,52 +2,48 @@ import { getNumberPrice, getNumberArea } from "./getNumber";
 
 const MAX_RANGE = 99999999;
 
-const normalizeRange = (value, getNumbers) => {
+// Chuẩn hóa min/max cho từng item (dùng chung cho price/area)
+const getMinMax = (value, getNumbers) => {
   const numbers = getNumbers(value);
-  const normalizedValue = value.toLowerCase();
+  const val = value.toLowerCase();
 
-  if (normalizedValue.includes("dưới") || normalizedValue.includes("duoi")) {
+  if (val.includes("dưới") || val.includes("duoi")) {
     return { min: 0, max: numbers[0] };
   }
-
-  if (normalizedValue.includes("trên") || normalizedValue.includes("tren")) {
+  if (val.includes("trên") || val.includes("tren")) {
     return { min: numbers[0], max: MAX_RANGE };
   }
-
-  return {
-    min: numbers[0],
-    max: numbers[1],
-  };
+  // Trường hợp khoảng giữa (ví dụ: 5-10 triệu, 20-30 m2)
+  return { min: numbers[0], max: numbers[1] || numbers[0] };
 };
 
-export const getCodePrice = (total) => {
-  return total.map((item) => ({
+export const getCodePrice = (prices) =>
+  prices?.map((item) => ({
     ...item,
-    ...normalizeRange(item.value, getNumberPrice),
+    ...getMinMax(item.value, getNumberPrice),
   }));
-};
 
-export const getCodeArea = (total) => {
-  return total.map((item) => ({
+export const getCodeArea = (areas) =>
+  areas?.map((item) => ({
     ...item,
-    ...normalizeRange(item.value, getNumberArea),
+    ...getMinMax(item.value, getNumberArea),
   }));
-};
 
-export const getCodes = (arrMinMax, prices) => {
-  const pricesWithMinMax = getCodePrice(prices);
-  return pricesWithMinMax.filter(
+export const filterCodesByRange = (range, list, getNumbers) => {
+  const withMinMax = list?.map((item) => ({
+    ...item,
+    ...getMinMax(item.value, getNumbers),
+  }));
+  return withMinMax.filter(
     (item) =>
-      (item.min === arrMinMax[0] && item.max === arrMinMax[1]) ||
-      Math.max(item.min, arrMinMax[0]) < Math.min(item.max, arrMinMax[1])
+      (item.min === range[0] && item.max === range[1]) ||
+      Math.max(item.min, range[0]) < Math.min(item.max, range[1])
   );
 };
 
-export const getCodesArea = (arrMinMax, areas) => {
-  const areasWithMinMax = getCodeArea(areas);
-  return areasWithMinMax.filter(
-    (item) =>
-      (item.min === arrMinMax[0] && item.max === arrMinMax[1]) ||
-      Math.max(item.min, arrMinMax[0]) < Math.min(item.max, arrMinMax[1])
-  );
-};
+export const getCodesPrice = (range, prices) =>
+  filterCodesByRange(range, prices, getNumberPrice);
+
+// Lọc code diện tích
+export const getCodesArea = (range, areas) =>
+  filterCodesByRange(range, areas, getNumberArea);

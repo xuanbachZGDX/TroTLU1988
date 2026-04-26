@@ -1,14 +1,22 @@
 import React, { memo } from "react";
 
-const InputForm = ({ label, value, setValue, keyPayload, invalidFields, setInvalidFields, type }) => {
+const InputForm = ({
+  label,
+  value,
+  setValue,
+  keyPayload,
+  invalidFields,
+  setInvalidFields,
+  type,
+}) => {
   return (
     <div>
-      <label htmlFor="phone" className="text-xs">
+      <label htmlFor={keyPayload} className="text-xs">
         {label}
       </label>
       <input
         type={type || "text"}
-        id="phone"
+        id={keyPayload}
         className="outline-none bg-[#e8f0fe] p-2 rounded-md w-full"
         value={value}
         onChange={(e) =>
@@ -17,9 +25,11 @@ const InputForm = ({ label, value, setValue, keyPayload, invalidFields, setInval
         onFocus={() => setInvalidFields([])}
       />
       {invalidFields.length > 0 &&
-        invalidFields.some((i) => i.name === keyPayload) && 
-          <small className="text-red-500 italic">{invalidFields.find(i => i.name === keyPayload)?.message}</small>
-        }
+        invalidFields.some((i) => i.name === keyPayload) && (
+          <small className="text-red-500 italic">
+            {invalidFields.find((i) => i.name === keyPayload)?.message}
+          </small>
+        )}
     </div>
   );
 };

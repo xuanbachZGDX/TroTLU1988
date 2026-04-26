@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from "react";
 import icons from "../utils/icons";
 import { getNumberPrice, getNumberArea } from "../utils/Common/getNumber";
-import { getCodes, getCodesArea } from "../utils/Common/getCode";
+import { getCodesPrice, getCodesArea } from "../utils/Common/getCode";
 
 const { GrLinkPrevious } = icons;
 
@@ -100,7 +100,7 @@ const Modal = ({
     let arrMinMaxFormatted = [convertTailToHead(min), convertTailToHead(max)];
     const gaps =
       name === "price"
-        ? getCodes(arrMinMaxFormatted, content)
+        ? getCodesPrice(arrMinMaxFormatted, content)
         : name === "area"
           ? getCodesArea(arrMinMaxFormatted, content)
           : [];

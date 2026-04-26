@@ -19,7 +19,7 @@ const Item = ({
 
   const handleStar = () => {
     let stars = [];
-    for (let i = 1; i < +star; i++) {
+    for (let i = 0; i < +star; i++) {
       stars.push(<GrStar className="star-item" size={18} color="yellow" />);
     }
     return stars;
