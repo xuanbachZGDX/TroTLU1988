@@ -37,7 +37,7 @@ export const filterCodesByRange = (range, list, getNumbers) => {
   return withMinMax.filter(
     (item) =>
       (item.min === range[0] && item.max === range[1]) ||
-      Math.max(item.min, range[0]) < Math.min(item.max, range[1])
+      Math.max(item.min, range[0]) <= Math.min(item.max, range[1])
   );
 };
 

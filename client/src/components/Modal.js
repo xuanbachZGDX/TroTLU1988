@@ -198,22 +198,22 @@ const Modal = ({
           </div>
         )}
         {(name === "price" || name === "area") && (
-          <div className="p-12 py-20">
+          <div className="p-8 py-16">
             <div className="flex flex-col items-center justify-center relative">
-              <div className="z-30 absolute top-[-48px] font-bold text-xl text-orange-600">
+              <div className="z-30 absolute top-[-56px] font-bold text-2xl text-secondary2">
                 {headLeft === 100 && headRight === 100
                   ? `Trên ${convertTailToHead(headLeft)} ${name === "price" ? "triệu" : "m2"}`
-                  : `Từ ${headLeft <= headRight ? convertTailToHead(headLeft) : convertTailToHead(headRight)} -${headRight >= headLeft ? convertTailToHead(headRight) : convertTailToHead(headLeft)} ${name === "price" ? "triệu" : "m2"}`}
+                  : `Từ ${headLeft <= headRight ? convertTailToHead(headLeft) : convertTailToHead(headRight)} - ${headRight >= headLeft ? convertTailToHead(headRight) : convertTailToHead(headLeft)} ${name === "price" ? "triệu" : "m2"}`}
               </div>
               <div
                 onClick={handleClickTrack}
                 id="track"
-                className="slider-track h-[5px] bg-gray-300 absolute top-0 bottom-0 w-full rounded-full"
+                className="slider-track h-[6px] bg-gray-200 absolute top-0 bottom-0 w-full rounded-full cursor-pointer"
               ></div>
               <div
                 onClick={handleClickTrack}
                 id="track-active"
-                className="slider-track-active h-[5px] bg-orange-600 absolute top-0 bottom-0 rounded-full"
+                className="slider-track-active h-[6px] bg-secondary2 absolute top-0 bottom-0 rounded-full cursor-pointer"
               ></div>
               <input
                 max="100"
@@ -264,15 +264,19 @@ const Modal = ({
                 </span>
               </div>
             </div>
-            <div className="mt-24">
-              <h4 className="font-medium mb-4">Chọn nhanh:</h4>
-              <div className="flex gap-2 items-center flex-wrap w-full ">
+            <div className="mt-20">
+              <h4 className="font-medium text-gray-700 mb-4">Chọn nhanh:</h4>
+              <div className="flex gap-3 items-center flex-wrap w-full">
                 {content?.map((item) => {
                   return (
                     <button
                       key={item.code}
                       onClick={() => handleActive(item.code, item.value)}
-                      className={`px-4 py-2 rounded-md cursor-pointer ${item.code === activeEle ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                      className={`px-5 py-2 text-sm rounded-full cursor-pointer transition-all duration-200 ${
+                        item.code === activeEle
+                          ? "bg-secondary2 text-white shadow-md font-medium"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+                      }`}
                     >
                       {item.value}
                     </button>
@@ -285,7 +289,7 @@ const Modal = ({
         {(name === "price" || name === "area") && (
           <button
             type="button"
-            className="w-full absolute bottom-0 bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md"
+            className="w-full absolute bottom-0 bg-secondary1 py-3 text-white font-semibold rounded-bl-md rounded-br-md hover:bg-[#0f54b8] transition-colors uppercase tracking-widest shadow-inner"
             onClick={handleBeforeSubmit}
           >
             ÁP DỤNG

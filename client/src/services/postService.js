@@ -54,3 +54,17 @@ export const apiGetAllPostsLimit = (query) =>
       reject(error);
     }
   });
+
+  export const apiCreatePost = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "post",
+        url: `/api/v1/post/create-new`,
+        data: payload
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
