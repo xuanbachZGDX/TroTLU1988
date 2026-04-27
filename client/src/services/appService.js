@@ -48,7 +48,7 @@ export const apiGetPublicProvinces = () =>
     try {
       const response = await axiosDefault({
         method: "get",
-        url: "https://provinces.open-api.vn/api/",
+        url: "https://provinces.open-api.vn/api/v1/p/",
       });
 
       resolve(response);
@@ -62,7 +62,20 @@ export const apiGetPublicDistrict = (provinceCode) =>
     try {
       const response = await axiosDefault({
         method: "get",
-        url: `https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`,
+        url: `https://provinces.open-api.vn/api/v1/p/${provinceCode}?depth=2`,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetPublicWard = (districtCode) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosDefault({
+        method: "get",
+        url: `https://provinces.open-api.vn/api/v1/d/${districtCode}?depth=2`,
       });
       resolve(response);
     } catch (error) {

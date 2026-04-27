@@ -27,13 +27,12 @@ const Select = ({
         value={value || ""}
         onChange={(e) => {
           const selectedValue = e.target.value;
-          console.log(`Selected ${type}:`, selectedValue);
           !name
             ? setValue(selectedValue)
             : setValue((prev) => ({ ...prev, [name]: selectedValue }));
         }}
         className="border border-gray-300 p-2 rounded-md w-full outline-none cursor-pointer"
-        onFocus={() => setInvalidFields([])}
+        onFocus={() => setInvalidFields?.([])}
       >
         <option value="">-- Chọn {label} --</option>
         {options?.map((item) => (
@@ -42,7 +41,9 @@ const Select = ({
           </option>
         ))}
       </select>
-      <small className="text-red-500">{handleTextError()}</small>
+      {invalidFields && (
+        <small className="text-red-500">{handleTextError()}</small>
+      )}
     </div>
   );
 };

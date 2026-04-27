@@ -3,13 +3,15 @@ const validate = (payload, setInvalidFields) => {
   let fields = Object.entries(payload);
 
   fields.forEach((item) => {
-    if (item[1] === "") {
+    if (item[1] === "" || (Array.isArray(item[1]) && item[1].length === 0)) {
       let message = "Trường này không được để trống.";
       if (item[0] === 'priceNumber') message = "Bạn chưa nhập giá phòng";
       else if (item[0] === 'areaNumber') message = "Bạn chưa nhập diện tích";
       else if (item[0] === 'address') message = "Chưa chọn khu vực đăng tin";
       else if (item[0] === 'title') message = "Tiêu đề không được để trống";
       else if (item[0] === 'description') message = "Bạn chưa nhập nội dung";
+      else if (item[0] === 'images') message = "Chưa tải ảnh lên";
+      else if (item[0] === 'categoryCode') message = "Chưa chọn loại chuyên mục";
       
       setInvalidFields((prev) => [
         ...prev,

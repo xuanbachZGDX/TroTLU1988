@@ -117,7 +117,7 @@ const CreatePost = () => {
       label: `${categories?.find((item) => item.code === payload.categoryCode)?.value || ""} ${payload?.address?.split(",")[0] || ""}`,
     };
 
-    const result = validate(payload, setInvalidFields);
+    const result = validate(finalPayload, setInvalidFields);
     if (result > 0) {
       document.activeElement?.blur();
       Swal.fire(
