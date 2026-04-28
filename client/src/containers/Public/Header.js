@@ -33,7 +33,7 @@ const Header = () => {
   }, [page]);
 
   return (
-    <div ref={headerRef} className="w-3/5">
+    <div ref={headerRef} className="w-1100 max-w-full px-4 md:px-0">
       <div className="w-full flex items-center justify-between">
         <Link to={"/"}>
           <img

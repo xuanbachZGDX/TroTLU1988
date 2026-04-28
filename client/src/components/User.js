@@ -8,7 +8,7 @@ const User = () => {
   return (
     <div className="flex items-center gap-2">
       <img
-        src={currentData?.avatar || userAvatar}
+        src={typeof currentData?.avatar === 'string' && currentData?.avatar ? currentData.avatar : userAvatar}
         alt="avatar"
         className="w-10 h-10 object-cover rounded-full border-2 border-white shadow-md"
       />

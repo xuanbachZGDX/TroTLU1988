@@ -5,6 +5,7 @@ import * as actions from "../../store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import validate from "../../utils/Common/validate";
+import { apiRegister } from "../../services/authService";
 
 const Login = () => {
   const location = useLocation();
@@ -40,10 +41,21 @@ const Login = () => {
           password: payload.password,
         };
     let invalids = validate(finalPayload, setInvalidFields);
-    if (invalids === 0)
-      isRegister
-        ? dispatch(actions.register(payload))
-        : dispatch(actions.login(payload));
+    if (invalids === 0) {
+      if (isRegister) {
+        const response = await apiRegister(payload);
+        if (response?.data?.err === 0) {
+          Swal.fire("Thành công", response.data.msg || "Đăng ký thành công! Vui lòng đăng nhập.", "success").then(() => {
+            setIsRegister(false);
+            setPayload({ phone: "", password: "", name: "" });
+          });
+        } else {
+          Swal.fire("Oops!", response?.data?.msg || "Đăng ký thất bại", "error");
+        }
+      } else {
+        dispatch(actions.login(payload));
+      }
+    }
   };
 
   return (

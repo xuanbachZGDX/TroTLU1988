@@ -1,12 +1,12 @@
 import React from "react";
 
-const InputReadOnly = ({ label, value }) => {
+const InputReadOnly = ({ label, value, direction }) => {
   return (
-    <div>
-      <div className="flex flex-col gap-2">
-        <label className="font-medium" htmlFor="exact-address">
-          {label}
-        </label>
+    <div className={`flex ${direction ? direction : "flex-col gap-2"}`}>
+      <label className="w-48 flex-none font-medium" htmlFor="exact-address">
+        {label}
+      </label>
+      <div className="flex flex-auto">
         <input
           id="exact-address"
           value={value || ""}

@@ -8,7 +8,7 @@ import {
   SearchDetail,
 } from "./containers/Public";
 import { path } from "./utils/constant";
-import { CreatePost, System, ManagePost } from "./containers/System";
+import { CreatePost, System, ManagePost, EditAccount } from "./containers/System";
 
 function App() {
 
@@ -38,7 +38,7 @@ function App() {
           <Route index element={<CreatePost />} />
           <Route path={path.CREATE_POST} element={<CreatePost />} />
           <Route path={path.MANAGE_POST} element={<ManagePost />} />
-          <Route path={path.PROFILE} element={<CreatePost />} />
+          <Route path={path.EDIT_ACCOUNT} element={<EditAccount />} />
         </Route>
       </Routes>
     </div>

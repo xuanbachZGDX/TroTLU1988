@@ -82,7 +82,7 @@ const Search = () => {
 
   return (
     <>
-      <div className="p-[10px] w-3/5 my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
+      <div className="p-[10px] w-1100 max-w-full my-3 bg-[#febb02] rounded-lg flex-col lg:flex-row flex items-center justify-around gap-2">
         <span
           onClick={() => handleShowModal(categories, "category", "Tìm tất cả")}
           className="flex-1 cursor-pointer"

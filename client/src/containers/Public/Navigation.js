@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import * as action from "../../store/actions";
 
 const notActive =
-  "relative h-full flex items-center px-5 text-white opacity-80 hover:opacity-100 transition-all duration-300 " +
+  "relative h-full flex items-center px-3 lg:px-4 text-white opacity-80 hover:opacity-100 transition-all duration-300 whitespace-nowrap " +
   "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[4px] after:bg-secondary2 " +
   "after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left";
 
 const active =
-  "relative h-full flex items-center px-5 text-white font-medium " +
+  "relative h-full flex items-center px-3 lg:px-4 text-white font-medium whitespace-nowrap " +
   "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[4px] after:bg-secondary2";
 
 const Navigation = ({ isAdmin }) => {
@@ -25,10 +25,17 @@ const Navigation = ({ isAdmin }) => {
     <div
       className={`w-full flex ${isAdmin ? "justify-start" : "justify-center"} items-center h-[54px] bg-secondary1 shadow-md`}
     >
-      <div className="w-3/5 flex h-full items-center  text-sm font-medium">
+      <div className="w-1100 max-w-full flex h-full items-center text-sm font-medium overflow-x-auto hide-scrollbar">
+        <div className="h-full flex justify-center items-center">
+          <NavLink
+            to={`/`}
+            className={({ isActive }) => (isActive ? active : notActive)}
+          >
+            Trang chủ
+          </NavLink>
+        </div>
         {categories?.length > 0 &&
           categories.map((item) => {
-            const isHomePage = location.pathname === '/' && item.value === "Phòng trọ";
             return (
               <div
                 key={item.code}
@@ -36,7 +43,7 @@ const Navigation = ({ isAdmin }) => {
               >
                 <NavLink
                   to={`/${formatVietnameseToString(item.value)}`}
-                  className={({ isActive }) => (isActive || isHomePage ? active : notActive)}
+                  className={({ isActive }) => (isActive ? active : notActive)}
                 >
                   {item.value}
                 </NavLink>
