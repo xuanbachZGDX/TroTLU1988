@@ -1,15 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
 import { formatDateVN } from "../../utils/Common/formatDate";
 import { checkStatus } from "../../utils/Common/checkStatus";
+import { Button, Update } from "../../components";
 
 const ManagePost = () => {
   const dispatch = useDispatch();
+  const [isEdit, setIsEdit] = useState(false);
+
   const { postOfCurrent } = useSelector((state) => state.post);
   useEffect(() => {
-    dispatch(actions.getPostsLimitAdmin());
-  }, [dispatch]);
+    if (!isEdit) {
+      dispatch(actions.getPostsLimitAdmin());
+    }
+  }, [dispatch, isEdit]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -21,7 +26,7 @@ const ManagePost = () => {
       </div>
       <table className="w-full table-fixed">
         <thead>
-          <tr>
+          <tr className="bg-gray-100">
             <th className="border p-2">Mã tin</th>
             <th className="border p-2">Ảnh đại diện</th>
             <th className="border p-2">Tiêu đề</th>
@@ -29,12 +34,15 @@ const ManagePost = () => {
             <th className="border p-2">Ngày bắt đầu</th>
             <th className="border p-2">Ngày hết hạn</th>
             <th>Trạng thái</th>
+            <th className="border p-2">Tuỳ chọn</th>
           </tr>
         </thead>
         <tbody>
           {!postOfCurrent || postOfCurrent.length === 0 ? (
             <tr>
-              <td colSpan="7" className="text-center p-4">Bạn chưa có tin đăng</td>
+              <td colSpan="7" className="text-center p-4">
+                Bạn chưa có tin đăng
+              </td>
             </tr>
           ) : (
             postOfCurrent.map((item) => {
@@ -47,7 +55,9 @@ const ManagePost = () => {
 
               return (
                 <tr key={item.id}>
-                  <td className="border p-2 text-center">{item?.overview?.code || item?.id?.split("-")[0]}</td>
+                  <td className="border p-2 text-center">
+                    {item?.overview?.code || item?.id?.split("-")[0]}
+                  </td>
                   <td className="border p-2 text-center align-middle">
                     <img
                       className="w-12 h-12 object-cover rounded-md inline-block"
@@ -55,8 +65,14 @@ const ManagePost = () => {
                       alt="avatar-post"
                     />
                   </td>
-                  <td className="border p-2">{item?.title}</td>
-                  <td className="border p-2 text-center">{item?.attributes?.price}</td>
+                  <td className="border p-2">
+                    <div className="line-clamp-3 pr-2" title={item?.title}>
+                      {item?.title}
+                    </div>
+                  </td>
+                  <td className="border p-2 text-center">
+                    {item?.attributes?.price}
+                  </td>
                   <td className="border p-2 text-center">
                     {formatDateVN(item?.overview?.created || item?.createdAt)}
                   </td>
@@ -64,7 +80,38 @@ const ManagePost = () => {
                     {formatDateVN(item?.overview?.expired)}
                   </td>
                   <td className="border p-2 text-center">
-                    {checkStatus(item?.overview?.expired)}
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <div>{checkStatus(item?.overview?.expired)}</div>
+                      {item?.updatedAt && item?.createdAt && new Date(item.updatedAt).getTime() > new Date(item.createdAt).getTime() + 1000 ? (
+                        <div className="text-[11px] text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full inline-block">
+                          Vừa cập nhật
+                        </div>
+                      ) : item?.createdAt && new Date().getTime() - new Date(item.createdAt).getTime() < 24 * 60 * 60 * 1000 ? (
+                        <div className="text-[11px] text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full inline-block">
+                          Mới đăng
+                        </div>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td className="border p-2 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        text="Sửa"
+                        bgColor="bg-blue-100 hover:bg-blue-200"
+                        textColor="text-blue-600 font-medium"
+                        px="px-4"
+                        onClick={() => {
+                          dispatch(actions.editPost(item));
+                          setIsEdit(true);
+                        }}
+                      />
+                      <Button
+                        text="Xóa"
+                        bgColor="bg-red-100 hover:bg-red-200"
+                        textColor="text-red-600 font-medium"
+                        px="px-4"
+                      />
+                    </div>
                   </td>
                 </tr>
               );
@@ -72,6 +119,7 @@ const ManagePost = () => {
           )}
         </tbody>
       </table>
+      {isEdit && <Update setIsEdit={setIsEdit} />}
     </div>
   );
 };

@@ -15,8 +15,8 @@ const Button = ({
       className={`py-2 ${px ? px : "px-2"} ${textColor} ${bgColor} ${fullWidth && "w-full"} outline-none rounded-md hover:underline flex items-center justify-center gap-1`}
       onClick={onClick}
     >
-      <span>{text}</span>
-      <span>{IcAfter && <IcAfter />}</span>
+      <span className="text-center">{text}</span>
+      {IcAfter && <span>{<IcAfter />}</span>}
     </button>
   );
 };

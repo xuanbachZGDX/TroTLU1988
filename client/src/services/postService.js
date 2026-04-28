@@ -69,6 +69,20 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
+  export const apiUpdatePost = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/post/update-post`,
+        data: payload
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
   export const apiGetPostLimitAdmin = (query) =>
   new Promise(async (resolve, reject) => {
     try {

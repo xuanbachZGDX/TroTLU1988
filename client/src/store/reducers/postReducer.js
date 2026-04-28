@@ -1,3 +1,4 @@
+import { data } from "react-router-dom";
 import actionTypes from "../actions/actionType";
 
 const initState = {
@@ -6,6 +7,7 @@ const initState = {
   count: 0,
   newPosts: [],
   postOfCurrent: [],
+  dataEdit: {}
 };
 
 const postReducer = (state = initState, action) => {
@@ -30,6 +32,12 @@ const postReducer = (state = initState, action) => {
         ...state,
         msg: action.msg || "",
         postOfCurrent: action.posts || [],
+      };
+
+    case actionTypes.EDIT_POST:
+      return {
+        ...state,
+        dataEdit: action.dataEdit || {},
       };
 
     default:

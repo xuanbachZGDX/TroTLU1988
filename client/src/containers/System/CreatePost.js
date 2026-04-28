@@ -4,13 +4,16 @@ import { apiUploadImages } from "../../services";
 import icons from "../../utils/icons";
 import { getCodesPrice, getCodesArea } from "../../utils/Common/getCode";
 import { useSelector } from "react-redux";
-import { apiCreatePost } from "../../services";
+import { apiCreatePost, apiUpdatePost } from "../../services";
 import Swal from "sweetalert2";
 import validate from "../../utils/Common/validate";
+import { useDispatch } from "react-redux";
+import * as actions from "../../store/actions";
 
 const { BsCameraFill, ImBin } = icons;
 
-const CreatePost = () => {
+const CreatePost = ({ isEdit, setIsEdit }) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("khu-vuc");
 
   const scrollToElement = (id) => {
@@ -20,21 +23,49 @@ const CreatePost = () => {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-  const [payload, setPayload] = useState({
-    categoryCode: "",
-    title: "",
-    priceNumber: "",
-    areaNumber: "",
-    images: [],
-    address: "",
-    priceCode: "",
-    areaCode: "",
-    description: "",
-    target: "",
-    province: "",
+
+  const { dataEdit } = useSelector((state) => state.post);
+  
+  const [payload, setPayload] = useState(() => {
+    const activeData = isEdit ? dataEdit : null;
+    let desc = activeData?.description || "";
+    try {
+      const parsed = JSON.parse(desc);
+      if (Array.isArray(parsed)) {
+        desc = parsed.join("\n");
+      } else if (typeof parsed === "string") {
+        desc = parsed;
+      }
+    } catch (e) {}
+
+    const initData = {
+      categoryCode: activeData?.categoryCode || "",
+      title: activeData?.title || "",
+      priceNumber: activeData?.priceNumber * 1000000 || 0,
+      areaNumber: activeData?.areaNumber || 0,
+      images: activeData?.images?.image ? JSON.parse(activeData?.images?.image) : [],
+      address: activeData?.address || "",
+      priceCode: activeData?.priceCode || "",
+      areaCode: activeData?.areaCode || "",
+      description: desc,
+      target: activeData?.target || "",
+      province: activeData?.province || "",
+    };
+
+    return initData;
   });
 
-  const [imagesPreview, setImagesPreview] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState(() => {
+    const activeData = isEdit ? dataEdit : null;
+    if (activeData?.images?.image) {
+      try {
+        return JSON.parse(activeData.images.image);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -109,6 +140,10 @@ const CreatePost = () => {
 
     let finalPayload = {
       ...payload,
+      postId: dataEdit?.id,
+      attributeId: dataEdit?.attributeId,
+      imageId: dataEdit?.imageId,
+      overviewId: dataEdit?.overviewId,
       priceCode,
       areaCode,
       userId: currentData?.id,
@@ -129,65 +164,79 @@ const CreatePost = () => {
       });
       return;
     }
-    
-    const response = await apiCreatePost(finalPayload);
+
+    const response = isEdit 
+      ? await apiUpdatePost(finalPayload)
+      : await apiCreatePost(finalPayload);
 
     if (response?.data?.err === 0) {
-      Swal.fire("Thành công", "Đã đăng bài thành công", "success").then(() => {
-        setPayload({
-          categoryCode: "",
-          title: "",
-          priceNumber: "",
-          areaNumber: "",
-          images: [],
-          address: "",
-          priceCode: "",
-          areaCode: "",
-          description: "",
-          target: "",
-          province: "",
-        });
-        setImagesPreview([]);
+      Swal.fire("Thành công", isEdit ? "Đã cập nhật bài đăng thành công" : "Đã đăng bài thành công", "success").then(() => {
+        if (!isEdit) {
+          resetPayload();
+          setImagesPreview([]);
+        } else {
+          if (setIsEdit) setIsEdit(false);
+        }
       });
     } else {
       Swal.fire(
         "Thất bại",
         response?.data?.msg || "Có lỗi xảy ra, vui lòng thử lại",
         "error",
-      );
+       );
     }
   };
 
+  const resetPayload = () => {
+    setPayload({
+            categoryCode: "",
+            title: "",
+            priceNumber: "",
+            areaNumber: "",
+            images: [],
+            address: "",
+            priceCode: "",
+            areaCode: "",
+            description: "",
+            target: "",
+            province: "",
+          });
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="px-6 py-4 bg-white border-b border-gray-200">
-        <h1 className="text-3xl font-semibold py-4">Đăng tin cho thuê</h1>
-        <div className="flex gap-6 mt-2">
-          <span
-            onClick={() => scrollToElement("khu-vuc")}
-            className={`${activeTab === "khu-vuc" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
-          >
-            Khu vực
-          </span>
-          <span
-            onClick={() => scrollToElement("thong-tin-mo-ta")}
-            className={`${activeTab === "thong-tin-mo-ta" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
-          >
-            Thông tin mô tả
-          </span>
-          <span
-            onClick={() => scrollToElement("hinh-anh")}
-            className={`${activeTab === "hinh-anh" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
-          >
-            Hình ảnh
-          </span>
-          <span
-            onClick={() => scrollToElement("thong-tin-lien-he")}
-            className={`${activeTab === "thong-tin-lien-he" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
-          >
-            Thông tin liên hệ
-          </span>
-        </div>
+      <div className="px-6 py-4 bg-white border-b border-gray-200 relative">
+        <h1 className="text-3xl font-semibold py-4">
+          {isEdit ? "Cập nhật tin đăng" : "Đăng tin cho thuê"}
+        </h1>
+        {!isEdit && (
+          <div className="flex gap-6 mt-2">
+            <span
+              onClick={() => scrollToElement("khu-vuc")}
+              className={`${activeTab === "khu-vuc" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
+            >
+              Khu vực
+            </span>
+            <span
+              onClick={() => scrollToElement("thong-tin-mo-ta")}
+              className={`${activeTab === "thong-tin-mo-ta" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
+            >
+              Thông tin mô tả
+            </span>
+            <span
+              onClick={() => scrollToElement("hinh-anh")}
+              className={`${activeTab === "hinh-anh" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
+            >
+              Hình ảnh
+            </span>
+            <span
+              onClick={() => scrollToElement("thong-tin-lien-he")}
+              className={`${activeTab === "thong-tin-lien-he" ? "text-red-500 border-b-2 border-red-500" : "text-gray-500"} pb-2 cursor-pointer font-medium`}
+            >
+              Thông tin liên hệ
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center px-6 pt-6">
@@ -319,11 +368,10 @@ const CreatePost = () => {
           </div>
           <Button
             onClick={handleSubmit}
-            text="Tạo mới"
+            text={isEdit ? "Cập nhật tin đăng" : "Đăng tin"}
             bgColor="bg-green-600"
             textColor="text-white"
           />
-          <div className="h-[500px]"></div>
         </div>
       </div>
     </div>

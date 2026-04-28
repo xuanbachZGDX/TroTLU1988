@@ -6,7 +6,7 @@ import {
   apiGetPublicWard,
 } from "../services/appService";
 
-const Address = ({ setPayload, invalidFields, setInvalidFields }) => {
+const Address = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -14,7 +14,7 @@ const Address = ({ setPayload, invalidFields, setInvalidFields }) => {
   const [district, setDistrict] = useState("");
   const [ward, setWard] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
-  const [fullAddress, setFullAddress] = useState("");
+  const [fullAddress, setFullAddress] = useState(payload?.address || "");
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -63,6 +63,50 @@ const Address = ({ setPayload, invalidFields, setInvalidFields }) => {
     }
   }, [district]);
 
+  const isInitRef = React.useRef(false);
+
+  useEffect(() => {
+    const autoFillAddress = async () => {
+      if (payload?.address && provinces.length > 0 && !isInitRef.current) {
+        isInitRef.current = true;
+        
+        // Tách chuỗi địa chỉ: "Số nhà, Phường X, Quận Y, Tỉnh Z"
+        const parts = payload.address.split(",").map((p) => p.trim());
+        if (parts.length === 0) return; 
+
+        // 1. Tìm và set Tỉnh/Thành phố
+        const pName = parts[parts.length - 1];
+        const p = provinces.find((i) => i.name.includes(pName) || pName.includes(i.name));
+        if (!p) return;
+        setProvince(p.code);
+
+        // 2. Tìm Quận/Huyện (nếu có)
+        if (parts.length >= 2) {
+          const dRes = await apiGetPublicDistrict(p.code);
+          const dName = parts[parts.length - 2];
+          const d = dRes?.data?.districts?.find((i) => i.name.includes(dName) || dName.includes(i.name));
+          if (!d) return;
+          setDistrict(d.code);
+
+          // 3. Tìm Phường/Xã (nếu có)
+          if (parts.length >= 3) {
+            const wRes = await apiGetPublicWard(d.code);
+            const wName = parts[parts.length - 3];
+            const w = wRes?.data?.wards?.find((i) => i.name.includes(wName) || wName.includes(i.name));
+            if (w) setWard(w.code);
+
+            // 4. Số nhà (nếu có)
+            if (parts.length > 3) {
+              setHouseNumber(parts.slice(0, parts.length - 3).join(", "));
+            }
+          }
+        }
+      }
+    };
+
+    autoFillAddress();
+  }, [payload?.address, provinces]);
+
   useEffect(() => {
     const p = provinces.find((item) => item.code == province);
     const d = districts.find((item) => item.code == district);
@@ -74,16 +118,18 @@ const Address = ({ setPayload, invalidFields, setInvalidFields }) => {
     if (d) addressArr.push(d.name);
     if (p) addressArr.push(p.name);
 
-    setFullAddress(addressArr.join(", "));
+    if (addressArr.length > 0) {
+      setFullAddress(addressArr.join(", "));
+    }
   }, [province, district, ward, houseNumber, provinces, districts, wards]);
 
   useEffect(() => {
     const p = provinces.find((item) => item.code == province);
     setPayload((prev) => ({
       ...prev,
-      province,
+      province: p ? p.code : prev.province,
       address: fullAddress,
-      provinceCode: p ? p.name : "",
+      provinceCode: p ? p.name : prev.provinceCode,
     }));
   }, [province, fullAddress, setPayload, provinces]);
 

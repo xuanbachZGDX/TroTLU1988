@@ -92,3 +92,12 @@ export const getPostsLimitAdmin = (query) => async (dispatch) => {
     });
   }
 };
+
+export const editPost = (dataEdit) => ({
+  type: actionTypes.EDIT_POST,
+  dataEdit
+})
+
+export const resetDataEdit = () => ({
+  type: actionTypes.RESET_DATA_EDIT
+})

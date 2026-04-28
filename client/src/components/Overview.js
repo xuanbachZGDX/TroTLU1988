@@ -2,8 +2,6 @@ import React, { memo } from "react";
 import { useSelector } from "react-redux";
 import { InputReadOnly, InputFormV2 } from "./index";
 
-
-
 const Overview = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
   const { currentData } = useSelector((state) => state.user);
 
