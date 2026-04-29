@@ -6,6 +6,7 @@ import {
   HomePage,
   DetailPost,
   SearchDetail,
+  Contact
 } from "./containers/Public";
 import { path } from "./utils/constant";
 import { CreatePost, System, ManagePost, EditAccount } from "./containers/System";
@@ -31,6 +32,7 @@ function App() {
             path={path.DETAIL_POST__TITLE__POSTID}
             element={<DetailPost />}
           />
+          <Route path={path.CONTACT} element={<Contact />} />
           <Route path={"chi-tiet/*"} element={<DetailPost />} />
         </Route>
 
@@ -40,6 +42,7 @@ function App() {
           <Route path={path.MANAGE_POST} element={<ManagePost />} />
           <Route path={path.EDIT_ACCOUNT} element={<EditAccount />} />
         </Route>
+
       </Routes>
     </div>
   );

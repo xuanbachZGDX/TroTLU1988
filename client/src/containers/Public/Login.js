@@ -21,13 +21,27 @@ const Login = () => {
     name: "",
   });
 
+  const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
+
   useEffect(() => {
     setIsRegister(location.state?.flag);
   }, [location.state?.flag]);
 
   useEffect(() => {
-    isLoggedIn && navigate("/");
-  }, [isLoggedIn, navigate]);
+    if (isLoggedIn && !wasLoggedIn) {
+      Swal.fire({
+        title: "Thành công",
+        text: "Đăng nhập thành công!",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+    // Cập nhật trạng thái sau mỗi lần render
+    setWasLoggedIn(isLoggedIn);
+  }, [isLoggedIn, navigate, wasLoggedIn]);
 
   useEffect(() => {
     msg && Swal.fire("Oops!", msg, "error");
@@ -45,12 +59,20 @@ const Login = () => {
       if (isRegister) {
         const response = await apiRegister(payload);
         if (response?.data?.err === 0) {
-          Swal.fire("Thành công", response.data.msg || "Đăng ký thành công! Vui lòng đăng nhập.", "success").then(() => {
+          Swal.fire(
+            "Thành công",
+            response.data.msg || "Đăng ký thành công! Vui lòng đăng nhập.",
+            "success",
+          ).then(() => {
             setIsRegister(false);
             setPayload({ phone: "", password: "", name: "" });
           });
         } else {
-          Swal.fire("Oops!", response?.data?.msg || "Đăng ký thất bại", "error");
+          Swal.fire(
+            "Oops!",
+            response?.data?.msg || "Đăng ký thất bại",
+            "error",
+          );
         }
       } else {
         dispatch(actions.login(payload));
