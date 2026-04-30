@@ -7,6 +7,8 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import reduxStore from "./redux";
 import { BrowserRouter } from "react-router-dom";
 import * as actions from "./store/actions";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const { store, persistor } = reduxStore();
 
@@ -24,6 +26,7 @@ const AppInit = ({ children }) => {
     dispatch(actions.getPrices());
     dispatch(actions.getAreas());
     dispatch(actions.getProvinces());
+    dispatch(actions.getFeatures());
   }, [dispatch]);
 
   return <>{children}</>;

@@ -17,8 +17,8 @@ module.exports = {
       published: {
         type: Sequelize.STRING
       },
-      hashtag: {
-        type: Sequelize.STRING
+      features: {
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,

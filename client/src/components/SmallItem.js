@@ -1,29 +1,53 @@
 import React from "react";
 import moment from "moment";
 import "moment/locale/vi";
+import { Link } from "react-router-dom";
+import { formatVietnameseToString } from "../utils/Common/formatVietnameseToString";
+import { path } from "../utils/constant";
 
-const SmallItem = ({ title, price, image, createdAt }) => {
+const SmallItem = ({ id, title, price, image, createdAt }) => {
   const formatTime = (createdAt) => {
-    moment.locale("vn");
+    moment.locale("vi");
     return moment(createdAt).fromNow();
   };
+
+  // Tạo URL chi tiết theo cùng pattern với Item.js
+  const detailUrl = `${path.DETAIL}/${formatVietnameseToString(
+    title?.replaceAll("/", " ")
+  )}/${id}`;
+
   return (
-    <div className="w-full flex items-start gap-3 py-2 border-b border-gray-300">
-      <img
-        src={image[0]}
-        alt="Ảnh"
-        className="w-[65px] h-[65px] flex-none object-cover rounded-md"
-      />
-      <div className="w-full flex-auto flex flex-col justify-between gap-1">
-        <h4 className="text-blue-600 text-[15px]">
-          {`${title?.slice(0, 45)}...`}
-        </h4>
-        <div className="flex items-center justify-between w-full">
-          <span className="text-sm font-medium text-green-500">{price}</span>
-          <span className="text-sm text-gray-300">{formatTime(createdAt)}</span>
+    <Link
+      to={detailUrl}
+      className="w-full flex items-start gap-3 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 rounded-md px-1 cursor-pointer"
+    >
+      {/* Ảnh thumbnail */}
+      <div className="w-[72px] h-[56px] flex-none rounded-md overflow-hidden bg-gray-100">
+        {image?.[0] ? (
+          <img
+            src={image[0]}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200" />
+        )}
+      </div>
+
+      {/* Nội dung */}
+      <div className="flex-1 min-w-0 flex flex-col gap-1">
+        {/* Tiêu đề */}
+        <p className="text-blue-600 text-[13px] font-medium leading-snug line-clamp-2 hover:text-orange-500 transition-colors">
+          {title}
+        </p>
+
+        {/* Giá + Thời gian */}
+        <div className="flex items-center justify-between mt-auto">
+          <span className="text-green-600 text-[12px] font-semibold">{price}</span>
+          <span className="text-gray-400 text-[11px]">{formatTime(createdAt)}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

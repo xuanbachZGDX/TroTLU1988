@@ -5,6 +5,7 @@ import * as userController from "../controllers/userController";
 const router = express.Router();
 
 router.use(verifyToken);
-router.get("/get-current", userController.getCurrent);
+router.get("/me",  userController.getCurrent);
+router.put("/me",  userController.updateUser);
 
 export default router;

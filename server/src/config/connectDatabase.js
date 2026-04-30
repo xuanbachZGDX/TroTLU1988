@@ -4,7 +4,8 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize('phongtro123', 'root', '123456', {
   host: 'localhost',
   dialect: 'mysql',
-  logging: false
+  logging: false,
+  timezone: '+07:00'
 });
 
 const connectDb = async () => {

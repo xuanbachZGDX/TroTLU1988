@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToString";
 import { useDispatch, useSelector } from "react-redux";
 import * as action from "../../store/actions";
+import {path} from "../../utils/constant";
 
 const notActive =
   "relative h-full flex items-center px-3 lg:px-4 text-white opacity-80 hover:opacity-100 transition-all duration-300 whitespace-nowrap " +
@@ -15,7 +16,6 @@ const active =
 
 const Navigation = ({ isAdmin }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const { categories } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(action.getAllCategories());
@@ -34,24 +34,32 @@ const Navigation = ({ isAdmin }) => {
             Trang chủ
           </NavLink>
         </div>
-        {categories?.length > 0 &&
-          categories.map((item) => {
-            return (
-              <div
-                key={item.code}
-                className="h-full flex justify-center items-center"
-              >
-                <NavLink
-                  to={`/${formatVietnameseToString(item.value)}`}
-                  className={({ isActive }) => (isActive ? active : notActive)}
+          {categories?.length > 0 &&
+            categories.map((item) => {
+              return (
+                <div
+                  key={item.code}
+                  className="h-full flex justify-center items-center"
                 >
-                  {item.value}
-                </NavLink>
-              </div>
-            );
-          })}
+                  <NavLink
+                    to={`/${formatVietnameseToString(item.value)}`}
+                    className={({ isActive }) => (isActive ? active : notActive)}
+                  >
+                    {item.value}
+                  </NavLink>
+                </div>
+              );
+            })}
+          <div className="h-full flex justify-center items-center">
+            <NavLink
+              to={`/${path.CONTACT}`}
+              className={({ isActive }) => (isActive ? active : notActive)}
+            >
+              Liên hệ
+            </NavLink>
+          </div>
+        </div>
       </div>
-    </div>
   );
 };
 

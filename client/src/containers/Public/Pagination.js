@@ -13,7 +13,7 @@ const Pagination = () => {
   const [isHideEnd, setIsHideEnd] = useState(false);
   const [isHideStart, setIsHideStart] = useState(false);
   const [searchParams] = useSearchParams();
-  const limit = Number(process.env.REACT_APP_LIMIT_POSTS || 1);
+  const limit = Number(import.meta.env.VITE_LIMIT_POSTS || 10);
   const maxPage = Math.ceil(count / limit);
 
   useEffect(() => {

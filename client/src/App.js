@@ -33,7 +33,7 @@ function App() {
             element={<DetailPost />}
           />
           <Route path={path.CONTACT} element={<Contact />} />
-          <Route path={"chi-tiet/*"} element={<DetailPost />} />
+          {/* <Route path={path.DETAIL_ALL} element={<DetailPost />} /> */}
         </Route>
 
         <Route path={path.SYSTEM} element={<System />}>

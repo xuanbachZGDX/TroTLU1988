@@ -19,3 +19,6 @@ export { default as InputReadOnly } from "./InputReadOnly";
 export { default as InputFormV2 } from "./InputFormV2";
 export { default as Loading } from "./Loading";
 export { default as Update } from "./Update";
+export { default as Slider } from "./SlickSlider";
+export { default as Footer } from "./Footer";
+export { default as GoogleMap } from "./GoogleMap";

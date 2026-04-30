@@ -6,7 +6,7 @@ export const apiGetAllPosts = () =>
     try {
       const response = await axiosConfig({
         method: "get",
-        url: "/api/v1/post/all",
+        url: "/api/v1/posts/all",
       });
       resolve(response);
     } catch (error) {
@@ -19,7 +19,7 @@ export const apiGetAllPostsLimit = (query) =>
     try {
       const response = await axiosConfig({
         method: "get",
-        url: `/api/v1/post/limit`,
+        url: `/api/v1/posts`,
         params: query,
       });
       resolve(response);
@@ -28,12 +28,13 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiGetNewPosts = () =>
+export const apiGetPostById = (id) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "get",
-        url: `/api/v1/post/new-post`,
+        url: `/api/v1/posts/detail`,
+        params: { id },
       });
       resolve(response);
     } catch (error) {
@@ -41,12 +42,25 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiUploadImages = (images) =>
+export const apiGetNewPosts = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: `/api/v1/posts/latest`,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiUploadImages = (images) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axios({
         method: "post",
-        url: `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`,
+        url: `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`,
         data: images
       });
       resolve(response);
@@ -55,12 +69,12 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiCreatePost = (payload) =>
+export const apiCreatePost = (payload) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "post",
-        url: `/api/v1/post/create-new`,
+        url: `/api/v1/posts/create`,
         data: payload
       });
       resolve(response);
@@ -69,12 +83,12 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiUpdatePost = (payload) =>
+export const apiUpdatePost = (payload) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "put",
-        url: `/api/v1/post/update-post`,
+        url: `/api/v1/posts/update`,
         data: payload
       });
       resolve(response);
@@ -83,12 +97,12 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiGetPostLimitAdmin = (query) =>
+export const apiGetPostLimitAdmin = (query) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "get",
-        url: `/api/v1/post/limit-admin`,
+        url: `/api/v1/posts/manage`,
         params: query,
       });
       resolve(response);
@@ -97,12 +111,12 @@ export const apiGetAllPostsLimit = (query) =>
     }
   });
 
-  export const apiDeletePost = (postId) =>
+export const apiDeletePost = (postId) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "delete",
-        url: `/api/v1/post/delete-post`,
+        url: `/api/v1/posts/delete`,
         params: { postId },
       });
       resolve(response);

@@ -1,6 +1,6 @@
 import React from "react";
 import { text } from "../utils/dataContact";
-import { Button } from "../components";
+import { Button, GoogleMap } from "../components";
 
 const Contact = () => {
   return (
@@ -32,6 +32,15 @@ const Contact = () => {
         textColor="text-white"
         px="px-6"
       />
+
+      {/* Bản đồ văn phòng */}
+      <div className="w-full">
+        <GoogleMap
+          address={text.address}
+          title="Văn phòng của chúng tôi"
+          height="360px"
+        />
+      </div>
     </div>
   );
 };

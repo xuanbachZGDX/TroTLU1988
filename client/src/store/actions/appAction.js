@@ -102,3 +102,19 @@ export const getProvinces = () => async (dispatch) => {
     });
   }
 };
+
+export const getFeatures = () => async (dispatch) => {
+  try {
+    const response = await api.apiGetFeatures();
+    if (response?.data.err === 0) {
+      dispatch({
+        type: actionTypes.GET_FEATURES,
+        features: response.data.response,
+      });
+    } else {
+      dispatch({ type: actionTypes.GET_FEATURES, features: [] });
+    }
+  } catch (error) {
+    dispatch({ type: actionTypes.GET_FEATURES, features: [] });
+  }
+};

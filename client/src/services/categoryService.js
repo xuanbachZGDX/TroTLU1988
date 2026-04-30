@@ -5,7 +5,7 @@ export const apiGetAllCategories = () =>
     try {
       const response = await axiosConfig({
         method: "get",
-        url: "/api/v1/category/all",
+        url: "/api/v1/categories/all",
       });
       resolve(response);
     } catch (error) {

@@ -7,13 +7,10 @@ import { useSelector } from "react-redux";
 import { apiCreatePost, apiUpdatePost } from "../../services";
 import Swal from "sweetalert2";
 import validate from "../../utils/Common/validate";
-import { useDispatch } from "react-redux";
-import * as actions from "../../store/actions";
 
 const { BsCameraFill, ImBin } = icons;
 
 const CreatePost = ({ isEdit, setIsEdit }) => {
-  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("khu-vuc");
 
   const scrollToElement = (id) => {
@@ -50,6 +47,9 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
       description: desc,
       target: activeData?.target || "",
       province: activeData?.province || "",
+      features: activeData?.attributes?.features
+        ? JSON.parse(activeData.attributes.features)
+        : [],
     };
 
     return initData;
@@ -69,7 +69,7 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { prices, areas, categories } = useSelector((state) => state.app);
+  const { prices, areas, categories, features } = useSelector((state) => state.app);
 
   const [invalidFields, setInvalidFields] = useState([]);
 
@@ -86,7 +86,7 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
       formData.append("file", i);
       formData.append(
         "upload_preset",
-        process.env.REACT_APP_UPLOAD_ASSETS_NAME,
+        import.meta.env.VITE_UPLOAD_ASSETS_NAME,
       );
 
       uploadPromises.push(apiUploadImages(formData));
@@ -189,18 +189,19 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
 
   const resetPayload = () => {
     setPayload({
-            categoryCode: "",
-            title: "",
-            priceNumber: "",
-            areaNumber: "",
-            images: [],
-            address: "",
-            priceCode: "",
-            areaCode: "",
-            description: "",
-            target: "",
-            province: "",
-          });
+      categoryCode: "",
+      title: "",
+      priceNumber: "",
+      areaNumber: "",
+      images: [],
+      address: "",
+      priceCode: "",
+      areaCode: "",
+      description: "",
+      target: "",
+      province: "",
+      features: [],
+    });
   }
 
   return (
@@ -280,29 +281,22 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
           <div className="bg-white rounded-md shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-medium mb-6">Đặc điểm nổi bật</h2>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                "Đầy đủ nội thất",
-                "Có gác",
-                "Có kệ bếp",
-                "Có máy lạnh",
-                "Có máy giặt",
-                "Có tủ lạnh",
-                "Có thang máy",
-                "Không chung chủ",
-                "Giờ giấc tự do",
-                "Có bảo vệ 24/24",
-                "Có hầm để xe",
-              ].map((item, index) => (
-                <label
-                  key={index}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+              {(features || []).map((item) => (
+                <label key={item} className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
-                    className="w-4 h-4"
-                    defaultChecked={item === "Có bảo vệ 24/24"}
+                    className="w-4 h-4 accent-green-500"
+                    checked={payload.features?.includes(item) || false}
+                    onChange={(e) => {
+                      setPayload((prev) => ({
+                        ...prev,
+                        features: e.target.checked
+                          ? [...(prev.features || []), item]
+                          : (prev.features || []).filter((f) => f !== item),
+                      }));
+                    }}
                   />
-                  {item}
+                  <span className="text-sm">{item}</span>
                 </label>
               ))}
             </div>

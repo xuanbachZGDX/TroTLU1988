@@ -6,9 +6,8 @@ export const apiGetPrices = () =>
     try {
       const response = await axios({
         method: "get",
-        url: "/api/v1/price/all",
+        url: "/api/v1/prices/all",
       });
-
       resolve(response);
     } catch (error) {
       reject(error);
@@ -20,9 +19,8 @@ export const apiGetAreas = () =>
     try {
       const response = await axios({
         method: "get",
-        url: "/api/v1/area/all",
+        url: "/api/v1/areas/all",
       });
-
       resolve(response);
     } catch (error) {
       reject(error);
@@ -34,9 +32,8 @@ export const apiGetProvinces = () =>
     try {
       const response = await axios({
         method: "get",
-        url: "/api/v1/province/all",
+        url: "/api/v1/provinces/all",
       });
-
       resolve(response);
     } catch (error) {
       reject(error);
@@ -76,6 +73,19 @@ export const apiGetPublicWard = (districtCode) =>
       const response = await axiosDefault({
         method: "get",
         url: `https://provinces.open-api.vn/api/v1/d/${districtCode}?depth=2`,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetFeatures = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "/api/v1/features/all",
       });
       resolve(response);
     } catch (error) {

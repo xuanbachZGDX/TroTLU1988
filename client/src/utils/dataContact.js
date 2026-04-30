@@ -1,6 +1,7 @@
 export const text = {
   image: "https://phongtro123.com/images/support-bg.jpg",
   content: "Liên hệ với chúng tôi nếu bạn cần hỗ trợ",
+  address: "Nghiêm Xuân Yên, Định Công, Hà Nội",
   contact: [
     {
       text: "HỖ TRỢ THANH TOÁN",

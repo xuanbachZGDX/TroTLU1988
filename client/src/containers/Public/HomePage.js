@@ -5,7 +5,7 @@ import { List, Pagination } from "./index";
 import { useSelector } from "react-redux";
 
 const HomePage = () => {
-  const { categories, prices, areas } = useSelector((state) => state.app);
+  const { prices, areas } = useSelector((state) => state.app);
 
   return (
     <div className="w-full flex flex-col gap-3">
@@ -20,7 +20,6 @@ const HomePage = () => {
           <Pagination />
         </div>
         <div className="w-[30%] flex flex-col gap-4 justify-start items-center">
-          <ItemSidebar content={categories} title="Danh sách cho thuê" />
           <ItemSidebar
             isDouble={true}
             type="priceCode"

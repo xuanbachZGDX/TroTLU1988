@@ -40,7 +40,7 @@ const EditAccount = () => {
     setIsLoading(true);
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", process.env.REACT_APP_UPLOAD_ASSETS_NAME);
+    formData.append("upload_preset", import.meta.env.VITE_UPLOAD_ASSETS_NAME);
 
     try {
       const response = await apiUploadImages(formData);

@@ -1,5 +1,19 @@
 import actionTypes from "./actionType";
-import { apiGetAllPosts, apiGetAllPostsLimit, apiGetNewPosts, apiGetPostLimitAdmin } from "../../services/postService";
+import { apiGetAllPosts, apiGetAllPostsLimit, apiGetNewPosts, apiGetPostLimitAdmin, apiGetPostById } from "../../services/postService";
+
+export const getPostDetail = (id) => async (dispatch) => {
+  try {
+    const response = await apiGetPostById(id);
+    if (response?.data.err === 0) {
+      dispatch({ type: actionTypes.GET_POST_DETAIL, postDetail: response.data.response });
+    } else {
+      dispatch({ type: actionTypes.GET_POST_DETAIL, postDetail: null });
+    }
+  } catch (error) {
+    dispatch({ type: actionTypes.GET_POST_DETAIL, postDetail: null });
+  }
+};
+
 
 export const getAllPosts = () => async (dispatch) => {
   try {

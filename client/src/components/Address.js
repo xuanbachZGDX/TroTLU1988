@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { Select, InputReadOnly } from "./index";
+import { Select, InputReadOnly, GoogleMap } from "./index";
 import {
   apiGetPublicDistrict,
   apiGetPublicProvinces,
@@ -15,6 +15,7 @@ const Address = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
   const [ward, setWard] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [fullAddress, setFullAddress] = useState(payload?.address || "");
+  const [mapAddress, setMapAddress] = useState(payload?.address || ""); // debounced cho map
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -133,6 +134,14 @@ const Address = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
     }));
   }, [province, fullAddress, setPayload, provinces]);
 
+  // Debounce: cập nhật map 800ms sau lần cuối địa chỉ thay đổi
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMapAddress(fullAddress);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [fullAddress]);
+
   useEffect(() => {
     if (setInvalidFields) {
       setInvalidFields((prev) => prev.filter((i) => i.name !== "address"));
@@ -212,6 +221,15 @@ const Address = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
             )}
           </div>
         </div>
+
+        {/* Preview bản đồ — hiện khi đã có địa chỉ */}
+        {mapAddress && (
+          <GoogleMap
+            address={mapAddress}
+            title="Xem trước vị trí"
+            height="260px"
+          />
+        )}
       </div>
     </div>
   );

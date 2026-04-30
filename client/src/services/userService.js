@@ -5,7 +5,7 @@ export const apiGetCurrent = () =>
     try {
       const response = await axios({
         method: "get",
-        url: "/api/v1/user/get-current",
+        url: "/api/v1/users/me",
       });
       resolve(response);
     } catch (error) {
@@ -18,7 +18,7 @@ export const apiUpdateUser = (payload) =>
     try {
       const response = await axios({
         method: "put",
-        url: "/api/v1/user/update-user",
+        url: "/api/v1/users/me",
         data: payload,
       });
       resolve(response);

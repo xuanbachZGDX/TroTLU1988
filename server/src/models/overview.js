@@ -11,16 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Overview.hasOne(models.Post, {foreignKey: 'overviewId', as: 'overview'})
     }
   }
   Overview.init({
     code: DataTypes.STRING,
     area: DataTypes.STRING,
-    type: DataTypes.STRING,
     target: DataTypes.STRING,
     created: DataTypes.DATE,
     expired: DataTypes.DATE,
-    bonus: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Overview',

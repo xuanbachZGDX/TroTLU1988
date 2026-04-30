@@ -7,6 +7,7 @@ const initState = {
   count: 0,
   newPosts: [],
   postOfCurrent: [],
+  postDetail: null,
   dataEdit: {}
 };
 
@@ -32,6 +33,12 @@ const postReducer = (state = initState, action) => {
         ...state,
         msg: action.msg || "",
         postOfCurrent: action.posts || [],
+      };
+
+    case actionTypes.GET_POST_DETAIL:
+      return {
+        ...state,
+        postDetail: action.postDetail || null,
       };
 
     case actionTypes.EDIT_POST:
