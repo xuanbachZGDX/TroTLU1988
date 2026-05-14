@@ -14,6 +14,20 @@ export const apiRegister = (payload) =>
     }
   });
 
+export const apiLoginGoogle = (credential) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "post",
+        url: "/api/v1/auth/google-login",
+        data: { credential },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
   export const apiLogin = (payload) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -27,3 +41,31 @@ export const apiRegister = (payload) =>
       reject(error);
     }
   });
+
+export const apiForgotPassword = (email) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "post",
+        url: "/api/v1/auth/forgot-password",
+        data: { email },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiResetPassword = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "post",
+        url: "/api/v1/auth/reset-password",
+        data: payload,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

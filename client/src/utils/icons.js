@@ -1,15 +1,18 @@
-import { AiFillPlusCircle, AiOutlineLogout } from "react-icons/ai";
+import { AiFillPlusCircle, AiOutlineLogout, AiOutlineDashboard, AiFillCheckCircle } from "react-icons/ai";
 import { GrNext, GrStar, GrLinkNext, GrLinkPrevious } from "react-icons/gr";
 import {
   BsChevronRight,
   BsBookmarkStarFill,
   BsChevronDown,
-  BsCameraFill
+  BsCameraFill,
+  BsCheckCircleFill,
+  BsWallet2,
+  BsXCircleFill
 } from "react-icons/bs";
-import { HiOutlineLocationMarker } from "react-icons/hi";
+import { HiOutlineLocationMarker, HiOutlineUsers } from "react-icons/hi";
 import { TbReportMoney } from "react-icons/tb";
-import { RiCrop2Line, RiHeartFill, RiHeartLine } from "react-icons/ri";
-import { MdOutlineHouseSiding, MdManageSearch } from "react-icons/md";
+import { RiCrop2Line, RiHeartFill, RiHeartLine, RiMessage2Line } from "react-icons/ri";
+import { MdOutlineHouseSiding, MdManageSearch, MdOutlineApartment, MdOutlineMapsHomeWork, MdOutlinePriceChange, MdHistory } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
 import { ImPencil2, ImBin  } from "react-icons/im";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -35,7 +38,18 @@ const icons = {
   AiOutlineLogout,
   BsChevronDown,
   ImBin,
-  BsCameraFill
+  BsCameraFill,
+  BsCheckCircleFill,
+  AiFillCheckCircle,
+  AiOutlineDashboard,
+  HiOutlineUsers,
+  MdOutlineApartment,
+  MdOutlineMapsHomeWork,
+  MdOutlinePriceChange,
+  BsWallet2,
+  BsXCircleFill,
+  MdHistory,
+  RiMessage2Line
 };
 
 export default icons;

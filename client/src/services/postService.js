@@ -124,3 +124,17 @@ export const apiDeletePost = (postId) =>
       reject(error);
     }
   });
+
+export const apiExtendPost = (postId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/posts/extend`,
+        data: { postId },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

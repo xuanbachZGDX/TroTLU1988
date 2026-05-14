@@ -1,6 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, #root {
+  font-family: 'Inter', sans-serif !important;
+  scroll-behavior: smooth;
+}
+
+.scroll-mt-40 {
+  scroll-margin-top: 160px;
+}
 
 .star-item {
   display: inline-block;
@@ -68,4 +79,30 @@ input[type="range"]::-ms-thumb {
 
 input[type="range"]::-ms-thumb:active {
   border: solid 1px rbg(144, 211, 255);
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

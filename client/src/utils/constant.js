@@ -1,5 +1,5 @@
 export const path = {
-  HOME: "/*",
+  HOME: "",
   HOME__PAGE: ":page",
   LOGIN: "login",
   PHONG_TRO: "phong-tro",
@@ -9,15 +9,28 @@ export const path = {
   CAN_HO_DICH_VU: "can-ho-dich-vu",
   O_GHEP: "o-ghep",
   MAT_BANG: "mat-bang",
+  BANG_GIA: "bang-gia-dich-vu",
   DETAIL_POST__TITLE__POSTID: "chi-tiet/:title/:postId",
   SEARCH: "tim-kiem",
-  SYSTEM: "/he-thong/*",
+  SYSTEM: "he-thong",
   CREATE_POST: "tao-moi-bai-dang",
   MANAGE_POST: "quan-ly-bai-dang",
   EDIT_ACCOUNT: "sua-thong-tin-ca-nhan",
+  MANAGE_SERVICE_PRICE: "bang-gia-dich-vu",
+  ADMIN: "admin",
+  ADMIN_LOGIN: "login",
+  ADMIN_DASHBOARD: "tong-quan",
+  ADMIN_POSTS: "quan-ly-tat-ca-bai-dang",
+  ADMIN_USERS: "quan-ly-nguoi-dung",
+  ADMIN_CONTACTS: "quan-ly-lien-he",
   CONTACT: "lien-he",
-  DETAIL: "/chi-tiet",
-  DETAIL_ALL: "chi-tiet/*",
+  DETAIL: "chi-tiet",
+  TIN_DA_LUU: "tin-da-luu",
+  FORGOT_PASSWORD: "forgot-password",
+  RESET_PASSWORD: "reset-password",
+  DEPOSIT: "nap-tien",
+  PAYMENT_RESULT: "ket-qua-thanh-toan",
+  TRANSACTION_HISTORY: "lich-su-giao-dich",
 };
 
 export const text = {
@@ -26,20 +39,20 @@ export const text = {
     "Phongtro123.com – Kênh thông tin phòng trọ số 1 Việt Nam. Website đăng tin cho thuê phòng trọ miễn phí, tiếp cận hơn 2.5 triệu lượt xem mỗi tháng, uy tín, hiệu quả cao.",
 };
 
-export const location = [
-  {
-    id: "hcm",
-    name: "Phòng trọ Hồ Chí Minh",
-    image: "https://phongtro123.com/images/location_hcm.jpg",
-  },
-  {
-    id: "hn",
-    name: "Phòng trọ Hà Nội",
-    image: "https://phongtro123.com/images/location_hn.jpg",
-  },
-  {
-    id: "dn",
-    name: "Phòng trọ Đà Nẵng",
-    image: "https://phongtro123.com/images/location_dn.jpg",
-  },
+export const priceList = [
+  { name: "Tin VIP Nổi Bật", price: "50.000đ", week: "300.000đ", month: "1.200.000đ", color: "text-red-600", star: 5, benefit: "Vị trí đầu tiên, tiêu đề Đỏ In Hoa, nhãn VIP Nổi bật" },
+  { name: "Tin VIP 1", price: "30.000đ", week: "180.000đ", month: "700.000đ", color: "text-[#E13491]", star: 4, benefit: "Vị trí sau VIP Nổi bật, tiêu đề Hồng, nhãn VIP 1" },
+  { name: "Tin VIP 2", price: "10.000đ", week: "60.000đ", month: "250.000đ", color: "text-[#F57C00]", star: 3, benefit: "Vị trí sau VIP 1, tiêu đề Cam, nhãn VIP 2" },
+  { name: "Tin VIP 3", price: "5.000đ", week: "30.000đ", month: "120.000đ", color: "text-[#1976D2]", star: 2, benefit: "Vị trí sau VIP 2, tiêu đề Xanh, nhãn VIP 3" },
+  { name: "Tin thường", price: "2.000đ", week: "10.000đ", month: "40.000đ", color: "text-gray-600", star: 0, benefit: "Vị trí sau cùng, tiêu đề xanh mặc định" },
 ];
+
+export const demoPosts = [
+  { id: "v5", star: 5, title: "VIP NỔI BẬT: Căn hộ Penthouse view toàn cảnh thành phố, nội thất siêu sang", color: "text-red-600" },
+  { id: "v1", star: 4, title: "VIP 1: Chung cư cao cấp 2 phòng ngủ, đầy đủ tiện ích, gần trung tâm", color: "text-[#E13491]" },
+  { id: "v2", star: 3, title: "VIP 2: Nhà nguyên căn chính chủ, hẻm xe hơi, an ninh tốt", color: "text-[#F57C00]" },
+  { id: "v3", star: 2, title: "VIP 3: Phòng trọ studio khép kín, ban công thoáng mát", color: "text-[#1976D2]" },
+  { id: "v0", star: 0, title: "Tin thường: Tìm nam ở ghép, phòng sạch sẽ, giá sinh viên", color: "text-gray-600" },
+];
+
+

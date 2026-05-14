@@ -7,6 +7,7 @@ const initState = {
   areas: [],
   provinces: [],
   features: [],
+  isLoading: false,
 };
 
 const appReducer = (state = initState, action) => {
@@ -40,6 +41,11 @@ const appReducer = (state = initState, action) => {
       return {
         ...state,
         features: action.features || [],
+      };
+    case actionTypes.LOADING:
+      return {
+        ...state,
+        isLoading: action.flag,
       };
 
     default:

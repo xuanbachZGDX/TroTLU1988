@@ -80,17 +80,20 @@ export const getAreas = () => async (dispatch) => {
 
 export const getProvinces = () => async (dispatch) => {
   try {
-    const response = await api.apiGetProvinces();
-    if (response?.data.err === 0) {
+    const response = await api.apiGetPublicProvinces();
+    if (response?.status === 200) {
       dispatch({
         type: actionTypes.GET_PROVINCES,
-        provinces: response.data.response,
+        provinces: response.data.map(p => ({
+          code: p.code,
+          value: p.name
+        })),
         msg: "",
       });
     } else {
       dispatch({
         type: actionTypes.GET_PROVINCES,
-        msg: response.data.msg,
+        msg: "Thất bại khi lấy tỉnh thành",
         provinces: null,
       });
     }
@@ -118,3 +121,31 @@ export const getFeatures = () => async (dispatch) => {
     dispatch({ type: actionTypes.GET_FEATURES, features: [] });
   }
 };
+
+export const apiGetDistricts = (provinceCode) => async (dispatch) => {
+  try {
+    const response = await api.apiGetPublicDistrict(provinceCode);
+    if (response?.status === 200) {
+      return {
+        data: {
+          err: 0,
+          response: (response.data.districts || []).map(d => ({
+            code: d.code,
+            value: d.name
+          }))
+        }
+      };
+    }
+    return { data: { err: 1, response: [] } };
+  } catch (error) {
+    return { data: { err: 1, response: [] } };
+  }
+};
+export const apiGetPrices = api.apiGetPrices;
+export const apiGetAreas = api.apiGetAreas;
+export const apiGetProvinces = api.apiGetProvinces;
+
+export const loading = (flag) => ({
+  type: actionTypes.LOADING,
+  flag,
+});
