@@ -1,5 +1,5 @@
 import express from "express";
-import * as postController from "../controllers/postController.js";
+import * as postController from "../controllers/Post/postController";
 import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
@@ -13,6 +13,7 @@ router.use(verifyToken);
 router.post("/create",   postController.createNewPost);
 router.get("/manage",    postController.getPostLimitAdmin);
 router.put("/update",    postController.updatePost);
+router.put("/extend",    postController.extendPost);
 router.delete("/delete", postController.deletePost);
 
 export default router;

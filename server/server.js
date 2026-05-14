@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import initRoutes from "./src/routes";
 import connectDb from "./src/config/connectDatabase";
+import seedAdmin from "./src/utils/seedAdmin";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 initRoutes(app);
 connectDb();
+seedAdmin();
 
 const port = process.env.PORT || 8888;
 app.listen(port, () => {

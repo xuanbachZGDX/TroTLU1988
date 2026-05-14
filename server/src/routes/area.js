@@ -1,5 +1,5 @@
 import express from "express";
-import * as controller from "../controllers/areaController";
+import * as controller from "../controllers/App/areaController";
 
 const router = express.Router();
 

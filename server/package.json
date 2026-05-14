@@ -4,7 +4,11 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --exec babel-node server.js"
+    "start": "nodemon --exec babel-node server.js",
+    "refresh:scraped": "babel-node src/scripts/refreshScrapedData.js",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:status": "sequelize-cli db:migrate:status",
+    "grant:admin": "babel-node src/scripts/grantAdmin.js"
   },
   "keywords": [],
   "author": "",
@@ -15,9 +19,13 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.3",
+    "moment": "^2.30.1",
     "mysql2": "^3.20.0",
+    "nodemailer": "^8.0.7",
     "nodemon": "^3.1.14",
+    "qs": "^6.15.1",
     "sequelize": "^6.37.8",
     "uuid": "^13.0.0"
   },
