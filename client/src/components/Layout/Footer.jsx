@@ -70,7 +70,7 @@ const LinkColumn = ({ title, links }) => (
 // Main Footer
 
 const Footer = () => (
-  <footer className="w-full bg-amber-50 border-t border-amber-200 mt-8">
+  <footer className="w-full bg-gray-50 border-t border-gray-200 mt-8">
     <div className="w-1100 max-w-full mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
 
       {/*  Về chúng tôi */}
@@ -122,7 +122,7 @@ const Footer = () => (
     </div>
 
     {/* Copyright bar */}
-    <div className="bg-amber-100 border-t border-amber-200 py-3 text-center text-xs text-gray-500">
+    <div className="bg-gray-100 border-t border-gray-200 py-3 text-center text-xs text-gray-500">
       © {new Date().getFullYear()} Phongtro123.com — Kênh thông tin phòng trọ số 1 Việt Nam
     </div>
   </footer>
