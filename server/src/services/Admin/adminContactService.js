@@ -33,3 +33,27 @@ export const deleteAdminContactService = (id) =>
       reject(error);
     }
   });
+
+export const replyAdminContactService = (id, responseText) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const contact = await db.Contact.findByPk(id);
+      if (!contact) {
+        return resolve({
+          err: 1,
+          msg: "Không tìm thấy tin nhắn liên hệ",
+        });
+      }
+
+      contact.response = responseText;
+      contact.status = "replied";
+      await contact.save();
+
+      resolve({
+        err: 0,
+        msg: "Replied",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });

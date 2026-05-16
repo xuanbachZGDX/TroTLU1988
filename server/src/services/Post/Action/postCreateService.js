@@ -20,7 +20,11 @@ export const createNewPostService = (body, userId) =>
         const pricePerDay = star === 5 ? 10000 : star === 4 ? 7000 : star === 3 ? 5000 : star === 2 ? 3000 : 1000;
         const postPrice = pricePerDay * duration;
 
-        const user = await db.User.findOne({ where: { id: userId }, transaction });
+        const user = await db.User.findOne({ 
+          where: { id: userId }, 
+          transaction,
+          lock: transaction.LOCK.UPDATE 
+        });
         if (!user || (user.balance || 0) < postPrice) throw new Error("NOT_ENOUGH_BALANCE");
 
         await db.User.update({ balance: (user.balance || 0) - postPrice }, { where: { id: userId }, transaction });

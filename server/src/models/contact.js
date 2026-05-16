@@ -18,10 +18,14 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     phone: DataTypes.STRING,
     content: DataTypes.TEXT,
-    status: DataTypes.STRING
+    response: DataTypes.TEXT,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: "pending",
+    },
   }, {
     sequelize,
-    modelName: 'Contact',
+    modelName: "Contact",
   });
   return Contact;
 };

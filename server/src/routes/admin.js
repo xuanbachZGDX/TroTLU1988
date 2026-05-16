@@ -14,5 +14,6 @@ router.get("/users", adminController.getUsers);
 router.put("/users/:userId/status", adminController.updateUserStatus);
 router.get("/contacts", adminController.getContacts);
 router.delete("/contacts/:contactId", adminController.deleteContact);
+router.put("/contacts/:contactId/reply", adminController.replyContact);
 
 export default router;

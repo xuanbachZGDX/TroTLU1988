@@ -152,14 +152,14 @@ export const deletePost = async (req, res) => {
 };
 
 export const extendPost = async (req, res) => {
-  const { postId } = req.body;
+  const { postId, days, star } = req.body;
   const { id } = req.user;
   try {
     if (!postId || !id) return res.status(400).json({
       err: 1,
       msg: "Thiếu mã bài đăng hoặc người dùng",
     });
-    const response = await postService.extendPostService(postId, id);
+    const response = await postService.extendPostService(postId, id, days, star);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

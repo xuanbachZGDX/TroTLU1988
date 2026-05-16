@@ -7,8 +7,9 @@ import { getStandardPostInclude } from "./postHelper";
 export const getPostLimitAdminService = (page, { search, status, ...query }, id) =>
   new Promise(async (resolve, reject) => {
     try {
-      const offset = !page || +page <= 1 ? 0 : +page - 1;
+      const pageInt = !page || +page <= 1 ? 0 : +page - 1;
       const limit = +process.env.LIMIT || 10;
+      const offset = pageInt * limit;
       const where = id ? { userId: id } : {};
 
       for (const [key, value] of Object.entries(query)) {
@@ -22,65 +23,115 @@ export const getPostLimitAdminService = (page, { search, status, ...query }, id)
         ];
       }
 
-      const allPosts = await db.Post.findAll({
-        where, order: [["createdAt", "DESC"]],
-        include: [...getStandardPostInclude(), { model: db.Overview, as: "overview" }],
-      });
-
-      let filteredRows = allPosts;
-      const today = moment().startOf('day');
+      const todayStr = moment().format("YYYY-MM-DD");
+      const overviewWhere = {};
 
       if (status === "active") {
-        filteredRows = allPosts.filter(item => {
-          if (item.status === "pending" || item.status === "rejected") return false;
-          const expDate = moment(item.overview?.expired, "DD/MM/YYYY");
-          return !expDate.isValid() || expDate.isSameOrAfter(today);
-        });
+        where.status = "active";
+        overviewWhere[Op.and] = [
+          db.sequelize.literal(`STR_TO_DATE(overview.expired, '%d/%m/%Y') >= '${todayStr}'`)
+        ];
       } else if (status === "expired") {
-        filteredRows = allPosts.filter(item => {
-          if (item.status === "pending" || item.status === "rejected") return false;
-          const expDate = moment(item.overview?.expired, "DD/MM/YYYY");
-          return expDate.isValid() && expDate.isBefore(today);
-        });
-      } else if (status === "pending") {
-        filteredRows = allPosts.filter(item => item.status === "pending");
-      } else if (status === "rejected") {
-        filteredRows = allPosts.filter(item => item.status === "rejected");
+        where.status = "active";
+        overviewWhere[Op.and] = [
+          db.sequelize.literal(`STR_TO_DATE(overview.expired, '%d/%m/%Y') < '${todayStr}'`)
+        ];
+      } else if (status === "pending" || status === "rejected") {
+        where.status = status;
       }
 
-      const count = filteredRows.length;
-      const rows = filteredRows.slice(offset * limit, offset * limit + limit);
-      resolve({ err: 0, msg: "OK", response: { count, rows: rows.map(r => r.get({ plain: true })) } });
+      const response = await db.Post.findAndCountAll({
+        where,
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+        include: [
+          ...getStandardPostInclude(),
+          { 
+            model: db.Overview, 
+            as: "overview",
+            where: Object.keys(overviewWhere).length > 0 ? overviewWhere : undefined,
+            required: status === "active" || status === "expired"
+          }
+        ],
+        distinct: true
+      });
+
+      resolve({ 
+        err: 0, 
+        msg: "OK", 
+        response: { 
+          count: response.count, 
+          rows: response.rows.map(r => r.get({ plain: true })) 
+        } 
+      });
     } catch (error) {
       reject(error);
     }
   });
 
-export const extendPostService = (postId, userId) =>
+export const extendPostService = (postId, userId, days = 7, newStar = null) =>
   new Promise(async (resolve, reject) => {
     try {
-      const extendPrice = 10000;
-      const extendDays = 7;
+      const daysInt = parseInt(days);
+      if (isNaN(daysInt) || daysInt <= 0) throw new Error("INVALID_DAYS");
 
       await db.sequelize.transaction(async (transaction) => {
-        const user = await db.User.findOne({ where: { id: userId }, transaction });
-        if (!user || (user.balance || 0) < extendPrice) throw new Error("NOT_ENOUGH_BALANCE");
-
-        const post = await db.Post.findOne({ where: { id: postId, userId }, include: [{ model: db.Overview, as: 'overview' }], transaction });
+        const post = await db.Post.findOne({ 
+          where: { id: postId, userId }, 
+          include: [{ model: db.Overview, as: 'overview' }], 
+          transaction 
+        });
         if (!post) throw new Error("POST_NOT_FOUND");
 
-        await db.User.update({ balance: (user.balance || 0) - extendPrice }, { where: { id: userId }, transaction });
-        await db.Transaction.create({ id: generateId(), userId, amount: extendPrice, type: 'payment', content: `Gia hạn tin ${post.overview?.code || post.id.slice(0,8)}`, status: 'success' }, { transaction });
+        // Tính giá dựa trên số sao (loại tin)
+        // 5 sao: 50k, 4 sao: 30k, 3 sao: 10k, 2 sao: 5k, 0 sao: 2k
+        let pricePerDay = 2000;
+        const star = newStar !== null ? parseInt(newStar) : (post.star || 0);
+        if (star === 5) pricePerDay = 50000;
+        else if (star === 4) pricePerDay = 30000;
+        else if (star === 3) pricePerDay = 10000;
+        else if (star === 2) pricePerDay = 5000;
+
+        const totalPrice = pricePerDay * daysInt;
+
+        const user = await db.User.findOne({ 
+          where: { id: userId }, 
+          transaction,
+          lock: transaction.LOCK.UPDATE 
+        });
+        if (!user || (user.balance || 0) < totalPrice) throw new Error("NOT_ENOUGH_BALANCE");
+
+        await db.User.update({ balance: (user.balance || 0) - totalPrice }, { where: { id: userId }, transaction });
+        
+        // Cập nhật lại số sao cho tin nếu có thay đổi
+        if (newStar !== null) {
+          await db.Post.update({ star }, { where: { id: postId }, transaction });
+        }
+
+        await db.Transaction.create({ 
+          id: generateId(), 
+          userId, 
+          amount: totalPrice, 
+          type: 'payment', 
+          content: `Gia hạn ${newStar !== null ? '& Nâng cấp' : ''} tin ${post.overview?.code || post.id.slice(0,8)} thêm ${daysInt} ngày`, 
+          status: 'success' 
+        }, { transaction });
 
         const today = moment().startOf('day');
         const expMoment = moment(post.overview?.expired, "DD/MM/YYYY");
-        const newExpiredDate = expMoment.isAfter(today) ? expMoment.add(extendDays, 'days') : today.add(extendDays, 'days');
+        
+        // Nếu tin chưa hết hạn thì cộng dồn từ ngày hết hạn cũ, nếu đã hết hạn thì cộng từ hôm nay
+        const newExpiredDate = expMoment.isValid() && expMoment.isAfter(today) 
+          ? expMoment.add(daysInt, 'days') 
+          : today.add(daysInt, 'days');
 
         await db.Overview.update({ expired: newExpiredDate.format("DD/MM/YYYY") }, { where: { postId }, transaction });
       });
-      resolve({ err: 0, msg: "Gia hạn tin thành công (7 ngày)" });
+      resolve({ err: 0, msg: `Gia hạn tin thành công (${days} ngày)` });
     } catch (error) {
-      if (error.message === "NOT_ENOUGH_BALANCE") resolve({ err: 2, msg: "Số dư không đủ." });
+      if (error.message === "NOT_ENOUGH_BALANCE") resolve({ err: 2, msg: "Số dư ví không đủ để thực hiện gia hạn." });
+      else if (error.message === "INVALID_DAYS") resolve({ err: 1, msg: "Số ngày gia hạn không hợp lệ." });
       else reject(error);
     }
   });

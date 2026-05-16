@@ -7,5 +7,6 @@ const router = express.Router();
 router.use(verifyToken);
 router.get("/me",  userController.getCurrent);
 router.put("/me",  userController.updateUser);
+router.get("/my-contacts", userController.getMyContacts);
 
 export default router;

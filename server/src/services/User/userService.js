@@ -49,3 +49,20 @@ export const updateUser = (payload, id) =>
       reject(error);
     }
   });
+
+export const getMyInquiriesService = (userId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await db.Contact.findAll({
+        where: { userId },
+        order: [["createdAt", "DESC"]],
+      });
+      resolve({
+        err: 0,
+        msg: "OK",
+        response,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
