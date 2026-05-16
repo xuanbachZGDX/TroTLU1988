@@ -1,10 +1,8 @@
 import React from "react";
-import Header from "./Header";
-import { Outlet } from "react-router-dom";
-import { Navigation, Search } from "./index";
-import { Intro, Contact, Footer } from "../../components";
-import { useLocation } from "react-router-dom";
-import { path } from "../../utils/constant";
+import { Outlet, useLocation } from "react-router-dom";
+import { Header, Navigation, Search } from "../index";
+import { Intro, Contact, Footer } from "../../../components";
+import { path } from "../../../utils/constant";
 
 const Home = () => {
   const location = useLocation();

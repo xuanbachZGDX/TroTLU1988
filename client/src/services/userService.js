@@ -26,3 +26,16 @@ export const apiUpdateUser = (payload) =>
       reject(error);
     }
   });
+
+export const apiGetMyInquiries = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "/api/v1/users/my-contacts",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

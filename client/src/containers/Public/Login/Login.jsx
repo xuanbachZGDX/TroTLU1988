@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
-import * as actions from "../../store/actions";
-import validate from "../../utils/Common/validate";
-import { apiRegister } from "../../services/authService";
-import { path } from "../../utils/constant";
-import AdminLoginForm from "./Login/AdminLoginForm";
-import UserAuthForm from "./Login/UserAuthForm";
+import * as actions from "../../../store/actions";
+import validate from "../../../utils/Common/validate";
+import { apiRegister } from "../../../services/authService";
+import { path } from "../../../utils/constant";
+import AdminLoginForm from "./AdminLoginForm";
+import UserAuthForm from "./UserAuthForm";
 
 const Login = () => {
   const location = useLocation();
@@ -60,7 +60,7 @@ const Login = () => {
   }, [isLoggedIn, currentData, navigate, isAdminLogin]);
 
   useEffect(() => {
-    msg && Swal.fire("Oops!", msg, "error");
+    msg && Swal.fire("Thông báo", msg, "error");
   }, [msg, update]);
 
   const handleSubmit = async () => {
@@ -75,7 +75,7 @@ const Login = () => {
             setPayload({ phone: "", password: "", name: "" });
           });
         } else {
-          Swal.fire("Oops!", response?.data?.msg || "Đăng ký thất bại", "error");
+          Swal.fire("Thất bại", response?.data?.msg || "Đăng ký thất bại", "error");
         }
       } else {
         dispatch(actions.login(finalPayload));

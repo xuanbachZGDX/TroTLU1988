@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "../../components";
-import { apiResetPassword } from "../../services/authService";
+import { Button } from "../../../components";
+import { apiResetPassword } from "../../../services/authService";
 import Swal from "sweetalert2";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -25,7 +25,7 @@ const ResetPassword = () => {
 
   const handleSubmit = async () => {
     if (!otp || !password || !confirmPassword) {
-      Swal.fire("Oops!", "Vui lòng nhập đầy đủ thông tin!", "error");
+      Swal.fire("Thông báo", "Vui lòng nhập đầy đủ thông tin!", "error");
       return;
     }
     if (password.length < 6) {

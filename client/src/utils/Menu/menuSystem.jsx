@@ -76,4 +76,11 @@ export const menuSystem = [
     icons: <MdHistory />,
     type: 'user'
   },
+  {
+    id: 7,
+    text: "Góp ý của tôi",
+    path: `/${path.SYSTEM}/${path.MY_CONTACTS}`,
+    icons: <RiMessage2Line />,
+    type: 'user'
+  },
 ];

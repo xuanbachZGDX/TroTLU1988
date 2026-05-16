@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Item } from "../../components";
-import { apiGetPostById } from "../../services";
+import { Item } from "../../../components";
+import { apiGetPostById } from "../../../services";
 
 const Wishlist = () => {
   const [posts, setPosts] = useState([]);
@@ -50,13 +50,21 @@ const Wishlist = () => {
             } catch (error) {
               images = [];
             }
+            const getDescription = (desc) => {
+              try {
+                return JSON.parse(desc);
+              } catch (e) {
+                return desc ? [desc] : [];
+              }
+            };
+
             return (
               <Item
                 key={item.id}
                 id={item.id}
                 address={item.address}
                 attributes={item.attributes}
-                description={JSON.parse(item.description || "[]")}
+                description={getDescription(item.description)}
                 images={images}
                 star={item.star}
                 title={item.title}

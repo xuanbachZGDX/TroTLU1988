@@ -57,7 +57,7 @@ const UserPostRow = ({ item, handleEdit, handleExtend, handleDelete }) => {
             </button>
             {!isRejected && (
               <button
-                onClick={() => handleExtend(item.id)}
+                onClick={() => handleExtend(item)}
                 className="bg-green-50 text-green-600 p-1.5 rounded hover:bg-green-100 text-xs font-medium"
               >
                 Gia hạn

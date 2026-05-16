@@ -125,13 +125,13 @@ export const apiDeletePost = (postId) =>
     }
   });
 
-export const apiExtendPost = (postId) =>
+export const apiExtendPost = (postId, days, star) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "put",
         url: `/api/v1/posts/extend`,
-        data: { postId },
+        data: { postId, days, star },
       });
       resolve(response);
     } catch (error) {

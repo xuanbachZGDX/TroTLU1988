@@ -31,6 +31,8 @@ export const path = {
   DEPOSIT: "nap-tien",
   PAYMENT_RESULT: "ket-qua-thanh-toan",
   TRANSACTION_HISTORY: "lich-su-giao-dich",
+  MY_CONTACTS: "gop-y-cua-toi",
+  EXTEND_POST: "gia-han-tin-dang/:postId",
 };
 
 export const text = {

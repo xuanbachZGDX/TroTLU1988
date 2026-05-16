@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import * as actions from "../../../store/actions";
 import { Update } from "../../../components";
 import Swal from "sweetalert2";
@@ -7,9 +8,11 @@ import { apiDeletePost, apiExtendPost } from "../../../services";
 import { apiGetPublicDistrict } from "../../../services/appService";
 import UserPostFilters from "./UserPostFilters";
 import UserPostRow from "./UserPostRow";
+import { path } from "../../../utils/constant";
 
 const ManagePost = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [updateData, setUpdateData] = useState(false);
   const { postOfCurrent } = useSelector((state) => state.post);
@@ -58,25 +61,8 @@ const ManagePost = () => {
     }
   };
 
-  const handleExtendPost = async (postId) => {
-    const res = await Swal.fire({
-      title: "Gia hạn tin đăng?",
-      text: "Tin đăng sẽ được gia hạn thêm 7 ngày. Phí gia hạn là 10.000đ sẽ trừ trực tiếp từ số dư tài khoản.",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Gia hạn ngay",
-      cancelButtonText: "Hủy",
-      confirmButtonColor: "#2563eb",
-    });
-    if (res.isConfirmed) {
-      const response = await apiExtendPost(postId);
-      if (response?.data?.err === 0) {
-        setUpdateData(p => !p);
-        Swal.fire("Gia hạn thành công!", "Tin đăng của bạn đã được gia hạn thêm 7 ngày.", "success");
-      } else {
-        Swal.fire("Gia hạn thất bại!", response?.data?.msg || "Số dư không đủ hoặc có lỗi xảy ra.", "error");
-      }
-    }
+  const handleExtendPost = (item) => {
+    navigate(`/${path.SYSTEM}/gia-han-tin-dang/${item.id}`);
   };
 
   return (

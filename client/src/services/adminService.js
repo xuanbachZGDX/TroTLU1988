@@ -120,3 +120,17 @@ export const apiDeleteAdminContact = (contactId) =>
       reject(error);
     }
   });
+
+export const apiReplyAdminContact = (contactId, responseText) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/admin/contacts/${contactId}/reply`,
+        data: { responseText },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

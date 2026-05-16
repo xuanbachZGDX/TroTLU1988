@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToString";
+import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 import { useDispatch, useSelector } from "react-redux";
-import * as action from "../../store/actions";
-import {path} from "../../utils/constant";
-import logo from "../../assets/logo-phongtro.png";
+import * as action from "../../../store/actions";
+import {path} from "../../../utils/constant";
+import logo from "../../../assets/logo-phongtro.png";
 
 const notActive =
   "relative h-full flex items-center px-3 lg:px-4 text-white opacity-90 hover:opacity-100 transition-all duration-300 whitespace-nowrap " +

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { InputForm, Button } from "../../components";
-import validate from "../../utils/Common/validate";
+import { InputForm, Button } from "../../../components";
+import validate from "../../../utils/Common/validate";
 import Swal from "sweetalert2";
-import { apiPostContact } from "../../services/appService";
+import { apiPostContact } from "../../../services/appService";
 import { useSelector } from "react-redux";
 
 const Contact = () => {
@@ -39,7 +39,7 @@ const Contact = () => {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Oops!",
+          title: "Thông báo",
           text: "Có lỗi xảy ra, vui lòng thử lại.",
         });
       }

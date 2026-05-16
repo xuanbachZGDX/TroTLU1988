@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, createSearchParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { path } from "../../utils/constant";
-import icons from "../../utils/icons";
-import * as actions from "../../store/actions";
+import { path } from "../../../utils/constant";
+import icons from "../../../utils/icons";
+import * as actions from "../../../store/actions";
 import {
   apiGetPublicDistrict,
   apiGetPublicWard,
-} from "../../services/appService";
-import SearchModal from "./Search/SearchModal";
+} from "../../../services/appService";
+import SearchModal from "./SearchModal";
 
 const { HiOutlineLocationMarker, FiSearch } = icons;
 

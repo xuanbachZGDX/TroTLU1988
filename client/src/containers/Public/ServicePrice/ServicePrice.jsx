@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import icons from "../../utils/icons";
-import { Item } from "../../components";
-import ServicePriceTable from "../../components/Post/ServicePriceTable";
-import { priceList } from "../../utils/constant";
+import icons from "../../../utils/icons";
+import { Item } from "../../../components";
+import ServicePriceTable from "../../../components/Post/ServicePriceTable";
+import { priceList } from "../../../utils/constant";
 import { useDispatch, useSelector } from "react-redux";
-import * as actions from "../../store/actions";
+import * as actions from "../../../store/actions";
 
 const { GrStar, AiFillCheckCircle } = icons;
 

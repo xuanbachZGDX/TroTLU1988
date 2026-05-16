@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import "moment/locale/vi";
-import { getPostDetail } from "../../store/actions/postAction";
-import { Slider, GoogleMap } from "../../components";
+import { getPostDetail } from "../../../store/actions/postAction";
+import { Slider, GoogleMap } from "../../../components";
 import { FaRegUserCircle } from "react-icons/fa";
-import SidebarContact from "./DetailPost/SidebarContact";
-import PostContent from "./DetailPost/PostContent";
+import SidebarContact from "./SidebarContact";
+import PostContent from "./PostContent";
 
 const DetailPost = () => {
   const { postId } = useParams();
@@ -71,14 +71,15 @@ const DetailPost = () => {
 
   return (
     <div className="w-full">
-      <div className="flex gap-6 mb-6">
-        <div className="w-[65%]">
+      <div className="flex gap-4 mb-4">
+        <div className="w-[68%]">
           <Slider images={images} />
         </div>
 
-        <div className="w-[35%]">
+        <div className="w-[32%]">
           <SidebarContact 
             user={postDetail?.user}
+            postId={postId}
             getPhoneLink={getPhoneLink}
             getZaloLink={getZaloLink}
             formatJoinDate={formatJoinDate}
@@ -86,8 +87,8 @@ const DetailPost = () => {
         </div>
       </div>
 
-      <div className="flex gap-6">
-        <div className="w-[65%] flex flex-col gap-4">
+      <div className="flex gap-4">
+        <div className="w-[68%] flex flex-col gap-4">
           <PostContent 
             postDetail={postDetail}
             formatDate={formatDate}
@@ -130,19 +131,7 @@ const DetailPost = () => {
                 </a>
               </div>
             </div>
-
-            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-gray-600">
-              <p className="font-semibold mb-1">Lưu ý:</p>
-              <p>
-                Chỉ đặt cọc xác định được chủ nhà và có thỏa thuận biên nhận rõ ràng. Kiểm tra mọi
-                điều khoản và yêu cầu liệt kê tất cả chi phí hàng tháng vào hợp đồng.
-              </p>
-            </div>
           </div>
-        </div>
-
-        <div className="w-[35%]">
-          {/* Sidebar - Placeholder */}
         </div>
       </div>
     </div>

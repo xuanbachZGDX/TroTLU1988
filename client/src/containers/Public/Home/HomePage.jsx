@@ -1,7 +1,7 @@
 import React from "react";
-import { text } from "../../utils/constant";
-import { Province, ItemSidebar, RelatePost } from "../../components";
-import { List, Pagination } from "./index";
+import { text } from "../../../utils/constant";
+import { Province, ItemSidebar, RelatePost } from "../../../components";
+import { List, Pagination } from "../index";
 import { useSelector } from "react-redux";
 
 const HomePage = () => {

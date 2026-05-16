@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "../../components";
-import { apiForgotPassword } from "../../services/authService";
+import { Button } from "../../../components";
+import { apiForgotPassword } from "../../../services/authService";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const ForgotPassword = () => {
 
   const handleSubmit = async () => {
     if (!email) {
-      Swal.fire("Oops!", "Vui lòng nhập email của bạn!", "error");
+      Swal.fire("Lỗi!", "Vui lòng nhập email của bạn!", "error");
       return;
     }
     

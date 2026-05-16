@@ -26,6 +26,8 @@ import {
   Deposit,
   PaymentResult,
   TransactionHistory,
+  UserInquiries,
+  PostPackage,
 } from "./containers/System";
 import ManageServicePrice from "./containers/System/ManageServicePrice";
 
@@ -76,6 +78,8 @@ function App() {
           <Route path={path.DEPOSIT} element={<Deposit />} />
           <Route path={path.PAYMENT_RESULT} element={<PaymentResult />} />
           <Route path={path.TRANSACTION_HISTORY} element={<TransactionHistory />} />
+          <Route path={path.MY_CONTACTS} element={<UserInquiries />} />
+          <Route path={path.EXTEND_POST} element={<PostPackage />} />
         </Route>
 
         <Route path={`/${path.ADMIN}/${path.ADMIN_LOGIN}`} element={<Login />} />

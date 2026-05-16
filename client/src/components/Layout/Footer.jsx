@@ -41,8 +41,8 @@ const SOCIAL_LINKS = [
 
 /** Cột chứa danh sách link */
 const LinkColumn = ({ title, links }) => (
-  <div className="flex flex-col gap-2">
-    <h3 className="text-sm font-bold uppercase text-gray-700 mb-1 tracking-wide">
+  <div className="flex flex-col gap-3">
+    <h3 className="text-[14px] font-bold uppercase text-blue-700 mb-2 tracking-wide">
       {title}
     </h3>
     {links.map((link) =>
@@ -50,7 +50,7 @@ const LinkColumn = ({ title, links }) => (
         <Link
           key={link.label}
           to={link.to}
-          className="text-sm text-gray-600 hover:text-orange-600 transition-colors duration-200"
+          className="text-sm text-gray-600 hover:text-blue-600 transition-all duration-200"
         >
           {link.label}
         </Link>
@@ -58,7 +58,7 @@ const LinkColumn = ({ title, links }) => (
         <a
           key={link.label}
           href={link.href}
-          className="text-sm text-gray-600 hover:text-orange-600 transition-colors duration-200"
+          className="text-sm text-gray-600 hover:text-blue-600 transition-all duration-200"
         >
           {link.label}
         </a>
@@ -68,28 +68,27 @@ const LinkColumn = ({ title, links }) => (
 );
 
 // Main Footer
-
 const Footer = () => (
-  <footer className="w-full bg-gray-50 border-t border-gray-200 mt-8">
-    <div className="w-1100 max-w-full mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+  <footer className="w-full bg-gray-50 border-t-4 border-blue-600 mt-12">
+    <div className="w-1100 max-w-full mx-auto px-4 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
 
-      {/*  Về chúng tôi */}
+      {/* Về Phongtro123.com */}
       <LinkColumn title="Về Phongtro123.com" links={ABOUT_LINKS} />
 
       {/* Dành cho khách hàng */}
       <LinkColumn title="Dành cho khách hàng" links={CUSTOMER_LINKS} />
 
       {/* Phương thức thanh toán */}
-      <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-bold uppercase text-gray-700 mb-1 tracking-wide">
-          Phương thức thanh toán
+      <div className="flex flex-col gap-4">
+        <h3 className="text-[14px] font-bold uppercase text-blue-700 mb-2 tracking-wide">
+          Thanh toán an toàn
         </h3>
         <div className="flex flex-wrap gap-2">
           {PAYMENT_METHODS.map((p) => (
             <span
               key={p.label}
-              style={{ backgroundColor: p.bg, color: p.color }}
-              className="text-xs font-bold px-3 py-1.5 rounded-md cursor-default select-none"
+              style={{ backgroundColor: "#fff", border: `1px solid #e2e8f0`, color: '#475569' }}
+              className="text-[10px] font-bold px-3 py-1.5 rounded shadow-sm uppercase"
             >
               {p.label}
             </span>
@@ -98,11 +97,11 @@ const Footer = () => (
       </div>
 
       {/* Mạng xã hội */}
-      <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-bold uppercase text-gray-700 mb-1 tracking-wide">
-          Theo dõi Phongtro123.com
+      <div className="flex flex-col gap-4">
+        <h3 className="text-[14px] font-bold uppercase text-blue-700 mb-2 tracking-wide">
+          Theo dõi chúng tôi
         </h3>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           {SOCIAL_LINKS.map((s) => (
             <a
               key={s.label}
@@ -112,18 +111,30 @@ const Footer = () => (
               title={s.label}
               style={{ backgroundColor: s.bg }}
               className="w-9 h-9 rounded-full flex items-center justify-center text-white
-                         hover:opacity-80 hover:scale-110 transition-all duration-200"
+                         hover:opacity-80 hover:scale-110 shadow-sm transition-all duration-200"
             >
               {s.icon}
             </a>
           ))}
         </div>
+        <div className="mt-4 p-4 rounded-lg bg-blue-50 border border-blue-100">
+           <p className="text-xs text-blue-800 leading-relaxed font-medium">
+              Kênh thông tin phòng trọ số 1 Việt Nam - Uy tín, Hiệu quả.
+           </p>
+        </div>
       </div>
     </div>
 
     {/* Copyright bar */}
-    <div className="bg-gray-100 border-t border-gray-200 py-3 text-center text-xs text-gray-500">
-      © {new Date().getFullYear()} Phongtro123.com — Kênh thông tin phòng trọ số 1 Việt Nam
+    <div className="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+      <div className="w-1100 mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>© {new Date().getFullYear()} <span className="font-bold text-blue-600">Phongtro123.com</span>. Tất cả quyền được bảo lưu.</p>
+        <div className="flex gap-8 font-medium">
+            <span className="hover:text-blue-600 cursor-pointer">Chính sách</span>
+            <span className="hover:text-blue-600 cursor-pointer">Bảo mật</span>
+            <span className="hover:text-blue-600 cursor-pointer">Trợ giúp</span>
+        </div>
+      </div>
     </div>
   </footer>
 );

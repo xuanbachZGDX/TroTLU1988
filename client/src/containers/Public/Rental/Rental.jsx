@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ItemSidebar, RelatePost } from "../../components";
-import { List, Pagination } from "./index";
+import { ItemSidebar, RelatePost } from "../../../components";
+import { List, Pagination } from "../index";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToString";
+import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 
 const Rental = () => {
   const { prices, areas, categories } = useSelector((state) => state.app);

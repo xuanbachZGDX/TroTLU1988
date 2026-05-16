@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import logo from "../../assets/logo-phongtro.png";
-import { User } from "../../components";
-import icons from "../../utils/icons";
+import logo from "../../../assets/logo-phongtro.png";
+import { User } from "../../../components";
+import icons from "../../../utils/icons";
 import { useNavigate, Link, useSearchParams, createSearchParams } from "react-router-dom";
-import { path } from "../../utils/constant";
-import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToString";
+import { path } from "../../../utils/constant";
+import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 import { useSelector, useDispatch } from "react-redux";
-import * as actions from "../../store/actions";
-import { menuSystem } from "../../utils/Menu/menuSystem.jsx";
-import { apiGetPublicDistrict, apiGetPublicWard } from "../../services/appService";
-import FilterModal from "./Header/FilterModal";
-import UserMenu from "./Header/UserMenu";
+import * as actions from "../../../store/actions";
+import { menuSystem } from "../../../utils/Menu/menuSystem.jsx";
+import { apiGetPublicDistrict, apiGetPublicWard } from "../../../services/appService";
+import FilterModal from "./FilterModal";
+import UserMenu from "./UserMenu";
 
 const cleanName = (name) => {
   if (!name) return "";
@@ -158,7 +158,7 @@ const Header = () => {
       <div className="w-[1200px] max-w-full mx-auto h-[75px] px-4 flex items-center justify-between gap-6">
         
         {/* Logo */}
-        <Link to={"/"} className="flex-shrink-0">
+        <Link to={"/"} onClick={() => window.scrollTo(0, 0)} className="flex-shrink-0">
           <img src={logo} alt="logo" className="w-[180px] h-[45px] object-contain" />
         </Link>
 
