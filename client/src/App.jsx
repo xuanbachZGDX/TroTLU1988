@@ -1,36 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import {
-  Home,
-  Login,
-  Rental,
-  HomePage,
-  DetailPost,
-  SearchDetail,
-  Contact,
-  Wishlist,
-  ServicePrice,
-  ForgotPassword,
-  ResetPassword
+  Home, Login, Rental, HomePage, DetailPost, SearchDetail,
+  Contact, Wishlist, ServicePrice, ForgotPassword, ResetPassword,
 } from "./containers/Public";
 import { path } from "./utils/constant";
 import {
-  AdminDashboard,
-  AdminManagePosts,
-  AdminManageUsers,
-  AdminManageContacts,
-  CreatePost,
-  ManagePost,
-  EditAccount,
-  SystemLayout,
-  AdminGuard,
-  Deposit,
-  PaymentResult,
-  TransactionHistory,
-  UserInquiries,
-  PostPackage,
+  AdminDashboard, AdminManagePosts, AdminManageUsers, AdminManageContacts,
+  CreatePost, ManagePost, EditAccount, SystemLayout, AdminGuard,
+  Deposit, PaymentResult, TransactionHistory, UserInquiries, PostPackage,
+  AdminNotifications
 } from "./containers/System";
+import LandlordGuard from "./containers/System/LandlordGuard";
 import ManageServicePrice from "./containers/System/ManageServicePrice";
-
 import { useSelector } from "react-redux";
 import { Loading, ScrollToTop } from "./components";
 
@@ -68,18 +49,19 @@ function App() {
           <Route path="*" element={<HomePage />} />
         </Route>
 
-        {/* Unified System Routes (User & Admin share the same layout) */}
+        {/* System Routes — phải đăng nhập */}
         <Route path={`/${path.SYSTEM}`} element={<SystemLayout />}>
-          <Route index element={<ManagePost />} />
-          <Route path={path.CREATE_POST} element={<CreatePost />} />
-          <Route path={path.MANAGE_POST} element={<ManagePost />} />
+          <Route index element={<EditAccount />} />
+        {/* Chỉ landlord/admin mới vào được 2 route này */}
+          <Route path={path.CREATE_POST} element={<LandlordGuard><CreatePost /></LandlordGuard>} />
+          <Route path={path.MANAGE_POST} element={<LandlordGuard><ManagePost /></LandlordGuard>} />
           <Route path={path.EDIT_ACCOUNT} element={<EditAccount />} />
-          <Route path={path.MANAGE_SERVICE_PRICE} element={<ManageServicePrice />} />
-          <Route path={path.DEPOSIT} element={<Deposit />} />
-          <Route path={path.PAYMENT_RESULT} element={<PaymentResult />} />
-          <Route path={path.TRANSACTION_HISTORY} element={<TransactionHistory />} />
-          <Route path={path.MY_CONTACTS} element={<UserInquiries />} />
-          <Route path={path.EXTEND_POST} element={<PostPackage />} />
+          <Route path={path.MANAGE_SERVICE_PRICE} element={<LandlordGuard><ManageServicePrice /></LandlordGuard>} />
+          <Route path={path.DEPOSIT} element={<LandlordGuard><Deposit /></LandlordGuard>} />
+          <Route path={path.PAYMENT_RESULT} element={<LandlordGuard><PaymentResult /></LandlordGuard>} />
+          <Route path={path.TRANSACTION_HISTORY} element={<LandlordGuard><TransactionHistory /></LandlordGuard>} />
+          <Route path={path.MY_CONTACTS} element={<LandlordGuard><UserInquiries /></LandlordGuard>} />
+          <Route path={path.EXTEND_POST} element={<LandlordGuard><PostPackage /></LandlordGuard>} />
         </Route>
 
         <Route path={`/${path.ADMIN}/${path.ADMIN_LOGIN}`} element={<Login />} />
@@ -89,6 +71,7 @@ function App() {
           <Route path={path.ADMIN_POSTS} element={<AdminManagePosts />} />
           <Route path={path.ADMIN_USERS} element={<AdminManageUsers />} />
           <Route path={path.ADMIN_CONTACTS} element={<AdminManageContacts />} />
+          <Route path={path.ADMIN_NOTIFICATIONS} element={<AdminNotifications />} />
         </Route>
       </Routes>
     </div>

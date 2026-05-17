@@ -11,6 +11,8 @@ import { menuSystem } from "../../../utils/Menu/menuSystem.jsx";
 import { apiGetPublicDistrict, apiGetPublicWard } from "../../../services/appService";
 import FilterModal from "./FilterModal";
 import UserMenu from "./UserMenu";
+import { getRoleFromToken } from "../../../utils/Common/role";
+import AdminBellNotification from "./AdminBellNotification";
 
 const cleanName = (name) => {
   if (!name) return "";
@@ -34,13 +36,13 @@ const Header = () => {
   };
 
   const menuRef = useRef();
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn, token } = useSelector((state) => state.auth);
   const { currentData } = useSelector((state) => state.user);
   const { provinces, areas, prices, categories } = useSelector((s) => s.app);
-  
+
   const [isShowMenu, setIsShowMenu] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+
   const [selCategory, setSelCategory] = useState(null);
   const [selProvince, setSelProvince] = useState("");
   const [selDistrict, setSelDistrict] = useState("");
@@ -50,13 +52,28 @@ const Header = () => {
   const [selPrice, setSelPrice] = useState(null);
   const [selArea, setSelArea] = useState(null);
 
+  // Giải mã role từ JWT token
+  const tokenRole = React.useMemo(() => {
+    if (!token) return null;
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(base64))?.role?.toLowerCase() || null;
+    } catch {
+      return null;
+    }
+  }, [token]);
+
+  // Luôn dùng role từ currentData trước, fallback sang token
+  const role = currentData?.role?.toLowerCase() || tokenRole;
+
   useEffect(() => {
     const categoryCode = searchParams.get("categoryCode");
     const provinceCode = searchParams.get("provinceCode");
     const districtCode = searchParams.get("districtCode");
     const priceCode = searchParams.get("priceCode");
     const areaCode = searchParams.get("areaCode");
-    
+
     if (categories) setSelCategory(categories.find(c => c.code === categoryCode) || null);
     setSelProvince(provinceCode || "");
     setSelDistrict(districtCode || "");
@@ -193,6 +210,7 @@ const Header = () => {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-5 border-l border-gray-200 pl-5">
+              {role === 'admin' && <AdminBellNotification />}
               <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => setIsShowMenu(!isShowMenu)}
@@ -204,7 +222,7 @@ const Header = () => {
                 {isShowMenu && (
                   <UserMenu 
                     menuSystem={menuSystem} 
-                    currentData={currentData} 
+                    role={role} 
                     handleLogout={handleLogout} 
                     setIsShowMenu={setIsShowMenu} 
                   />
@@ -222,13 +240,15 @@ const Header = () => {
             </div>
           )}
 
-          <button 
-            onClick={() => navigate(`/${path.SYSTEM}/${path.CREATE_POST}`)}
-            className="bg-[#FF6600] text-white px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold shadow-md hover:bg-[#e65c00] transition-all active:scale-95"
-          >
-            <icons.ImPencil2 size={14} />
-            <span>Đăng tin</span>
-          </button>
+          {(!isLoggedIn || role === 'landlord') && (
+            <button 
+              onClick={() => navigate(`/${path.SYSTEM}/${path.CREATE_POST}`)}
+              className="bg-[#FF6600] text-white px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold shadow-md hover:bg-[#e65c00] transition-all active:scale-95"
+            >
+              <icons.ImPencil2 size={14} />
+              <span>Đăng tin</span>
+            </button>
+          )}
         </div>
       </div>
 

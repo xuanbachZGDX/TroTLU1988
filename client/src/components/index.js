@@ -36,3 +36,5 @@ export { default as SearchItem } from "./Search/SearchItem";
 
 // Map Components
 export { default as GoogleMap } from "./Map/GoogleMap";
+
+export { default as PostHistoryModal } from "./PostHistoryModal";

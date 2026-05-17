@@ -23,14 +23,55 @@ const UserAuthForm = ({
         </h3>
         <div className="w-full flex flex-col gap-5">
           {isRegister && (
-            <InputForm
-              setInvalidFields={setInvalidFields}
-              invalidFields={invalidFields}
-              label={"HỌ TÊN"}
-              value={payload.name}
-              setValue={setPayload}
-              keyPayload={"name"}
-            />
+            <>
+              {/* Chọn loại tài khoản */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  LOẠI TÀI KHOẢN BẮT BUỘC
+                </label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setPayload(prev => ({ ...prev, accountType: 'user' }))}
+                    className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
+                      payload.accountType === 'user'
+                        ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="font-bold text-base">Người tìm kiếm</span>
+                    <span className="text-xs mt-1 text-gray-500">(Người thuê phòng)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPayload(prev => ({ ...prev, accountType: 'landlord' }))}
+                    className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
+                      payload.accountType === 'landlord'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="font-bold text-base">Chủ trọ</span>
+                    <span className="text-xs mt-1 text-gray-500">(Đăng tin cho thuê)</span>
+                  </button>
+                </div>
+                {/* Hiển thị lỗi nếu chưa chọn loại tài khoản */}
+                {invalidFields?.find(f => f.name === 'accountType') && (
+                  <small className="text-red-500 font-medium">
+                    {invalidFields.find(f => f.name === 'accountType').message}
+                  </small>
+                )}
+              </div>
+
+              <InputForm
+                setInvalidFields={setInvalidFields}
+                invalidFields={invalidFields}
+                label={"HỌ TÊN"}
+                value={payload.name}
+                setValue={setPayload}
+                keyPayload={"name"}
+              />
+            </>
           )}
           <InputForm
             setInvalidFields={setInvalidFields}
@@ -83,7 +124,7 @@ const UserAuthForm = ({
               <span
                 onClick={() => {
                   setIsRegister(false);
-                  setPayload({ phone: "", password: "", name: "" });
+                  setPayload({ phone: "", password: "", name: "", accountType: "" });
                 }}
                 className="text-blue-500 hover:underline cursor-pointer"
               >
@@ -101,7 +142,7 @@ const UserAuthForm = ({
               <small
                 onClick={() => {
                   setIsRegister(true);
-                  setPayload({ phone: "", password: "", name: "" });
+                  setPayload({ phone: "", password: "", name: "", accountType: "" });
                 }}
                 className="text-[blue] hover:text-[red] cursor-pointer"
               >

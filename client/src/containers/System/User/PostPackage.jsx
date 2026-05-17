@@ -68,7 +68,7 @@ const PostPackage = ({ payload: propsPayload, setPayload: propsSetPayload }) => 
       const response = await apiExtendPost(postId, payload.postingDuration, payload.star);
       if (response?.data?.err === 0) {
         await Swal.fire("Thành công!", response.data.msg, "success");
-        dispatch(actions.getCurrentUser()); // Cập nhật lại số dư
+        dispatch(actions.getCurrent()); // Cập nhật lại số dư
         navigate(`/${path.SYSTEM}/${path.MANAGE_POST}`);
       } else {
         Swal.fire("Thất bại!", response?.data?.msg || "Có lỗi xảy ra", "error");

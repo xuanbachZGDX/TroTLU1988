@@ -1,13 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import icons from "../../../utils/icons";
+import { normalizeRole } from "../../../utils/Common/role";
 
 const { AiOutlineLogout } = icons;
 
-const UserMenu = ({ menuSystem, currentData, handleLogout, setIsShowMenu }) => {
+const UserMenu = ({ menuSystem, role, handleLogout, setIsShowMenu }) => {
+  const normalizedRole = normalizeRole(role);
+  const isAdmin = normalizedRole === "admin";
+  const isLandlord = normalizedRole === "landlord";
+
   return (
     <div className="absolute top-[calc(100%+15px)] right-0 w-[240px] bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
-      {menuSystem.filter(i => i.type !== 'admin' || currentData?.role === 'admin').map((item) => (
+      {menuSystem.filter(item => {
+        if (item.type === 'admin' && !isAdmin) return false;
+        if (item.type === 'landlord' && !isLandlord) return false;
+        // type 'all' hiển thị với tất cả
+        return true;
+      }).map((item) => (
         <Link 
           key={item.id} 
           to={item.path} 

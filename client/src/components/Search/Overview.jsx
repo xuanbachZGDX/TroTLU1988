@@ -41,7 +41,6 @@ const Overview = ({ payload, setPayload, invalidFields, setInvalidFields }) => {
       <div className="bg-white rounded-md shadow-sm border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-medium">Tiêu đề & Mô tả</h2>
-          <span className="font-medium cursor-pointer">Tạo nội dung với AI</span>
         </div>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">

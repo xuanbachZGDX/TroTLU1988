@@ -3,7 +3,7 @@ const validate = (payload, setInvalidFields) => {
   let fields = Object.entries(payload);
 
   fields.forEach((item) => {
-    if (["province", "features", "star", "postId", "attributeId", "imageId", "overviewId", "priceCode", "areaCode"].includes(item[0])) return;
+    if (["province", "features", "star", "postId", "attributeId", "imageId", "overviewId", "priceCode", "areaCode", "accountType"].includes(item[0])) return;
 
     if (item[1] === "" || (Array.isArray(item[1]) && item[1].length === 0)) {
       let message = "Trường này không được để trống.";

@@ -125,6 +125,20 @@ export const apiDeletePost = (postId) =>
     }
   });
 
+export const apiRestorePost = (postId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/posts/restore`,
+        data: { postId },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 export const apiExtendPost = (postId, days, star) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -132,6 +146,20 @@ export const apiExtendPost = (postId, days, star) =>
         method: "put",
         url: `/api/v1/posts/extend`,
         data: { postId, days, star },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetPostHistory = (postId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: `/api/v1/posts/history`,
+        params: { postId },
       });
       resolve(response);
     } catch (error) {

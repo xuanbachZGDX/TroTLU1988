@@ -23,6 +23,7 @@ export const path = {
   ADMIN_POSTS: "quan-ly-tat-ca-bai-dang",
   ADMIN_USERS: "quan-ly-nguoi-dung",
   ADMIN_CONTACTS: "quan-ly-lien-he",
+  ADMIN_NOTIFICATIONS: "quan-ly-thong-bao",
   CONTACT: "lien-he",
   DETAIL: "chi-tiet",
   TIN_DA_LUU: "tin-da-luu",

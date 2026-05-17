@@ -67,13 +67,13 @@ export const apiGetAdminUsers = (params) =>
     }
   });
 
-export const apiUpdateUserStatus = (userId, status) =>
+export const apiUpdateUserStatus = (userId, status, reason = "") =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "put",
         url: `/api/v1/admin/users/${userId}/status`,
-        data: { status },
+        data: { status, reason },
       });
       resolve(response);
     } catch (error) {
@@ -81,13 +81,13 @@ export const apiUpdateUserStatus = (userId, status) =>
     }
   });
 
-export const apiRejectAdminPost = (postId) =>
+export const apiRejectAdminPost = (postId, reason = "") =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "put",
         url: `/api/v1/admin/posts/${postId}/reject`,
-        data: { postId },
+        data: { postId, reason },
       });
       resolve(response);
     } catch (error) {
@@ -128,6 +128,59 @@ export const apiReplyAdminContact = (contactId, responseText) =>
         method: "put",
         url: `/api/v1/admin/contacts/${contactId}/reply`,
         data: { responseText },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetAdminNotifications = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: "/api/v1/admin/notifications",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiReadAdminNotification = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/admin/notifications/${id}/read`,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetAdminSettings = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: "/api/v1/admin/settings",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiUpdateAdminSettings = (settings) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: "/api/v1/admin/settings",
+        data: settings,
       });
       resolve(response);
     } catch (error) {

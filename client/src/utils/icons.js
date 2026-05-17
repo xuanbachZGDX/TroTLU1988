@@ -16,6 +16,7 @@ import { MdOutlineHouseSiding, MdManageSearch, MdOutlineApartment, MdOutlineMaps
 import { FiSearch } from "react-icons/fi";
 import { ImPencil2, ImBin  } from "react-icons/im";
 import { FaRegUserCircle } from "react-icons/fa";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 const icons = {
   AiFillPlusCircle,
@@ -49,7 +50,8 @@ const icons = {
   BsWallet2,
   BsXCircleFill,
   MdHistory,
-  RiMessage2Line
+  RiMessage2Line,
+  IoMdNotificationsOutline
 };
 
 export default icons;

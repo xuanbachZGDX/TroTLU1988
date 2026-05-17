@@ -60,14 +60,16 @@ const TransactionHistory = () => {
                                         </td>
                                         <td className="p-4 text-sm">
                                             {tx.type === 'deposit' ? (
-                                                <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium">Nạp tiền</span>
+                                                <span className="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Nạp tiền</span>
+                                            ) : tx.type === 'refund' ? (
+                                                <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Hoàn tiền</span>
                                             ) : (
-                                                <span className="px-2 py-1 bg-orange-50 text-orange-600 rounded text-xs font-medium">Thanh toán</span>
+                                                <span className="px-2.5 py-1 bg-orange-50 text-orange-600 border border-orange-100 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Thanh toán</span>
                                             )}
                                         </td>
                                         <td className="p-4 text-sm text-gray-600">{tx.content}</td>
-                                        <td className={`p-4 text-sm font-semibold text-right ${tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'}`}>
-                                            {tx.type === 'deposit' ? '+' : '-'}{tx.amount?.toLocaleString('vi-VN')} đ
+                                        <td className={`p-4 text-sm font-semibold text-right whitespace-nowrap ${(tx.type === 'deposit' || tx.type === 'refund') ? 'text-green-600' : 'text-red-600'}`}>
+                                            {(tx.type === 'deposit' || tx.type === 'refund') ? '+' : '-'}{tx.amount?.toLocaleString('vi-VN')} đ
                                         </td>
                                         <td className="p-4 text-sm text-center">
                                             {tx.status === 'success' ? (

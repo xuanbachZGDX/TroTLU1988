@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Overview, Address, Button, InputReadOnly, Select } from "../../../components";
+import { Overview, Address, Button, InputReadOnly, Select, PostHistoryModal } from "../../../components";
 import { useSelector } from "react-redux";
-import { apiCreatePost, apiUpdatePost, apiUploadImages } from "../../../services";
+import { apiCreatePost, apiUpdatePost, apiUploadImages, apiGetPostHistory } from "../../../services";
 import Swal from "sweetalert2";
 import validate from "../../../utils/Common/validate";
 import PostPackage from "./PostPackage";
@@ -35,7 +35,10 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
   const [imagesPreview, setImagesPreview] = useState(payload.images);
   const [isLoading, setIsLoading] = useState(false);
   const [invalidFields, setInvalidFields] = useState([]);
-  
+
+  const [historyData, setHistoryData] = useState([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
   useEffect(() => {
     if (prices.length > 0 && payload.priceNumber) {
         const pNum = +payload.priceNumber / 1000000;
@@ -73,9 +76,25 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
     const final = { ...payload, userId: currentData?.id, priceNumber: +payload.priceNumber / 1000000 };
     const res = isEdit ? await apiUpdatePost({ ...final, postId: dataEdit?.id }) : await apiCreatePost(final);
     if (res?.data?.err === 0) {
-      Swal.fire(isEdit ? "Thành công!" : "Đăng tin thành công!", res.data.msg, "success").then(() => isEdit ? setIsEdit(false) : window.location.reload());
+      Swal.fire({
+        title: isEdit ? "Cập nhật thành công!" : "Đăng tin thành công!",
+        text: isEdit 
+          ? "Tin đăng của bạn đã được cập nhật và gửi duyệt lại thành công. Vui lòng chờ Admin kiểm duyệt trước khi hiển thị công khai."
+          : res.data.msg,
+        icon: "success"
+      }).then(() => isEdit ? setIsEdit(false) : window.location.reload());
     } else {
       Swal.fire("Thất bại!", res?.data?.msg || "Có lỗi xảy ra", "error");
+    }
+  };
+
+  const handleViewHistory = async () => {
+    const response = await apiGetPostHistory(dataEdit?.id);
+    if (response?.data?.err === 0) {
+      setHistoryData(response.data.data || []);
+      setShowHistoryModal(true);
+    } else {
+      Swal.fire("Không tìm thấy", "Chưa có lịch sử chỉnh sửa nào cho tin đăng này.", "info");
     }
   };
 
@@ -97,6 +116,18 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
         </div>
       </div>
       <div className="max-w-5xl mx-auto mt-8 px-4 pb-20">
+        {isEdit && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6 flex justify-between items-center shadow-sm">
+            <div>
+              <span className="font-bold text-purple-800 text-sm">📜 Nhật ký chỉnh sửa tin đăng</span>
+              <p className="text-[11px] text-purple-600 mt-1">Xem chi tiết so sánh các lần thay đổi thông tin trước đây.</p>
+            </div>
+            <button type="button" onClick={handleViewHistory} className="bg-purple-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-purple-700 transition-all active:scale-95">
+              Xem lịch sử
+            </button>
+          </div>
+        )}
+
         <div className={step === 1 ? "flex flex-col gap-8" : "hidden"}>
           <div className="bg-white rounded-md shadow-sm border border-gray-200 p-6"><h2 className="text-xl font-medium mb-6">Chuyên mục</h2>
               <div className="w-1/2"><Select label="Loại chuyên mục (*)" options={categories} value={payload.categoryCode} setValue={setPayload} name="categoryCode" invalidFields={invalidFields} setInvalidFields={setInvalidFields} /></div>
@@ -125,6 +156,14 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
         </div>
         <div className={step === 2 ? "flex flex-col gap-8" : "hidden"}><PostPackage payload={payload} setPayload={setPayload} /><Button onClick={handleSubmit} text="Xác nhận" bgColor="bg-green-600" textColor="text-white" fullWidth /></div>
       </div>
+
+      <PostHistoryModal 
+        isOpen={showHistoryModal} 
+        onClose={() => { setShowHistoryModal(false); setHistoryData([]); }} 
+        historyPost={{ id: dataEdit?.id, overview: { code: dataEdit?.overview?.code || dataEdit?.id?.slice(0,8).toUpperCase() } }} 
+        historyData={historyData} 
+        isAdmin={false}
+      />
     </div>
   );
 };

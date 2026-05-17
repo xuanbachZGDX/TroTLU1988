@@ -71,3 +71,9 @@ export const loginGoogle = (credential) => async (dispatch) => {
 export const logout = () => ({
   type: actionTypes.LOGOUT,
 })
+
+// Dùng sau khi đăng ký: đăng nhập luôn bằng token nhận được
+export const loginWithToken = (token) => ({
+  type: actionTypes.LOGIN_SUCCESS,
+  data: token,
+});

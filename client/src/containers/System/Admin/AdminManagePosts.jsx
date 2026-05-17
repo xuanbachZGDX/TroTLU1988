@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import * as actions from "../../../store/actions";
-import { apiDeleteAdminPost, apiApproveAdminPost, apiRejectAdminPost } from "../../../services";
+import { apiDeleteAdminPost, apiApproveAdminPost, apiRejectAdminPost, apiGetPostHistory } from "../../../services";
 import { apiGetPublicDistrict } from "../../../services/appService";
-import { PaginationAdmin } from "../../../components";
+import { PaginationAdmin, PostHistoryModal } from "../../../components";
 import AdminPostFilters from "./AdminPostFilters";
 import AdminPostRow from "./AdminPostRow";
 
@@ -14,8 +14,12 @@ const AdminManagePosts = () => {
   const { categories, provinces } = useSelector((state) => state.app);
   const [districts, setDistricts] = useState([]);
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({ search: "", status: "", categoryCode: "", provinceCode: "", districtCode: "" });
-  const [appliedFilters, setAppliedFilters] = useState({ search: "", status: "", categoryCode: "", provinceCode: "", districtCode: "" });
+  const [filters, setFilters] = useState({ search: "", status: "", categoryCode: "", provinceCode: "", districtCode: "", star: "" });
+  const [appliedFilters, setAppliedFilters] = useState({ search: "", status: "", categoryCode: "", provinceCode: "", districtCode: "", star: "" });
+
+  const [historyPost, setHistoryPost] = useState(null);
+  const [historyData, setHistoryData] = useState([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   useEffect(() => {
     if (filters.provinceCode) {
@@ -80,21 +84,39 @@ const AdminManagePosts = () => {
   const handleReject = async (postId) => {
     const res = await Swal.fire({
       title: "Từ chối bài đăng này?",
-      text: "Bài đăng sẽ bị từ chối và không hiển thị cho người dùng. Hành động này có thể hoàn tác bằng cách duyệt lại.",
-      icon: "warning",
+      input: "text",
+      inputLabel: "Nhập lý do từ chối đăng tin:",
+      inputPlaceholder: "Ví dụ: Hình ảnh mờ, thông tin sai lệch...",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Bạn phải nhập lý do từ chối!";
+        }
+      },
       showCancelButton: true,
-      confirmButtonText: "Từ chối",
+      confirmButtonText: "Từ chối & Hoàn tiền",
       cancelButtonText: "Hủy",
       confirmButtonColor: "#f97316",
     });
-    if (res.isConfirmed) {
-      const response = await apiRejectAdminPost(postId);
+    if (res.isConfirmed && res.value) {
+      const reason = res.value;
+      const response = await apiRejectAdminPost(postId, reason);
       if (response?.data?.err === 0) {
-        Swal.fire("Đã từ chối!", "Bài đăng đã bị từ chối thành công.", "success");
+        Swal.fire("Đã từ chối!", "Bài đăng đã bị từ chối và hoàn trả phí thành công.", "success");
         dispatch(actions.getAdminPosts({ page, ...appliedFilters }));
       } else {
         Swal.fire("Thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
       }
+    }
+  };
+
+  const handleViewHistory = async (post) => {
+    setHistoryPost(post);
+    const response = await apiGetPostHistory(post.id);
+    if (response?.data?.err === 0) {
+      setHistoryData(response.data.data || []);
+      setShowHistoryModal(true);
+    } else {
+      Swal.fire("Thất bại", response?.data?.msg || "Không thể lấy lịch sử thay đổi", "error");
     }
   };
 
@@ -120,7 +142,20 @@ const AdminManagePosts = () => {
             </tr>
           </thead>
           <tbody>
-            {posts.length === 0 ? <tr><td colSpan="9" className="p-10 text-center italic text-gray-500">Trống.</td></tr> : posts.map(item => <AdminPostRow key={item.id} item={item} handleApprove={handleApprove} handleReject={handleReject} handleDelete={handleDelete} />)}
+            {posts.length === 0 ? (
+              <tr><td colSpan="9" className="p-10 text-center italic text-gray-500">Trống.</td></tr>
+            ) : (
+              posts.map(item => (
+                <AdminPostRow 
+                  key={item.id} 
+                  item={item} 
+                  handleApprove={handleApprove} 
+                  handleReject={handleReject} 
+                  handleDelete={handleDelete} 
+                  handleViewHistory={handleViewHistory}
+                />
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -128,6 +163,14 @@ const AdminManagePosts = () => {
         <p className="text-sm italic">Tổng: {postCount || 0}</p>
         {totalPages > 1 && <PaginationAdmin page={page} setPage={setPage} totalPages={totalPages} />}
       </div>
+
+      <PostHistoryModal 
+        isOpen={showHistoryModal} 
+        onClose={() => { setShowHistoryModal(false); setHistoryData([]); }} 
+        historyPost={historyPost} 
+        historyData={historyData} 
+        isAdmin={true}
+      />
     </div>
   );
 };

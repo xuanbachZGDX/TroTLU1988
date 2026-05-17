@@ -4,7 +4,7 @@ import { formatDateVN } from "../../../utils/Common/formatDate";
 import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 import { path } from "../../../utils/constant";
 
-const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete }) => {
+const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete, handleViewHistory }) => {
   let images = [];
   try {
     images = JSON.parse(item?.images?.image || "[]");
