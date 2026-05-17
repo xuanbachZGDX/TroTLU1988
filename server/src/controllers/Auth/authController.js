@@ -3,6 +3,7 @@ import * as authService from "../../services/Auth/authService";
 export const register = async (req, res) => {
   const { name, phone, password } = req.body || {};
   try {
+    console.log("SERVER REGISTER RECEIVED req.body:", req.body);
     if (!name || !phone || !password)
       return res.status(400).json({
         err: 1,

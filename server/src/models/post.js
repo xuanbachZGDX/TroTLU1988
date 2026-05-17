@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       areaNumber: DataTypes.FLOAT,
       status: DataTypes.STRING,
       userId: DataTypes.STRING,
+      note: DataTypes.STRING,
     },
     {
       sequelize,

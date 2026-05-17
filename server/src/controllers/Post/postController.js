@@ -151,6 +151,24 @@ export const deletePost = async (req, res) => {
   }
 };
 
+export const restorePost = async (req, res) => {
+  const { postId } = req.body;
+  const { id } = req.user;
+  try {
+    if (!postId || !id) return res.status(400).json({
+      err: 1,
+      msg: "Missing required fields",
+    });
+    const response = await postService.restorePost(postId, req.user);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      err: -1,
+      msg: "Failed at post controller: " + error,
+    });
+  }
+};
+
 export const extendPost = async (req, res) => {
   const { postId, days, star } = req.body;
   const { id } = req.user;
@@ -179,6 +197,24 @@ export const rejectPost = async (req, res) => {
       msg: "Thiếu mã bài đăng",
     });
     const response = await postService.rejectPostService(postId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      err: -1,
+      msg: "Failed at post controller: " + error,
+    });
+  }
+};
+
+export const getPostHistory = async (req, res) => {
+  const { postId } = req.query;
+  const { id } = req.user;
+  try {
+    if (!postId || !id) return res.status(400).json({
+      err: 1,
+      msg: "Missing required fields",
+    });
+    const response = await postService.getPostHistoryService(postId, req.user);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

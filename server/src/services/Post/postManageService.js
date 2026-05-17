@@ -19,7 +19,8 @@ export const getPostLimitAdminService = (page, { search, status, ...query }, id)
       if (search) {
         where[Op.or] = [
           { title: { [Op.like]: `%${search}%` } },
-          { address: { [Op.like]: `%${search}%` } }
+          { address: { [Op.like]: `%${search}%` } },
+          { id: { [Op.like]: `%${search}%` } }
         ];
       }
 

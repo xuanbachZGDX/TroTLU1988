@@ -15,5 +15,9 @@ router.put("/users/:userId/status", adminController.updateUserStatus);
 router.get("/contacts", adminController.getContacts);
 router.delete("/contacts/:contactId", adminController.deleteContact);
 router.put("/contacts/:contactId/reply", adminController.replyContact);
+router.get("/notifications", adminController.getNotifications);
+router.put("/notifications/:id/read", adminController.readNotification);
+router.get("/settings", adminController.getSettings);
+router.put("/settings", adminController.updateSettings);
 
 export default router;

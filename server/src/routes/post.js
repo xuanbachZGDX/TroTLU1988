@@ -12,8 +12,10 @@ router.get("/detail", postController.getPostById);
 router.use(verifyToken);
 router.post("/create",   postController.createNewPost);
 router.get("/manage",    postController.getPostLimitAdmin);
+router.get("/history",   postController.getPostHistory);
 router.put("/update",    postController.updatePost);
 router.put("/extend",    postController.extendPost);
+router.put("/restore",   postController.restorePost);
 router.delete("/delete", postController.deletePost);
 
 export default router;

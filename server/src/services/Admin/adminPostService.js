@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import db from "../../models";
 import moment from "moment";
 import { deletePost as deleteManagedPost } from "../Post/postService";
+import { v4 as generateId } from "uuid";
 
 const getPostInclude = () => [
   { model: db.Image, as: "images", attributes: ["image"] },
@@ -20,7 +21,8 @@ export const getAdminPostsService = (page, query) =>
 
       if (categoryCode) where.categoryCode = categoryCode;
       if (provinceCode) where.provinceCode = provinceCode;
-      if (search) where[Op.or] = [{ title: { [Op.like]: `%${search}%` } }, { address: { [Op.like]: `%${search}%` } }];
+      if (query.star !== undefined && query.star !== "") where.star = query.star;
+      if (search) where[Op.or] = [{ title: { [Op.like]: `%${search}%` } }, { address: { [Op.like]: `%${search}%` } }, { id: { [Op.like]: `%${search}%` } }];
 
       const response = await db.Post.findAndCountAll({
         where, order: [["createdAt", "DESC"]], include: getPostInclude(),
@@ -88,12 +90,100 @@ export const approveAdminPostService = (postId) =>
     }
   });
 
-export const rejectAdminPostService = (postId) =>
+export const rejectAdminPostService = (postId, reason = "") =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await db.Post.update({ status: 'rejected' }, { where: { id: postId } });
-      resolve({ err: response[0] > 0 ? 0 : 1, msg: response[0] > 0 ? "Đã từ chối" : "Thất bại" });
+      await db.sequelize.transaction(async (t) => {
+        const post = await db.Post.findOne({ where: { id: postId }, transaction: t });
+        if (!post) throw new Error("POST_NOT_FOUND");
+        if (post.status === 'rejected') return;
+
+        // Tìm giao dịch thanh toán gần nhất của tin này để hoàn tiền
+        const shortId = postId.slice(0, 8);
+        const lastTransaction = await db.Transaction.findOne({
+          where: {
+            userId: post.userId,
+            type: 'payment',
+            status: 'success',
+            content: { [Op.like]: `%${shortId}%` }
+          },
+          order: [['createdAt', 'DESC']],
+          transaction: t
+        });
+
+        if (lastTransaction) {
+          // Hoàn tiền cho user
+          const user = await db.User.findOne({ where: { id: post.userId }, transaction: t });
+          if (user) {
+            await db.User.update({ balance: (user.balance || 0) + lastTransaction.amount }, { where: { id: post.userId }, transaction: t });
+            await db.Transaction.create({
+              id: generateId(),
+              userId: post.userId,
+              amount: lastTransaction.amount,
+              type: 'refund',
+              content: `Hoàn tiền tin đăng bị từ chối: ${shortId}`,
+              status: 'success'
+            }, { transaction: t });
+          }
+        }
+
+        await db.Post.update({ status: 'rejected', note: reason }, { where: { id: postId }, transaction: t });
+      });
+      resolve({ err: 0, msg: "Đã từ chối bài đăng và hoàn tiền cho người dùng" });
+    } catch (error) {
+      if (error.message === "POST_NOT_FOUND") resolve({ err: 1, msg: "Không tìm thấy bài đăng" });
+      else reject(error);
+    }
+  });
+
+export const sweepPendingPostsService = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const pendingPosts = await db.Post.findAll({
+        where: { status: "pending" }
+      });
+
+      let approvedCount = 0;
+
+      for (const post of pendingPosts) {
+        const userId = post.userId;
+        const star = +post.star || 0;
+
+        // Tầng 1: Nếu là tin đăng VIP thì được tự động duyệt ngay
+        let shouldApprove = star > 0;
+
+        // Tầng 2: Nếu là tin thường, kiểm tra lịch sử chủ trọ uy tín
+        if (!shouldApprove) {
+          const activeCount = await db.Post.count({
+            where: { userId, status: "active" }
+          });
+          const rejectedCount = await db.Post.count({
+            where: { userId, status: "rejected" }
+          });
+
+          // Điều kiện uy tín: Có tối thiểu 5 tin đăng hoạt động và chưa từng bị từ chối tin nào
+          if (activeCount >= 5 && rejectedCount === 0) {
+            shouldApprove = true;
+          }
+        }
+
+        if (shouldApprove) {
+          await db.sequelize.transaction(async (transaction) => {
+            await db.Post.update({ status: "active" }, { where: { id: post.id }, transaction });
+            const expiredDays = star === 5 ? 30 : star === 4 ? 15 : star === 3 ? 10 : star === 2 ? 7 : 3;
+            await db.Attribute.update({ published: moment().format("DD/MM/YYYY") }, { where: { postId: post.id }, transaction });
+            await db.Overview.update({ 
+              published: moment().format("DD/MM/YYYY"), 
+              expired: moment().add(expiredDays, 'days').format("DD/MM/YYYY") 
+            }, { where: { postId: post.id }, transaction });
+          });
+          approvedCount++;
+        }
+      }
+
+      resolve({ err: 0, msg: `Quét hệ thống thành công. Đã duyệt tự động ${approvedCount} tin chờ duyệt.`, approvedCount });
     } catch (error) {
       reject(error);
     }
   });
+

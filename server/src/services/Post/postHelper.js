@@ -65,3 +65,25 @@ export const getStandardPostInclude = () => [
   { model: db.District, as: "district", attributes: ["code", "value"] },
   { model: db.Feature, as: "features", attributes: ["code", "value"], through: { attributes: [] } },
 ];
+
+export const shouldPostBeAutoApproved = async (postOrBody, userId) => {
+  const { getSystemSettings } = require("../../utils/systemSettings");
+  const settings = getSystemSettings();
+  if (!settings.autoApprove) return false;
+
+  const star = +postOrBody.star || 0;
+  // Tầng 1: Nếu là tin đăng VIP thì được tự động duyệt ngay
+  if (star > 0) return true;
+
+  // Tầng 2: Nếu là tin thường, kiểm tra lịch sử chủ trọ uy tín
+  const activeCount = await db.Post.count({
+    where: { userId, status: "active" }
+  });
+  const rejectedCount = await db.Post.count({
+    where: { userId, status: "rejected" }
+  });
+
+  // Điều kiện uy tín: Có tối thiểu 5 tin đăng hoạt động và chưa từng bị từ chối tin nào
+  return activeCount >= 5 && rejectedCount === 0;
+};
+

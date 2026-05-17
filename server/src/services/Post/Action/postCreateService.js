@@ -7,7 +7,8 @@ import {
   buildPostDescription, 
   syncProvince, 
   syncDistrict, 
-  syncPostFeatures 
+  syncPostFeatures,
+  shouldPostBeAutoApproved
 } from "../postHelper";
 
 export const createNewPostService = (body, userId) =>
@@ -37,13 +38,16 @@ export const createNewPostService = (body, userId) =>
         await syncProvince(body.provinceId, body.provinceName, transaction);
         await syncDistrict(body.districtId, body.districtName, body.provinceId, transaction);
 
+        const isAutoApproved = await shouldPostBeAutoApproved(body, userId);
+        const initialStatus = isAutoApproved ? "active" : "pending";
+
         await db.Post.create({
           id: postId, title: body.title, address: body.address,
           categoryCode: body.categoryCode, description: buildPostDescription(body.description),
           userId, areaCode: body.areaCode, priceCode: body.priceCode,
           provinceCode: body.provinceId, districtCode: body.districtId, 
           priceNumber: body.priceNumber || 0, areaNumber: body.areaNumber || 0,
-          star: body.star || "0", status: "pending"
+          star: body.star || "0", status: initialStatus
         }, { transaction });
 
         await db.Attribute.create({ id: generateId(), postId, price: formatPriceText(body.priceNumber), acreage: `${body.areaNumber} m2`, published: moment().format("DD/MM/YYYY") }, { transaction });
