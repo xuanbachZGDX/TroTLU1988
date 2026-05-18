@@ -1,28 +1,67 @@
-const scrappers = require("./scraper");
 const fs = require("fs");
+const path = require("path");
+const scrapers = require("./scraper");
+
+const DATA_DIRECTORY = path.resolve(__dirname, "..", "server", "data");
+const DEFAULT_CATEGORY_LIMIT = 7;
+
+const resolveFileName = (category) => {
+  if (category.slug) return `${category.slug}.json`;
+  const pathname = new URL(category.link).pathname.split("/").filter(Boolean);
+  return `${pathname.pop() || "phongtro123.com"}.json`;
+};
 
 const scrapeController = async (browserInstance) => {
   const url = "https://phongtro123.com/";
-  const propertyIndex = [0, 1, 2, 3, 4, 5, 6];
+
   try {
-    let browser = await browserInstance; 
+    const browser = await browserInstance;
+    if (!browser) throw new Error("Browser could not be started");
 
-    const categories = await scrappers.scrapeCategory(browser, url);
-    const selectedCategories = categories.filter((category, index) =>
-      propertyIndex.includes(index),
-    );
+    const categories = await scrapers.scrapeCategory(browser, url);
+    const selectedCategories = categories.slice(0, DEFAULT_CATEGORY_LIMIT);
+    let savedCount = 0;
 
-    for (let category of selectedCategories) {
-      console.log(`>> Đang thu thập dữ liệu cho danh mục: ${category.link}...`);
-      let result = await scrappers.scraper(browser, category.link);
+    fs.mkdirSync(DATA_DIRECTORY, { recursive: true });
 
-      let fileName = category.link.split("/").filter(Boolean).pop();
-      fs.writeFileSync(`${fileName}.json`, JSON.stringify(result, null, 2));
+    for (const category of selectedCategories) {
+      console.log(`Scraping category: ${category.link}`);
+      try {
+        const result = await scrapers.scraper(browser, category.link, {
+          maxPages: process.env.SCRAPE_MAX_PAGES || 3,
+        });
+
+        const payload = {
+          ...result,
+          category: {
+            title: category.category,
+            link: category.link,
+            slug: category.slug,
+          },
+        };
+
+        const fileName = resolveFileName(category);
+        const outputPath = path.join(DATA_DIRECTORY, fileName);
+        fs.writeFileSync(outputPath, JSON.stringify(payload, null, 2), "utf8");
+        console.log(`Saved: ${outputPath}`);
+        savedCount++;
+      } catch (err) {
+        console.error(`Failed to scrape category ${category.link}:`, err.message);
+      }
     }
 
     await browser.close();
+    console.log(
+      `Scrape completed successfully. Saved ${savedCount} category files to ${DATA_DIRECTORY}`,
+    );
+    return {
+      savedCount,
+      outputDirectory: DATA_DIRECTORY,
+    };
   } catch (error) {
     console.log("Bug in scrape controller: ", error);
+    throw error;
   }
 };
+
 module.exports = scrapeController;

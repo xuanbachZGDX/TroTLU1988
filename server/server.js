@@ -4,6 +4,7 @@ import cors from "cors";
 import initRoutes from "./src/routes";
 import connectDb from "./src/config/connectDatabase";
 import seedAdmin from "./src/utils/seedAdmin";
+import setupSwagger from "./src/config/swagger";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+setupSwagger(app);
 initRoutes(app);
 connectDb();
 seedAdmin();

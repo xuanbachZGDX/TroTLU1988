@@ -1,286 +1,210 @@
-const scrapeCategory = (browser, url) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      let page = await browser.newPage();
-      console.log(">> Mở tab mới...");
-      await page.goto(url);
-      console.log(">> Đang truy cập vào trang: ", url);
-      await page.waitForSelector("#webpage");
-      console.log(">> Webpage loaded...");
+const DEFAULT_TIMEOUT = 120000;
 
-      const dataCategory = await page.$$eval(
-        ".pt123__nav > ul > li",
-        (elements) => {
-          return elements.map((item) => {
-            const aTag = item.querySelector("a");
-            return {
-              category: aTag?.innerText?.trim() || "",
-              link: aTag?.href || "",
-            };
-          });
-        },
-      );
-
-      await page.close();
-      console.log(">> Tab đã đóng...");
-      resolve(dataCategory);
-    } catch (error) {
-      console.log("Bug in scrape category: ", error);
-      reject(error);
+const openPage = async (browser, url) => {
+  const page = await browser.newPage();
+  
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    const resourceType = req.resourceType();
+    if (['image', 'stylesheet', 'font', 'media', 'other'].includes(resourceType)) {
+      req.abort();
+    } else {
+      req.continue();
     }
   });
 
-const scraper = (browser, url) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      let newPage = await browser.newPage();
-      console.log(">> Mở tab mới...");
-      await newPage.goto(url);
-      console.log(">> Đang truy cập vào trang: ", url);
-      await newPage.waitForSelector("main header");
-      console.log(">> Webpage loaded tag main...");
+  page.setDefaultNavigationTimeout(DEFAULT_TIMEOUT);
+  await page.goto(url, {
+    waitUntil: "domcontentloaded",
+    timeout: DEFAULT_TIMEOUT,
+  });
+  return page;
+};
 
-      const scrapeData = {};
+const scrapeCategory = async (browser, url) => {
+  const page = await openPage(browser, url);
+  try {
+    await page.waitForSelector("#webpage", { timeout: DEFAULT_TIMEOUT });
 
-      // Lấy header
-      const headerData = await newPage.$eval("main header", (elements) => {
-        return {
-          title: elements.querySelector("h1")?.innerText?.trim() || "",
-          description: elements.querySelector("p")?.innerText?.trim() || "",
-        };
-      });
+    return await page.$$eval(".pt123__nav > ul > li", (elements) =>
+      elements
+        .map((item) => {
+          const link = item.querySelector("a");
+          const href = link?.href?.trim() || "";
+          return {
+            category: link?.innerText?.trim() || "",
+            link: href,
+            slug: href ? new URL(href).pathname.split("/").filter(Boolean).pop() || "phongtro123.com" : "",
+          };
+        })
+        .filter((item) => item.link),
+    );
+  } finally {
+    await page.close();
+  }
+};
 
-      scrapeData.header = headerData;
+const scrapeListingPage = async (page) => {
+  await page.waitForSelector("main", { timeout: DEFAULT_TIMEOUT });
 
-      // Lấy link detail item
-      const detailLinks = await newPage.$$eval(
-        "main ul.post__listing > li",
-        (elements) => {
-          detailLinks = elements.map((item) => {
-            return item.querySelector("h3 > a").href;
-          });
-          return detailLinks;
-        },
+  const header = await page.$eval("main header", (element) => ({
+    title: element.querySelector("h1")?.innerText?.trim() || "",
+    description: element.querySelector("p")?.innerText?.trim() || "",
+  }));
+
+  const detailLinks = await page.$$eval("main ul.post__listing > li h3 > a", (elements) =>
+    Array.from(new Set(elements.map((item) => item.href).filter(Boolean))),
+  );
+
+  const nextPage = await page
+    .$eval(".pagination .page-item.active + .page-item a", (element) => element.href)
+    .catch(() => null);
+
+  return { header, detailLinks, nextPage };
+};
+
+const scrapePostDetail = async (browser, link) => {
+  const page = await openPage(browser, link);
+  try {
+    return await page.evaluate(() => {
+      const normalize = (value) => value?.replace(/\s+/g, " ").trim() || "";
+      const rows = Array.from(document.querySelectorAll(".mt-2 table tbody tr"));
+      const table = rows.reduce((accumulator, row) => {
+        const label = normalize(row.querySelector("td:first-child")?.innerText);
+        const content = normalize(row.querySelector("td:last-child")?.innerText);
+        if (label) accumulator[label] = content;
+        return accumulator;
+      }, {});
+
+      const phoneElement = document.querySelector(".bg-white a[href^='tel:']");
+      const zaloElement = document.querySelector(".bg-white a[href*='zalo.me']");
+      const highlightContainer = Array.from(document.querySelectorAll(".bg-white > div")).find((item) =>
+        item.querySelector(".row > .col-3 i.green"),
       );
 
-      // console.log(detailLinks);
+      return {
+        sourceUrl: window.location.href,
+        images: Array.from(
+          document.querySelectorAll("#carousel_Photos div.carousel-item img"),
+        )
+          .map((item) => item.getAttribute("src"))
+          .filter(Boolean),
+        header: {
+          title: normalize(document.querySelector("main header h1")?.innerText),
+          star:
+            document
+              .querySelector("main header .badge .star")
+              ?.className?.match(/\d+/)?.[0] || "0",
+          class: {
+            price: normalize(document.querySelector("main header .text-green")?.innerText),
+            area: normalize(
+              document.querySelector("main header .dot")?.nextElementSibling?.innerText,
+            ),
+            updated: normalize(document.querySelector("main header time")?.innerText),
+          },
+          table: {
+            district: { label: "Quận huyện:", content: table["Quận huyện:"] || "" },
+            city: { label: "Tỉnh thành:", content: table["Tỉnh thành:"] || "" },
+            address: { label: "Địa chỉ:", content: table["Địa chỉ:"] || "" },
+            postId: { label: "Mã tin:", content: table["Mã tin:"] || "" },
+            publishedDate: { label: "Ngày đăng:", content: table["Ngày đăng:"] || "" },
+            expiredDate: { label: "Ngày hết hạn:", content: table["Ngày hết hạn:"] || "" },
+          },
+        },
+        mainContent: {
+          header: normalize(document.querySelector("header + div h2")?.innerText),
+          info: Array.from(document.querySelectorAll("header + div > p"))
+            .map((item) => normalize(item.innerText))
+            .filter(Boolean),
+        },
+        highLight: highlightContainer
+          ? {
+              title: normalize(highlightContainer.querySelector("h2")?.innerText),
+              content: Array.from(
+                highlightContainer.querySelectorAll(".row > .col-3 .text-body"),
+              )
+                .filter((item) => item.querySelector("i.green"))
+                .map((item) => normalize(item.innerText))
+                .filter(Boolean),
+            }
+          : { title: "", content: [] },
+        contactInfo: {
+          title: normalize(document.querySelector(".bg-white > div.mb-4:not(.border-bottom) h2")?.innerText),
+          content: {
+            name: normalize(document.querySelector(".bg-white > div.mb-4:not(.border-bottom) .ms-3 .fs-5.fw-medium")?.innerText),
+            phone: {
+              text: normalize(phoneElement?.innerText),
+              url: phoneElement?.getAttribute("href") || "",
+            },
+            zalo: {
+              text: normalize(zaloElement?.innerText),
+              url: zaloElement?.getAttribute("href") || "",
+            },
+          },
+        },
+      };
+    });
+  } finally {
+    await page.close();
+  }
+};
 
-      const scrapeDetail = async (link) =>
-        new Promise(async (resolve, reject) => {
-          try {
-            let pageDetail = await browser.newPage();
-            await pageDetail.goto(link);
-            console.log(">> Truy cập: ", link);
-            await pageDetail.waitForSelector("main");
+const scraper = async (browser, url, options = {}) => {
+  const maxPages = Number(options.maxPages || process.env.SCRAPE_MAX_PAGES || 1);
+  const listingPage = await openPage(browser, url);
 
-            const detailData = {};
+  try {
+    const details = [];
+    const visitedLinks = new Set();
+    const visitedListingUrls = new Set();
+    let currentUrl = url;
+    let currentPage = 1;
+    let categoryHeader = { title: "", description: "" };
 
-            // Cào data
-            // Cào ảnh
-            const images = await pageDetail.$$eval(
-              "#carousel_Photos div.carousel-item",
-              (items) => {
-                return items.map((item) => {
-                  const img = item.querySelector("img");
-                  return img ? img.src : null;
-                });
-              },
-            );
+    while (currentUrl && currentPage <= maxPages) {
+      visitedListingUrls.add(currentUrl);
 
-            detailData.images = images;
-
-            // Lấy header detail
-            const header = await pageDetail.$eval("main header", (ele) => {
-              const rows = document.querySelectorAll(".mt-2 table tbody tr");
-              return {
-                title: ele.querySelector("h1")?.innerText?.trim() || "",
-                star:
-                  ele
-                    .querySelector(".badge .star")
-                    ?.className?.match(/\d+/)?.[0] || "",
-                class: {
-                  price:
-                    ele.querySelector(".text-green")?.innerText?.trim() || "",
-                  area:
-                    ele
-                      .querySelector(".dot")
-                      ?.nextElementSibling?.innerText?.trim() || "",
-                  updated: ele.querySelector("time")?.innerText?.trim() || "",
-                },
-                table: {
-                  // Quận huyện
-                  district: {
-                    label:
-                      rows[0]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[0]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                  // Tỉnh thành
-                  city: {
-                    label:
-                      rows[1]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[1]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                  // Địa chỉ
-                  address: {
-                    label:
-                      rows[2]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[2]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                  // Mã tin
-                  postId: {
-                    label:
-                      rows[3]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[3]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                  // Ngày đăng
-                  publishedDate: {
-                    label:
-                      rows[4]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[4]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                  // Ngày hết hạn
-                  expiredDate: {
-                    label:
-                      rows[5]
-                        ?.querySelector("td:first-child")
-                        ?.innerText?.trim() || "",
-                    content:
-                      rows[5]
-                        ?.querySelector("td:last-child")
-                        ?.innerText?.trim() || "",
-                  },
-                },
-              };
-            });
-
-            detailData.header = header;
-
-            // Thông tin mô tả
-            const description = await pageDetail.$eval(
-              "header + div",
-              (ele) => ele.querySelector("h2")?.innerText?.trim() || "",
-            );
-
-            const infoDescription = await pageDetail.$$eval(
-              "header + div > p",
-              (ele) => ele.map((item) => item.innerText.trim()),
-            );
-
-            detailData.mainContent = {
-              header: description,
-              info: infoDescription,
-            };
-
-            // Nổi bật
-            const highLight = await pageDetail
-              .$eval(".bg-white > div:has(.row > .col-3 i.green)", (ele) => {
-                return {
-                  title: ele.querySelector("h2")?.innerText?.trim() || "",
-
-                  content: Array.from(
-                    ele.querySelectorAll(".row > .col-3 .text-body"),
-                  )
-                    .filter((item) => item.querySelector("i.green"))
-                    .map((item) => item.innerText.trim()),
-                };
-              })
-              .catch(() => ({
-                title: "",
-                content: [],
-              }));
-
-            detailData.highLight = highLight;
-
-            // Thông tin liên hệ
-            const contactInfo = await pageDetail
-              .$eval(".bg-white > div.mb-4:not(.border-bottom)", (ele) => {
-                // Khai báo sẵn các phần tử để tái sử dụng, đỡ phải querySelector nhiều lần
-                const phoneEle = ele.querySelector("a[href^='tel:']");
-                const zaloEle = ele.querySelector("a[href*='zalo.me']");
-
-                return {
-                  title: ele.querySelector("h2")?.innerText?.trim() || "",
-
-                  content: {
-                    name:
-                      ele
-                        .querySelector(".ms-3 .fs-5.fw-medium")
-                        ?.innerText?.trim() || "",
-
-                    // Lấy cả text hiển thị và link gốc cho Số điện thoại
-                    phone: {
-                      text: phoneEle?.innerText?.trim() || "",
-                      url: phoneEle?.getAttribute("href") || "",
-                    },
-
-                    // Lấy cả text hiển thị và link gốc cho Zalo
-                    zalo: {
-                      text: zaloEle?.innerText?.trim() || "",
-                      url: zaloEle?.getAttribute("href") || "",
-                    },
-                  },
-                };
-              })
-              .catch(() => ({
-                title: "",
-                content: {
-                  name: "",
-                  phone: { text: "", url: "" },
-                  zalo: { text: "", url: "" },
-                },
-              }));
-
-            detailData.contactInfo = contactInfo;
-
-            await pageDetail.close();
-            console.log(">> Tab detail đã đóng...", link);
-
-            resolve(detailData);
-          } catch (error) {
-            console.log("Bug in scrape detail: ", error);
-            reject(error);
-          }
+      if (currentPage > 1) {
+        await listingPage.goto(currentUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: DEFAULT_TIMEOUT,
         });
-
-      const details = [];
-      for (let link of detailLinks) {
-        const detail = await scrapeDetail(link);
-        details.push(detail);
       }
 
-      scrapeData.body = details;
+      const pageData = await scrapeListingPage(listingPage);
+      if (currentPage === 1) categoryHeader = pageData.header;
 
-      console.log(">> Trình duyệt đã đóng...");
-      resolve(scrapeData);
-    } catch (error) {
-      reject(error);
+      const postLinks = pageData.detailLinks.filter(link => !visitedLinks.has(link));
+      postLinks.forEach(link => visitedLinks.add(link));
+
+      const CHUNK_SIZE = 3; 
+      for (let i = 0; i < postLinks.length; i += CHUNK_SIZE) {
+        const chunk = postLinks.slice(i, i + CHUNK_SIZE);
+        const chunkResults = await Promise.all(chunk.map(link => scrapePostDetail(browser, link).catch(err => {
+          console.warn(`Lỗi khi scrape ${link}:`, err.message);
+          return null; 
+        })));
+        details.push(...chunkResults.filter(Boolean));
+      }
+
+      currentUrl = pageData.nextPage && !visitedListingUrls.has(pageData.nextPage) ? pageData.nextPage : null;
+      currentPage += 1;
     }
-  });
+
+    return {
+      header: categoryHeader,
+      metadata: {
+        sourceUrl: url,
+        scrapedAt: new Date().toISOString(),
+        pages: Math.min(currentPage - 1, maxPages),
+        totalPosts: details.length,
+      },
+      body: details,
+    };
+  } finally {
+    await listingPage.close();
+  }
+};
 
 module.exports = {
   scrapeCategory,
