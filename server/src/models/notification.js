@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class Notification extends Model {
     static associate(models) {
       Notification.belongsTo(models.User, { foreignKey: "senderId", as: "sender" });
+      Notification.belongsTo(models.User, { foreignKey: "recipientId", as: "recipient" });
       Notification.belongsTo(models.Post, { foreignKey: "postId", as: "post" });
     }
   }
@@ -12,8 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.STRING, primaryKey: true },
       postId: DataTypes.STRING,
       senderId: DataTypes.STRING,
+      recipientId: DataTypes.STRING,
       title: DataTypes.STRING,
-      content: DataTypes.STRING,
+      content: DataTypes.TEXT,
       isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {

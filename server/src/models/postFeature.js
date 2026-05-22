@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'PostFeature',
+    indexes: [
+      { fields: ['postId'] },
+      { fields: ['featureId'] },
+      { unique: true, fields: ['postId', 'featureId'] }
+    ]
   });
   return PostFeature;
 };

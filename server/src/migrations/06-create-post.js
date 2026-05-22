@@ -16,6 +16,7 @@ module.exports = {
       areaNumber: { type: Sequelize.FLOAT },
       status: { type: Sequelize.STRING, defaultValue: 'pending' },
       userId: { type: Sequelize.STRING },
+      note: { type: Sequelize.TEXT, allowNull: true },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE }
     });

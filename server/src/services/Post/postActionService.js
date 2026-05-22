@@ -49,6 +49,21 @@ export const deletePost = (postId, actor) =>
 
         // Thay vì destroy, chuyển trạng thái thành 'archived' để lưu trữ vào kho ẩn
         await db.Post.update({ status: 'archived' }, { where: { id: postId }, transaction });
+
+        // Tạo thông báo cho Admin nếu chủ trọ tự ẩn tin
+        if (actor?.role !== "admin") {
+          const userRecord = await db.User.findOne({ where: { id: post.userId }, transaction });
+          const landlordName = userRecord?.name || "Chủ trọ";
+          const { v4 } = require("uuid");
+          await db.Notification.create({
+            id: v4(),
+            postId,
+            senderId: actor?.id || post.userId,
+            title: "Tin đăng đã bị ẩn",
+            content: `Chủ trọ ${landlordName} đã ẩn tin đăng #${postId.slice(0, 8).toUpperCase()} và đưa vào Kho lưu trữ.`,
+            isRead: false
+          }, { transaction });
+        }
       });
       resolve({ err: 0, msg: "Lưu trữ tin đăng vào kho thành công" });
     } catch (error) {
@@ -64,7 +79,25 @@ export const restorePost = (postId, actor) =>
       if (!post) return resolve({ err: 1, msg: "Không tìm thấy bài đăng" });
       if (post.status !== "archived") return resolve({ err: 2, msg: "Bài đăng không nằm trong kho lưu trữ" });
 
-      await db.Post.update({ status: "pending" }, { where: { id: postId } });
+      await db.sequelize.transaction(async (transaction) => {
+        await db.Post.update({ status: "pending" }, { where: { id: postId }, transaction });
+        
+        // Nếu người khôi phục là chủ trọ thì gửi thông báo cho Admin duyệt lại
+        if (actor?.role !== "admin") {
+          const userRecord = await db.User.findByPk(actor?.id || post.userId);
+          const landlordName = userRecord?.name || "Chủ trọ";
+          const { v4 } = require("uuid");
+          await db.Notification.create({
+            id: v4(),
+            postId,
+            senderId: actor?.id || post.userId,
+            title: "Yêu cầu khôi phục tin đăng",
+            content: `Chủ trọ ${landlordName} đã khôi phục bài đăng #${postId.slice(0, 8).toUpperCase()} từ Kho lưu trữ. Vui lòng duyệt lại.`,
+            isRead: false
+          }, { transaction });
+        }
+      });
+
       resolve({ err: 0, msg: "Khôi phục bài đăng thành công, đang chờ duyệt lại!" });
     } catch (error) {
       reject(error);

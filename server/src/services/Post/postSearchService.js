@@ -42,21 +42,33 @@ export const getPostsLimitService = (page, { limitPost, order, features, ...quer
         where.address = { [Op.like]: `%${addressSearch}%` };
       }
 
-      const includeForIds = [];
       if (features && features.length > 0) {
         const featureCodes = Array.isArray(features) ? features : [features];
-        includeForIds.push({
-          model: db.Feature, as: "features",
+        const dbFeatures = await db.Feature.findAll({
           where: { code: { [Op.in]: featureCodes } },
-          attributes: [], through: { attributes: [] }
+          attributes: ['id']
         });
+        const featureIds = dbFeatures.map(f => f.id);
+        
+        if (featureIds.length > 0) {
+          const matchingRows = await db.PostFeature.findAll({
+            where: { featureId: { [Op.in]: featureIds } },
+            attributes: ['postId'],
+            group: ['postId'],
+            having: db.sequelize.literal(`COUNT(DISTINCT featureId) = ${featureIds.length}`)
+          });
+          const matchingPostIds = matchingRows.map(r => r.postId);
+          where.id = { [Op.in]: matchingPostIds };
+        } else {
+          where.id = null;
+        }
       }
 
       const sortOrder = order === 'new' ? [["createdAt", "DESC"]] : [["star", "DESC"], ["createdAt", "DESC"]];
 
       const { count, rows: idRows } = await db.Post.findAndCountAll({
         where, limit, offset: offset * limit, order: sortOrder,
-        attributes: ["id"], distinct: true, include: includeForIds,
+        attributes: ["id"], distinct: true,
       });
 
       const postIds = idRows.map(r => r.id);

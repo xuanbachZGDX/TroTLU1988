@@ -13,7 +13,7 @@ export const forgotPasswordService = (email) =>
       user.passwordResetExpires = Date.now() + 5 * 60 * 1000; 
       await user.save();
 
-      const emailSubject = "[PhongTro123] Mã xác thực khôi phục mật khẩu";
+      const emailSubject = "[TLU.com] Mã xác thực khôi phục mật khẩu";
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #007bff;">Khôi phục mật khẩu</h2>

@@ -37,11 +37,19 @@ module.exports = (sequelize, DataTypes) => {
       areaNumber: DataTypes.FLOAT,
       status: DataTypes.STRING,
       userId: DataTypes.STRING,
-      note: DataTypes.STRING,
+      note: DataTypes.TEXT,
     },
     {
       sequelize,
       modelName: "Post",
+      indexes: [
+        { fields: ["provinceCode"] },
+        { fields: ["districtCode"] },
+        { fields: ["priceCode"] },
+        { fields: ["areaCode"] },
+        { fields: ["status"] },
+        { fields: ["userId"] },
+      ]
     },
   );
   return Post;

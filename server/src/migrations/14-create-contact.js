@@ -25,6 +25,10 @@ module.exports = {
       content: {
         type: Sequelize.TEXT
       },
+      response: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
       status: {
         type: Sequelize.STRING
       },

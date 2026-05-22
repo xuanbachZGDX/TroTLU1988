@@ -3,7 +3,14 @@ import db from "../../models";
 export const getAdminNotificationsService = () =>
   new Promise(async (resolve, reject) => {
     try {
+      const { Op } = require("sequelize");
       const response = await db.Notification.findAll({
+        where: {
+          [Op.or]: [
+            { recipientId: null },
+            { recipientId: "admin" }
+          ]
+        },
         order: [["createdAt", "DESC"]],
         include: [
           {

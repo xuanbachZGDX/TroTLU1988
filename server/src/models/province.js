@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Province',
+    indexes: [
+      { unique: true, fields: ['code'] }
+    ]
   });
   return Province;
 };

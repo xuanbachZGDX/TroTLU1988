@@ -40,7 +40,7 @@ export const login = async (req, res) => {
 };
 
 export const loginGoogle = async (req, res) => {
-  const { credential } = req.body;
+  const { credential, accountType } = req.body;
   try {
     if (!credential)
       return res.status(400).json({
@@ -48,7 +48,7 @@ export const loginGoogle = async (req, res) => {
         msg: "Missing Google credential!",
       });
 
-    const response = await authService.loginGoogleService(credential);
+    const response = await authService.loginGoogleService(credential, accountType);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

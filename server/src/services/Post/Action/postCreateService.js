@@ -61,6 +61,19 @@ export const createNewPostService = (body, userId) =>
         }, { transaction });
 
         await syncPostFeatures(postId, body.features, transaction);
+
+        // Tạo thông báo cho Admin
+        const landlordName = user?.name || "Chủ trọ";
+        await db.Notification.create({
+          id: generateId(),
+          postId,
+          senderId: userId,
+          title: initialStatus === "active" ? "Tin đăng mới đã tự động duyệt" : "Tin đăng mới đang chờ duyệt",
+          content: initialStatus === "active"
+            ? `Chủ trọ ${landlordName} đã đăng tin mới #${postId.slice(0, 8).toUpperCase()} (đã được tự động duyệt).`
+            : `Chủ trọ ${landlordName} đã đăng tin mới #${postId.slice(0, 8).toUpperCase()}. Vui lòng kiểm duyệt.`,
+          isRead: false
+        }, { transaction });
       });
       resolve({ err: 0, msg: "Tạo tin đăng thành công" });
     } catch (error) {

@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import db from "../../models";
+import { sendBlockEmail } from "../../utils/emailService";
 
 export const getAdminUsersService = (page, query) =>
   new Promise(async (resolve, reject) => {
@@ -39,7 +40,6 @@ export const updateUserStatusService = (userId, status, reason = "") =>
       await db.User.update({ status }, { where: { id: userId } });
 
       if (status === "blocked" && user.email) {
-        const { sendBlockEmail } = require("../../utils/emailService");
         sendBlockEmail(user.email, user.name, reason || "Vi phạm điều khoản dịch vụ hệ thống PhongTro123.");
       }
 

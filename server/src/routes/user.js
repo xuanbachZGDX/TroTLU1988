@@ -41,5 +41,7 @@ router.get("/me",  userController.getCurrent);
  */
 router.put("/me",  userController.updateUser);
 router.get("/my-contacts", userController.getMyContacts);
+router.get("/notifications", userController.getNotifications);
+router.put("/notifications/:id/read", userController.readNotification);
 
 export default router;

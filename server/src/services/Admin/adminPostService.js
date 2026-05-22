@@ -53,6 +53,10 @@ export const getAdminPostsService = (page, query) =>
         });
       } else if (status === "pending") {
         rows = rows.filter(item => item.status === "pending");
+      } else if (status === "rejected") {
+        rows = rows.filter(item => item.status === "rejected");
+      } else if (status === "archived") {
+        rows = rows.filter(item => item.status === "archived");
       }
 
       resolve({ err: 0, msg: "OK", response: { count: rows.length, rows: rows.slice(offset * limit, offset * limit + limit) } });
@@ -83,6 +87,16 @@ export const approveAdminPostService = (postId) =>
         const expiredDays = star === 5 ? 30 : star === 4 ? 15 : star === 3 ? 10 : star === 2 ? 7 : 3;
         await db.Attribute.update({ published: moment().format("DD/MM/YYYY") }, { where: { postId }, transaction });
         await db.Overview.update({ published: moment().format("DD/MM/YYYY"), expired: moment().add(expiredDays, 'days').format("DD/MM/YYYY") }, { where: { postId }, transaction });
+        
+        await db.Notification.create({
+          id: generateId(),
+          senderId: null,
+          recipientId: post.userId,
+          postId: post.id,
+          title: "Tin đăng đã được duyệt",
+          content: `Tin đăng #${post.id.slice(0, 8).toUpperCase()} "${post.title?.slice(0, 50)}${post.title?.length > 50 ? '...' : ''}" của bạn đã được Admin phê duyệt thành công.`,
+          isRead: false
+        }, { transaction });
       });
       resolve({ err: 0, msg: "Duyệt thành công" });
     } catch (error) {
@@ -128,6 +142,16 @@ export const rejectAdminPostService = (postId, reason = "") =>
         }
 
         await db.Post.update({ status: 'rejected', note: reason }, { where: { id: postId }, transaction: t });
+
+        await db.Notification.create({
+          id: generateId(),
+          senderId: null,
+          recipientId: post.userId,
+          postId: post.id,
+          title: "Tin đăng bị từ chối",
+          content: `Tin đăng #${post.id.slice(0, 8).toUpperCase()} "${post.title?.slice(0, 50)}${post.title?.length > 50 ? '...' : ''}" của bạn bị từ chối phê duyệt. Lý do: "${reason}".`,
+          isRead: false
+        }, { transaction: t });
       });
       resolve({ err: 0, msg: "Đã từ chối bài đăng và hoàn tiền cho người dùng" });
     } catch (error) {
@@ -176,6 +200,16 @@ export const sweepPendingPostsService = () =>
               published: moment().format("DD/MM/YYYY"), 
               expired: moment().add(expiredDays, 'days').format("DD/MM/YYYY") 
             }, { where: { postId: post.id }, transaction });
+
+            await db.Notification.create({
+              id: generateId(),
+              senderId: null,
+              recipientId: post.userId,
+              postId: post.id,
+              title: "Tin đăng đã được duyệt",
+              content: `Tin đăng #${post.id.slice(0, 8).toUpperCase()} "${post.title?.slice(0, 50)}${post.title?.length > 50 ? '...' : ''}" của bạn đã được duyệt tự động.`,
+              isRead: false
+            }, { transaction });
           });
           approvedCount++;
         }

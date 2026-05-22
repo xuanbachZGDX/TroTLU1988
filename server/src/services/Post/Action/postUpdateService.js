@@ -19,6 +19,39 @@ export const updatePost = (postId, payload, actor) =>
 
       await db.sequelize.transaction(async (transaction) => {
         const isUser = actor?.role !== "admin";
+
+        if (isUser && post.status === "rejected") {
+          const overview = await db.Overview.findOne({ where: { postId }, transaction });
+          let duration = 3;
+          if (overview) {
+            const exp = moment(overview.expired, "DD/MM/YYYY");
+            const pub = moment(overview.published, "DD/MM/YYYY");
+            if (exp.isValid() && pub.isValid()) {
+              duration = Math.max(1, exp.diff(pub, 'days'));
+            }
+          }
+          const star = +post.star || 0;
+          const pricePerDay = star === 5 ? 10000 : star === 4 ? 7000 : star === 3 ? 5000 : star === 2 ? 3000 : 1000;
+          const postPrice = pricePerDay * duration;
+
+          const user = await db.User.findOne({ 
+            where: { id: post.userId }, 
+            transaction,
+            lock: transaction.LOCK.UPDATE 
+          });
+          if (!user || (user.balance || 0) < postPrice) throw new Error("NOT_ENOUGH_BALANCE");
+
+          const { v4 } = require("uuid");
+          await db.User.update({ balance: (user.balance || 0) - postPrice }, { where: { id: post.userId }, transaction });
+          await db.Transaction.create({ 
+            id: v4(), 
+            userId: post.userId, 
+            amount: postPrice, 
+            type: 'payment', 
+            content: `Thanh toán lại phí đăng tin bị từ chối - Mã tin: ${postId.slice(0,8)}`, 
+            status: 'success' 
+          }, { transaction });
+        }
         
         const isAutoApproved = isUser ? await shouldPostBeAutoApproved({ ...post.get({ plain: true }), ...payload }, post.userId) : false;
 
@@ -72,8 +105,10 @@ export const updatePost = (postId, payload, actor) =>
               id: v4(),
               postId,
               senderId: actor?.id || post.userId,
-              title: "Tin đăng đã được cập nhật",
-              content: `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()}. Vui lòng duyệt lại.`,
+              title: isAutoApproved ? "Tin đăng cập nhật đã tự động duyệt" : "Tin đăng đã được cập nhật",
+              content: isAutoApproved
+                ? `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()} (đã được tự động duyệt).`
+                : `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()}. Vui lòng duyệt lại.`,
               isRead: false
             }, { transaction });
           }
@@ -125,6 +160,10 @@ export const updatePost = (postId, payload, actor) =>
       });
       resolve({ err: 0, msg: "Cập nhật thành công" });
     } catch (error) {
-      reject(error);
+      if (error.message === "NOT_ENOUGH_BALANCE") {
+        resolve({ err: 2, msg: "Số dư tài khoản không đủ để thanh toán lại phí đăng tin bị từ chối." });
+      } else {
+        reject(error);
+      }
     }
   });
