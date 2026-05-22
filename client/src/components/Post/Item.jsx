@@ -5,6 +5,7 @@ import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToS
 import { path } from "../../utils/constant";
 import anonAvatar from "../../assets/user.png";
 import Swal from "sweetalert2";
+import { optimizeCloudinaryUrl } from "../../utils/Common/imageHelper";
 
 const { GrStar, RiHeartFill, RiHeartLine, HiOutlineLocationMarker } = icons;
 
@@ -89,21 +90,24 @@ const Item = ({
       >
         <div className="flex-1 h-full">
           <img
-            src={images[0] || "https://via.placeholder.com/400x300?text=No+Image"}
+            src={images[0] ? optimizeCloudinaryUrl(images[0], { width: 450, height: 300 }) : "https://via.placeholder.com/400x300?text=No+Image"}
             alt="preview"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </div>
         <div className="w-[35%] flex flex-col gap-[2px] h-full">
           <img
-            src={images[1] || images[0] || "https://via.placeholder.com/200x150?text=No+Image"}
+            src={optimizeCloudinaryUrl(images[1] || images[0], { width: 200, height: 150 }) || "https://via.placeholder.com/200x150?text=No+Image"}
             alt="preview"
             className="w-full h-[119px] object-cover"
+            loading="lazy"
           />
           <img
-            src={images[2] || images[0] || "https://via.placeholder.com/200x150?text=No+Image"}
+            src={optimizeCloudinaryUrl(images[2] || images[0], { width: 200, height: 150 }) || "https://via.placeholder.com/200x150?text=No+Image"}
             alt="preview"
             className="w-full h-[119px] object-cover"
+            loading="lazy"
           />
         </div>
         <span className="bg-black/60 text-white px-2 py-1 text-xs rounded-md absolute left-2 bottom-2 flex items-center gap-1">
@@ -147,9 +151,10 @@ const Item = ({
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-gray-100">
           <div className="flex items-center gap-2">
             <img
-              src={user?.avatar || anonAvatar}
+              src={user?.avatar ? optimizeCloudinaryUrl(user?.avatar, { width: 80, height: 80 }) : anonAvatar}
               alt="avatar"
               className="w-10 h-10 object-cover rounded-full border border-gray-100 shadow-sm"
+              loading="lazy"
             />
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-800">{user?.name}</span>

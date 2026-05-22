@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { apiGetAdminNotifications, apiReadAdminNotification, apiGetPostHistory } from "../../../services";
 import { PostHistoryModal } from "../../../components";
 import userAvatar from "../../../assets/user.png";
+import { path } from "../../../utils/constant";
 
 const AdminNotifications = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -37,6 +40,10 @@ const AdminNotifications = () => {
 
   const handleViewChanges = async (notif) => {
     await handleMarkAsRead(notif);
+    if (!notif.postId) {
+      navigate(`/${path.ADMIN}/${path.ADMIN_CONTACTS}`);
+      return;
+    }
     setHistoryPost({ id: notif.postId, overview: { code: notif.postId?.slice(0, 8).toUpperCase() } });
     
     const response = await apiGetPostHistory(notif.postId);

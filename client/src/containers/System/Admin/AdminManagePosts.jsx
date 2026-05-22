@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import * as actions from "../../../store/actions";
-import { apiDeleteAdminPost, apiApproveAdminPost, apiRejectAdminPost, apiGetPostHistory } from "../../../services";
+import { apiDeleteAdminPost, apiApproveAdminPost, apiRejectAdminPost, apiGetPostHistory, apiRestorePost } from "../../../services";
 import { apiGetPublicDistrict } from "../../../services/appService";
 import { PaginationAdmin, PostHistoryModal } from "../../../components";
 import AdminPostFilters from "./AdminPostFilters";
@@ -39,22 +39,43 @@ const AdminManagePosts = () => {
 
   const handleDelete = async (postId) => {
     const res = await Swal.fire({
-      title: "Xác nhận xóa bài đăng?",
-      text: "Bài đăng sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
+      title: "Ẩn bài đăng này?",
+      text: "Bài đăng này sẽ được đưa vào Kho lưu trữ tin ẩn. Bạn có thể khôi phục lại bất kỳ lúc nào.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Xóa bài đăng",
+      confirmButtonText: "Ẩn tin",
       cancelButtonText: "Hủy",
       confirmButtonColor: "#ef4444",
     });
     if (res.isConfirmed) {
       const response = await apiDeleteAdminPost(postId);
       if (response?.data?.err === 0) {
-        Swal.fire("Xóa thành công!", "Bài đăng đã được xóa khỏi hệ thống.", "success");
+        Swal.fire("Đã ẩn thành công!", "Bài đăng đã được chuyển vào Kho lưu trữ tin ẩn.", "success");
         dispatch(actions.getAdminPosts({ page, ...appliedFilters }));
         dispatch(actions.getAdminDashboard());
       } else {
-        Swal.fire("Xóa thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
+        Swal.fire("Ẩn thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
+      }
+    }
+  };
+
+  const handleRestore = async (postId) => {
+    const res = await Swal.fire({
+      title: "Khôi phục bài đăng này?",
+      text: "Bài đăng này sẽ được khôi phục về trạng thái chờ duyệt. Bạn có chắc chắn không?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Khôi phục",
+      cancelButtonText: "Hủy",
+      confirmButtonColor: "#3b82f6",
+    });
+    if (res.isConfirmed) {
+      const response = await apiRestorePost(postId);
+      if (response?.data?.err === 0) {
+        Swal.fire("Khôi phục thành công!", "Bài đăng đã được đưa về danh sách chờ duyệt.", "success");
+        dispatch(actions.getAdminPosts({ page, ...appliedFilters }));
+      } else {
+        Swal.fire("Lỗi khôi phục!", response?.data?.msg || "Có lỗi xảy ra, vui lòng thử lại.", "error");
       }
     }
   };
@@ -82,27 +103,35 @@ const AdminManagePosts = () => {
   };
 
   const handleReject = async (postId) => {
+    const targetPost = posts.find(p => p.id === postId);
+    const isActive = targetPost?.status === "active";
+
     const res = await Swal.fire({
-      title: "Từ chối bài đăng này?",
+      title: isActive ? "Gỡ bài đăng này?" : "Từ chối bài đăng này?",
       input: "text",
-      inputLabel: "Nhập lý do từ chối đăng tin:",
-      inputPlaceholder: "Ví dụ: Hình ảnh mờ, thông tin sai lệch...",
+      inputLabel: isActive ? "Nhập lý do gỡ bài đăng vi phạm:" : "Nhập lý do từ chối đăng tin:",
+      inputPlaceholder: isActive ? "Ví dụ: Tin đăng lừa đảo, nội dung không đúng sự thật..." : "Ví dụ: Hình ảnh mờ, thông tin sai lệch...",
       inputValidator: (value) => {
         if (!value) {
-          return "Bạn phải nhập lý do từ chối!";
+          return isActive ? "Bạn phải nhập lý do gỡ bài!" : "Bạn phải nhập lý do từ chối!";
         }
       },
       showCancelButton: true,
-      confirmButtonText: "Từ chối & Hoàn tiền",
+      confirmButtonText: isActive ? "Gỡ tin & Hoàn tiền" : "Từ chối & Hoàn tiền",
       cancelButtonText: "Hủy",
-      confirmButtonColor: "#f97316",
+      confirmButtonColor: "#ef4444",
     });
     if (res.isConfirmed && res.value) {
       const reason = res.value;
       const response = await apiRejectAdminPost(postId, reason);
       if (response?.data?.err === 0) {
-        Swal.fire("Đã từ chối!", "Bài đăng đã bị từ chối và hoàn trả phí thành công.", "success");
+        Swal.fire(
+          isActive ? "Đã gỡ bài thành công!" : "Đã từ chối!",
+          isActive ? "Bài đăng đã bị gỡ và hoàn phí dịch vụ thành công." : "Bài đăng đã bị từ chối và hoàn trả phí thành công.",
+          "success"
+        );
         dispatch(actions.getAdminPosts({ page, ...appliedFilters }));
+        dispatch(actions.getAdminDashboard());
       } else {
         Swal.fire("Thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
       }
@@ -152,6 +181,7 @@ const AdminManagePosts = () => {
                   handleApprove={handleApprove} 
                   handleReject={handleReject} 
                   handleDelete={handleDelete} 
+                  handleRestore={handleRestore}
                   handleViewHistory={handleViewHistory}
                 />
               ))

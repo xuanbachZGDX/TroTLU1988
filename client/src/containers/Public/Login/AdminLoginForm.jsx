@@ -15,7 +15,7 @@ const AdminLoginForm = ({ payload, setPayload, invalidFields, setInvalidFields, 
           <p className="text-gray-500 mt-2 text-sm">Cổng đăng nhập dành riêng cho quản trị viên</p>
         </div>
 
-        <div className="space-y-6">
+        <form onSubmit={(e) => { e.preventDefault(); }} className="space-y-6">
           <InputForm
             setInvalidFields={setInvalidFields}
             invalidFields={invalidFields}
@@ -23,6 +23,7 @@ const AdminLoginForm = ({ payload, setPayload, invalidFields, setInvalidFields, 
             value={payload.phone}
             setValue={setPayload}
             keyPayload={"phone"}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           />
           <InputForm
             setInvalidFields={setInvalidFields}
@@ -32,17 +33,19 @@ const AdminLoginForm = ({ payload, setPayload, invalidFields, setInvalidFields, 
             setValue={setPayload}
             keyPayload={"password"}
             type="password"
+            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           />
           
           <div className="pt-4">
             <button
+              type="button"
               onClick={handleSubmit}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-all shadow-md active:scale-[0.98] uppercase tracking-wide"
             >
               Xác thực & Đăng nhập
             </button>
           </div>
-        </div>
+        </form>
         
         <div className="mt-10 text-center">
           <button 

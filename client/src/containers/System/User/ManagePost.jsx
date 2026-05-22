@@ -43,13 +43,13 @@ const ManagePost = () => {
   const handleDeletePost = async (post) => {
     const isPending = post.status === "pending";
     const res = await Swal.fire({
-      title: isPending ? "Hủy đăng tin & Hoàn tiền?" : "Xác nhận xóa tin đăng?",
+      title: isPending ? "Hủy đăng tin & Hoàn tiền?" : "Ẩn tin đăng này?",
       text: isPending 
         ? "Tin đăng này đang ở trạng thái chờ duyệt. Hủy đăng tin bạn sẽ được HOÀN TRẢ LẠI 100% phí đăng tin vào số dư ví tài khoản."
-        : "Tin đăng đã được duyệt và hiển thị. Xóa tin đăng này bạn sẽ KHÔNG được hoàn lại phí.",
+        : "Tin đăng sẽ được đưa vào Kho lưu trữ tin ẩn. Bạn có thể khôi phục lại bất cứ lúc nào.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: isPending ? "Hủy tin & Hoàn tiền" : "Xóa tin",
+      confirmButtonText: isPending ? "Hủy tin & Hoàn tiền" : "Ẩn tin",
       cancelButtonText: "Hủy bỏ",
       confirmButtonColor: "#ef4444",
     });
@@ -57,9 +57,9 @@ const ManagePost = () => {
       const response = await apiDeletePost(post.id);
       if (response?.data?.err === 0) {
         setUpdateData(p => !p);
-        Swal.fire("Thành công!", isPending ? "Đã hủy tin và hoàn tiền thành công!" : "Tin đăng đã được xóa.", "success");
+        Swal.fire("Thành công!", isPending ? "Đã hủy tin và hoàn tiền thành công!" : "Tin đăng của bạn đã được ẩn và đưa vào Kho lưu trữ.", "success");
       } else {
-        Swal.fire("Xóa thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
+        Swal.fire("Ẩn thất bại!", "Có lỗi xảy ra, vui lòng thử lại.", "error");
       }
     }
   };

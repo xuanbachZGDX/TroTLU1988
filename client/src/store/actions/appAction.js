@@ -1,7 +1,9 @@
 import actionTypes from "./actionType";
 import * as api from "../../services";
 
-export const getAllCategories = () => async (dispatch) => {
+export const getAllCategories = () => async (dispatch, getState) => {
+  const { app } = getState();
+  if (app?.categories?.length > 0) return;
   try {
     const response = await api.apiGetAllCategories();
     if (response?.data.err === 0) {
@@ -24,7 +26,9 @@ export const getAllCategories = () => async (dispatch) => {
   }
 };
 
-export const getPrices = () => async (dispatch) => {
+export const getPrices = () => async (dispatch, getState) => {
+  const { app } = getState();
+  if (app?.prices?.length > 0) return;
   try {
     const response = await api.apiGetPrices();
     if (response?.data.err === 0) {
@@ -51,7 +55,9 @@ export const getPrices = () => async (dispatch) => {
   }
 };
 
-export const getAreas = () => async (dispatch) => {
+export const getAreas = () => async (dispatch, getState) => {
+  const { app } = getState();
+  if (app?.areas?.length > 0) return;
   try {
     const response = await api.apiGetAreas();
     if (response?.data.err === 0) {
@@ -78,7 +84,9 @@ export const getAreas = () => async (dispatch) => {
   }
 };
 
-export const getProvinces = () => async (dispatch) => {
+export const getProvinces = () => async (dispatch, getState) => {
+  const { app } = getState();
+  if (app?.provinces?.length > 0) return;
   try {
     const response = await api.apiGetPublicProvinces();
     if (response?.status === 200) {
@@ -106,7 +114,9 @@ export const getProvinces = () => async (dispatch) => {
   }
 };
 
-export const getFeatures = () => async (dispatch) => {
+export const getFeatures = () => async (dispatch, getState) => {
+  const { app } = getState();
+  if (app?.features?.length > 0) return;
   try {
     const response = await api.apiGetFeatures();
     if (response?.data.err === 0) {

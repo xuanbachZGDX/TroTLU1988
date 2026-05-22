@@ -71,7 +71,7 @@ const UserPostRow = ({ item, handleEdit, handleExtend, handleDelete, handleResto
         <td className="px-4 py-4">{formatDateVN(item?.overview?.published || item?.createdAt)}</td>
         <td className="px-4 py-4">{isRejected || isArchived ? "—" : formatDateVN(item?.overview?.expired)}</td>
         <td className="px-4 py-4 text-center">
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor}`}>{statusLabel}</span>
+          <span className={`text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap inline-block ${statusColor}`}>{statusLabel}</span>
         </td>
         <td className="px-4 py-4">
           <div className="flex gap-1 justify-center">
@@ -102,7 +102,7 @@ const UserPostRow = ({ item, handleEdit, handleExtend, handleDelete, handleResto
                   onClick={() => handleDelete(item)}
                   className="bg-red-50 text-red-600 p-1.5 rounded hover:bg-red-100 text-xs font-medium"
                 >
-                  {isPending ? "Hủy & Hoàn tiền" : "Xóa"}
+                  {isPending ? "Hủy & Hoàn tiền" : "Ẩn tin"}
                 </button>
               </>
             )}

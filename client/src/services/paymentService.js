@@ -1,4 +1,4 @@
-import axiosConfig from '../axiosConfig';
+import axiosConfig from '../lib/axios';
 
 export const apiCreatePaymentUrl = (payload) => new Promise(async (resolve, reject) => {
     try {

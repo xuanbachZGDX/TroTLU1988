@@ -60,7 +60,7 @@ const ResetPassword = () => {
         <p className="text-gray-500 text-sm mb-6 text-center">
           Nhập mã OTP (gửi qua Email) và mật khẩu mới cho tài khoản <strong>{email}</strong>.
         </p>
-        <div className="w-full flex flex-col gap-6">
+        <form onSubmit={(e) => { e.preventDefault(); }} className="w-full flex flex-col gap-6">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold uppercase text-gray-700">Mã OTP (6 chữ số)</label>
             <input
@@ -70,6 +70,7 @@ const ResetPassword = () => {
               maxLength={6}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
             />
           </div>
 
@@ -81,6 +82,7 @@ const ResetPassword = () => {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
             />
             <span 
               className="absolute right-3 top-8 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors"
@@ -98,6 +100,7 @@ const ResetPassword = () => {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
             />
           </div>
 
@@ -111,7 +114,7 @@ const ResetPassword = () => {
               disabled={isLoading}
             />
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

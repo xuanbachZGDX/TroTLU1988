@@ -51,10 +51,10 @@ const Contact = () => {
       <div className="flex gap-4">
         <div className="flex-1 flex flex-col h-fit gap-4 bg-gradient-to-br from-blue-700 to-cyan-400 rounded-3xl p-4 text-white">
           <h4 className="font-medium">Thông tin liên hệ</h4>
-          <span>Cảm ơn vì đã lựa chọn phongtro123.com!</span>
+          <span>Cảm ơn vì đã lựa chọn TLU.com!</span>
           <span>Điện thoại: 0981 069 848</span>
-          <span>Email: phongtro123@gmail.com</span>
-          <span>Website: https://phongtro123.com/</span>
+          <span>Email: tlu.com@gmail.com</span>
+          <span>Website: https://tlu.com/</span>
           <span>Zalo: 0981 069 848</span>
           <span>Địa chỉ: Nghiêm Xuân Yên, Định Công, Hà Nội</span>
         </div>

@@ -3,6 +3,13 @@ import React from "react";
 const PostHistoryModal = ({ isOpen, onClose, historyPost, historyData, isAdmin = false }) => {
   if (!isOpen) return null;
 
+  const formatPrice = (price) => {
+    if (price === null || price === undefined) return "N/A";
+    const num = +price;
+    if (num >= 1) return `${num.toFixed(2).replace(/\.00$/, '')} triệu/tháng`;
+    return `${(num * 1000000).toLocaleString('vi-VN')} đ/tháng`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -66,9 +73,9 @@ const PostHistoryModal = ({ isOpen, onClose, historyPost, historyData, isAdmin =
                     <div className="text-xs grid grid-cols-1 md:grid-cols-12 gap-2 border-b border-gray-50 pb-2">
                       <span className="md:col-span-2 font-bold text-gray-600">Giá phòng:</span>
                       <div className="md:col-span-10 flex items-center gap-4">
-                        <span className="text-red-600 line-through bg-red-50 px-2 py-0.5 rounded">{(h.oldPrice / 1000000).toFixed(2)} triệu/tháng</span>
+                        <span className="text-red-600 line-through bg-red-50 px-2 py-0.5 rounded">{formatPrice(h.oldPrice)}</span>
                         <span className="text-gray-400">➔</span>
-                        <span className="text-green-700 font-semibold bg-green-50 px-2 py-0.5 rounded">{(h.newPrice / 1000000).toFixed(2)} triệu/tháng</span>
+                        <span className="text-green-700 font-semibold bg-green-50 px-2 py-0.5 rounded">{formatPrice(h.newPrice)}</span>
                       </div>
                     </div>
                   )}

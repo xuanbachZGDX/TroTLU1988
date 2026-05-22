@@ -10,17 +10,22 @@ import AdminLoginForm from "./AdminLoginForm";
 import UserAuthForm from "./UserAuthForm";
 import { getRoleFromToken, normalizeRole } from "../../../utils/Common/role";
 
+const emptyPayload = { phone: "", password: "", name: "", accountType: "" };
+
 const Login = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoggedIn, msg, update, token } = useSelector((state) => state.auth);
   const { currentData } = useSelector((state) => state.user);
-  const isAdminLogin = location.pathname.includes('admin');
+  const isAdminLogin = location.pathname.includes("admin");
 
   const [isRegister, setIsRegister] = useState(location.state?.flag);
   const [invalidFields, setInvalidFields] = useState([]);
-  const [payload, setPayload] = useState({ phone: "", password: "", name: "", accountType: "" });
+  const [payload, setPayload] = useState(emptyPayload);
+  const [googleCredential, setGoogleCredential] = useState("");
+  const [googleAccountType, setGoogleAccountType] = useState("");
+  const [googleProfile, setGoogleProfile] = useState(null);
 
   useEffect(() => {
     setIsRegister(location.state?.flag);
@@ -28,13 +33,20 @@ const Login = () => {
 
   const hasShownSuccessRef = useRef(false);
 
+  const resetGoogleSelection = () => {
+    setGoogleCredential("");
+    setGoogleAccountType("");
+    setGoogleProfile(null);
+  };
+
   useEffect(() => {
     if (isLoggedIn && currentData?.id) {
       const role = getRoleFromToken(token) || normalizeRole(currentData.role);
       const isAdmin = role === "admin";
-      
+
       if (!hasShownSuccessRef.current) {
         hasShownSuccessRef.current = true;
+        resetGoogleSelection();
         Swal.fire({
           title: "Đăng nhập thành công!",
           text: `Xin chào, ${currentData?.name || (isAdmin ? "Quản trị viên" : "Người dùng")}!`,
@@ -48,7 +60,7 @@ const Login = () => {
             } else {
               navigate("/", { replace: true });
             }
-          }
+          },
         });
       } else {
         if (isAdmin && isAdminLogin) {
@@ -61,36 +73,36 @@ const Login = () => {
   }, [isLoggedIn, currentData, navigate, isAdminLogin, token]);
 
   useEffect(() => {
-    msg && Swal.fire("Thông báo", msg, "error");
+    if (!msg) return;
+    Swal.fire("Thông báo", msg, "error");
   }, [msg, update]);
 
   const handleSubmit = async () => {
     let finalPayload = isRegister ? payload : { phone: payload.phone, password: payload.password };
     let invalids = validate(finalPayload, setInvalidFields);
 
-    // Validate thêm: loại tài khoản bắt buộc khi đăng ký
     if (isRegister && !payload.accountType) {
-      setInvalidFields(prev => [
-        ...prev.filter(f => f.name !== 'accountType'),
-        { name: 'accountType', message: 'Vui lòng chọn loại tài khoản' }
+      setInvalidFields((prev) => [
+        ...prev.filter((f) => f.name !== "accountType"),
+        { name: "accountType", message: "Vui lòng chọn loại tài khoản" },
       ]);
-      invalids = [...invalids, { name: 'accountType' }];
+      invalids = [...invalids, { name: "accountType" }];
     }
 
     if (invalids.length === 0) {
       if (isRegister) {
         const response = await apiRegister(payload);
         if (response?.data?.err === 0) {
-          const roleLabel = payload.accountType === 'landlord' ? 'Chủ trọ' : 'Khách hàng';
+          const roleLabel = payload.accountType === "landlord" ? "Chủ trọ" : "Khách hàng";
 
           Swal.fire({
-            title: `Đăng ký thành công!`,
+            title: "Đăng ký thành công!",
             text: `Đã tạo tài khoản ${roleLabel} thành công. Vui lòng đăng nhập lại để sử dụng.`,
-            icon: 'success',
-            confirmButtonText: 'Đăng nhập ngay',
+            icon: "success",
+            confirmButtonText: "Đăng nhập ngay",
           }).then(() => {
             setIsRegister(false);
-            setPayload({ phone: payload.phone, password: '', name: '', accountType: '' });
+            setPayload({ ...emptyPayload, phone: payload.phone });
           });
         } else {
           Swal.fire("Thất bại", response?.data?.msg || "Đăng ký thất bại", "error");
@@ -101,12 +113,46 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSuccess = (response) => dispatch(actions.loginGoogle(response.credential));
+  const handleGoogleSuccess = async (response) => {
+    const result = await dispatch(actions.loginGoogle(response.credential));
+    if (!result) return;
+
+    if (result.requiresAccountType) {
+      setGoogleCredential(response.credential);
+      setGoogleAccountType("");
+      setGoogleProfile(result.profile || null);
+      Swal.fire({
+        title: "Hoàn tất tài khoản",
+        text: "Email Google này chưa có tài khoản. Hãy chọn vai trò để tiếp tục.",
+        icon: "info",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleGoogleAccountTypeSubmit = async () => {
+    if (!googleCredential) {
+      Swal.fire("Thông báo", "Không tìm thấy phiên đăng nhập Google. Vui lòng thử lại.", "warning");
+      return;
+    }
+
+    if (!googleAccountType) {
+      Swal.fire("Thông báo", "Vui lòng chọn loại tài khoản trước khi tiếp tục.", "warning");
+      return;
+    }
+
+    const result = await dispatch(actions.loginGoogle(googleCredential, googleAccountType));
+    if (result?.err === 0 && result?.token) {
+      resetGoogleSelection();
+    }
+  };
+
   const handleGoogleError = () => Swal.fire("Lỗi!", "Đăng nhập Google thất bại.", "error");
 
   if (isAdminLogin) {
     return (
-      <AdminLoginForm 
+      <AdminLoginForm
         payload={payload}
         setPayload={setPayload}
         invalidFields={invalidFields}
@@ -118,9 +164,12 @@ const Login = () => {
   }
 
   return (
-    <UserAuthForm 
+    <UserAuthForm
       isRegister={isRegister}
-      setIsRegister={setIsRegister}
+      setIsRegister={(value) => {
+        setIsRegister(value);
+        resetGoogleSelection();
+      }}
       payload={payload}
       setPayload={setPayload}
       invalidFields={invalidFields}
@@ -128,8 +177,14 @@ const Login = () => {
       handleSubmit={handleSubmit}
       handleGoogleSuccess={handleGoogleSuccess}
       handleGoogleError={handleGoogleError}
+      handleGoogleAccountTypeSubmit={handleGoogleAccountTypeSubmit}
+      googleAccountType={googleAccountType}
+      setGoogleAccountType={setGoogleAccountType}
+      googleProfile={googleProfile}
       navigate={navigate}
       path={path}
+      resetGoogleSelection={resetGoogleSelection}
+      resetFormPayload={() => setPayload(emptyPayload)}
     />
   );
 };

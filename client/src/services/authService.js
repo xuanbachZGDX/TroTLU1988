@@ -1,4 +1,4 @@
-import axiosConfig from "../axiosConfig";
+import axiosConfig from "../lib/axios";
 
 export const apiRegister = (payload) =>
   new Promise(async (resolve, reject) => {
@@ -14,13 +14,13 @@ export const apiRegister = (payload) =>
     }
   });
 
-export const apiLoginGoogle = (credential) =>
+export const apiLoginGoogle = (credential, accountType = null) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await axiosConfig({
         method: "post",
         url: "/api/v1/auth/google-login",
-        data: { credential },
+        data: { credential, accountType },
       });
       resolve(response);
     } catch (error) {
@@ -68,4 +68,4 @@ export const apiResetPassword = (payload) =>
     } catch (error) {
       reject(error);
     }
-  });
+  });

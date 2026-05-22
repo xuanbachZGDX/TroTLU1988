@@ -38,7 +38,7 @@ const ForgotPassword = () => {
         <p className="text-gray-500 text-sm mb-6 text-center">
           Nhập Email của bạn và chúng tôi sẽ gửi mã OTP xác thực qua Email.
         </p>
-        <div className="w-full flex flex-col gap-5">
+        <form onSubmit={(e) => { e.preventDefault(); }} className="w-full flex flex-col gap-5">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold uppercase text-gray-700">Email khôi phục</label>
             <input
@@ -47,6 +47,7 @@ const ForgotPassword = () => {
               placeholder="example@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
             />
           </div>
           <Button
@@ -65,7 +66,7 @@ const ForgotPassword = () => {
               ← Quay lại đăng nhập
             </span>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

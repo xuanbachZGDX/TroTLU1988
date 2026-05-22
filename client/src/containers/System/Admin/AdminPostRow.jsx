@@ -4,7 +4,7 @@ import { formatDateVN } from "../../../utils/Common/formatDate";
 import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 import { path } from "../../../utils/constant";
 
-const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete, handleViewHistory }) => {
+const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete, handleRestore, handleViewHistory }) => {
   let images = [];
   try {
     images = JSON.parse(item?.images?.image || "[]");
@@ -12,9 +12,27 @@ const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete, handleV
     images = [];
   }
 
-  const status = item.status === "pending" ? "Chờ duyệt" : checkStatus(item?.overview?.expired);
-  const isActive = status === "Đang hoạt động";
+  const isArchived = item.status === "archived";
+  const isRejected = item.status === "rejected";
   const isPending = item.status === "pending";
+
+  const status = isArchived
+    ? "Đã ẩn"
+    : isRejected
+      ? "Bị từ chối"
+      : isPending
+        ? "Chờ duyệt"
+        : checkStatus(item?.overview?.expired);
+
+  const isActive = item.status === "active" && status === "Đang hoạt động";
+  const isExpired = !isArchived && !isRejected && !isPending && status === "Đã hết hạn";
+  
+  const statusColor = isArchived ? "text-purple-700 bg-purple-50 border border-purple-200"
+    : isRejected ? "text-red-700 bg-red-50 border border-red-200"
+    : isPending ? "text-orange-700 bg-orange-50 border border-orange-200"
+    : isActive ? "text-green-700 bg-green-50 border border-green-200"
+    : "text-gray-500 bg-gray-50 border border-gray-200";
+
   const createdDate = new Date(item.createdAt);
   const isNew = (new Date() - createdDate) / (1000 * 60 * 60 * 24) <= 3;
 
@@ -59,16 +77,43 @@ const AdminPostRow = ({ item, handleApprove, handleReject, handleDelete, handleV
         })()}
       </td>
       <td className="px-4 py-4 text-center">
-        <div className="flex flex-col items-center">
-          <span className={`font-medium ${isActive ? "text-gray-800" : isPending ? "text-orange-600 font-bold" : "text-red-600 font-bold"}`}>{status}</span>
+        <div className="flex flex-col items-center gap-1">
+          <span className={`text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap inline-block ${statusColor}`}>{status}</span>
           {isNew && isActive && <span className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full">Mới</span>}
         </div>
       </td>
       <td className="px-4 py-4">
         <div className="flex gap-1 justify-center">
-          {isPending && <button onClick={() => handleApprove(item.id)} className="bg-blue-50 text-blue-600 p-1.5 rounded hover:bg-blue-100">Duyệt</button>}
-          {isPending && <button onClick={() => handleReject(item.id)} className="bg-orange-50 text-orange-600 p-1.5 rounded hover:bg-orange-100">Từ chối</button>}
-          <button onClick={() => handleDelete(item.id)} className="bg-red-50 text-red-600 p-1.5 rounded hover:bg-red-100">Xóa</button>
+          {isPending && (
+            <>
+              <button 
+                onClick={() => handleApprove(item.id)} 
+                className="bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 font-medium"
+              >
+                Duyệt
+              </button>
+              <button 
+                onClick={() => handleReject(item.id)} 
+                className="bg-orange-50 text-orange-600 px-2 py-1 rounded hover:bg-orange-100 font-medium"
+              >
+                Từ chối
+              </button>
+            </>
+          )}
+          {item.status === "active" && (
+            <button 
+              onClick={() => handleReject(item.id)} 
+              className="bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 font-medium"
+            >
+              Gỡ tin
+            </button>
+          )}
+          <button 
+            onClick={() => handleViewHistory(item)} 
+            className="bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200 font-medium"
+          >
+            Lịch sử
+          </button>
         </div>
       </td>
     </tr>

@@ -72,7 +72,7 @@ const validate = (payload, setInvalidFields) => {
         }
         break;
       case "description":
-        if (item[1] && item[1].length < 50) {
+        if (item[1] && item[1].length < 50 && !payload.hasOwnProperty("name")) {
           let invalidObj = {
             name: item[0],
             message: "Nội dung mô tả phải có ít nhất 50 ký tự.",

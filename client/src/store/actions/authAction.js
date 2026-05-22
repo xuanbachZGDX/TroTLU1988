@@ -27,16 +27,15 @@ export const login = (payload) => async (dispatch) => {
   try {
     const response = await apiLogin(payload);
     if (response?.data.err === 0) {
-        dispatch({
-            type: actionTypes.LOGIN_SUCCESS,
-            data: response.data.token
-        })
-    }
-    else {
-        dispatch({
+      dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        data: response.data.token,
+      });
+    } else {
+      dispatch({
         type: actionTypes.LOGIN_FAIL,
-        data: response.data.msg
-    })
+        data: response.data.msg,
+      });
     }
   } catch (error) {
     dispatch({
@@ -46,33 +45,34 @@ export const login = (payload) => async (dispatch) => {
   }
 };
 
-export const loginGoogle = (credential) => async (dispatch) => {
+export const loginGoogle = (credential, accountType = null) => async (dispatch) => {
   try {
-    const response = await apiLoginGoogle(credential);
-    if (response?.data.err === 0) {
+    const response = await apiLoginGoogle(credential, accountType);
+    if (response?.data.err === 0 && response?.data.token) {
       dispatch({
         type: actionTypes.LOGIN_SUCCESS,
         data: response.data.token,
       });
-    } else {
+    } else if (response?.data.err !== 0) {
       dispatch({
         type: actionTypes.LOGIN_FAIL,
         data: response.data.msg || "Đăng nhập Google thất bại",
       });
     }
+    return response?.data;
   } catch (error) {
     dispatch({
       type: actionTypes.LOGIN_FAIL,
       data: "Kết nối đến máy chủ thất bại!",
     });
+    return null;
   }
 };
 
 export const logout = () => ({
   type: actionTypes.LOGOUT,
-})
+});
 
-// Dùng sau khi đăng ký: đăng nhập luôn bằng token nhận được
 export const loginWithToken = (token) => ({
   type: actionTypes.LOGIN_SUCCESS,
   data: token,

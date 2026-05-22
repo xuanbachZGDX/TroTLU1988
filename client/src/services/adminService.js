@@ -1,4 +1,4 @@
-import axiosConfig from "../axiosConfig";
+import axiosConfig from "../lib/axios";
 
 export const apiGetAdminDashboard = () =>
   new Promise(async (resolve, reject) => {

@@ -1,4 +1,4 @@
-import axios from "../axiosConfig";
+import axios from "../lib/axios";
 import axiosDefault from "axios";
 
 export const apiGetPrices = () =>

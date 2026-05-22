@@ -4,7 +4,7 @@ import { formatVietnameseToString } from "../../../utils/Common/formatVietnamese
 import { useDispatch, useSelector } from "react-redux";
 import * as action from "../../../store/actions";
 import {path} from "../../../utils/constant";
-import logo from "../../../assets/logo-phongtro.png";
+import logo from "../../../assets/TLU.jpg";
 
 const notActive =
   "relative h-full flex items-center px-3 lg:px-4 text-white opacity-90 hover:opacity-100 transition-all duration-300 whitespace-nowrap " +
@@ -32,11 +32,11 @@ const Navigation = ({ isAdmin, showLogo }) => {
       <div className={`w-full ${showLogo ? "px-6" : "max-w-[1100px] mx-auto"} flex h-full items-center text-[13px] font-semibold tracking-tight`}>
         {showLogo && (
           <NavLink to="/" className="flex items-center mr-10 flex-none hover:scale-105 transition-transform duration-200">
-            <div className="bg-white p-2 rounded-xl shadow-md border border-white/20">
+            <div className="bg-white p-1 rounded-xl shadow-md border border-white/20 flex items-center justify-center">
               <img
                 src={logo}
                 alt="logo"
-                className="w-[180px] h-[35px] object-contain"
+                className="h-[38px] w-auto object-contain"
               />
             </div>
           </NavLink>

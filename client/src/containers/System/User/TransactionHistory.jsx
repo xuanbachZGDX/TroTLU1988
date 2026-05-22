@@ -73,11 +73,11 @@ const TransactionHistory = () => {
                                         </td>
                                         <td className="p-4 text-sm text-center">
                                             {tx.status === 'success' ? (
-                                                <span className="px-2 py-1 bg-green-50 text-green-600 rounded-full text-xs border border-green-200">Thành công</span>
+                                                <span className="px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Thành công</span>
                                             ) : tx.status === 'pending' ? (
-                                                <span className="px-2 py-1 bg-yellow-50 text-yellow-600 rounded-full text-xs border border-yellow-200">Đang chờ</span>
+                                                <span className="px-2.5 py-1 bg-yellow-50 text-yellow-600 border border-yellow-200 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Đang chờ</span>
                                             ) : (
-                                                <span className="px-2 py-1 bg-red-50 text-red-600 rounded-full text-xs border border-red-200">Thất bại</span>
+                                                <span className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-200 rounded-md text-[11px] font-bold whitespace-nowrap inline-block text-center shadow-sm">Thất bại</span>
                                             )}
                                         </td>
                                     </tr>

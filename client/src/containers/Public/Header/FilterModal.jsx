@@ -22,6 +22,9 @@ const FilterModal = ({
   areas,
   selArea,
   setSelArea,
+  features,
+  selFeatures,
+  toggleFeature,
   handleApply,
   cleanName
 }) => {
@@ -133,6 +136,12 @@ const FilterModal = ({
           <section>
             <h3 className="text-[15px] font-bold text-gray-800 mb-4 uppercase tracking-wide">Diện tích</h3>
             <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setSelArea(null)}
+                className={`px-5 py-2 text-sm rounded-full border transition-all ${!selArea ? "border-[#FF6600] bg-[#FFF5EE] text-[#FF6600] font-bold" : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"}`}
+              >
+                Tất cả
+              </button>
               {areas?.map((a) => (
                 <button
                   key={a.code}
@@ -140,6 +149,21 @@ const FilterModal = ({
                   className={`px-5 py-2 text-sm rounded-full border transition-all ${selArea?.code === a.code ? "border-[#FF6600] bg-[#FFF5EE] text-[#FF6600] font-bold" : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"}`}
                 >
                   {a.value}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-[15px] font-bold text-gray-800 mb-4 uppercase tracking-wide">Đặc điểm nổi bật</h3>
+            <div className="flex flex-wrap gap-2">
+              {features?.map((f) => (
+                <button
+                  key={f.code}
+                  onClick={() => toggleFeature(f)}
+                  className={`px-5 py-2 text-sm rounded-full border transition-all ${selFeatures?.some(x => x.code === f.code) ? "border-[#FF6600] bg-[#FFF5EE] text-[#FF6600] font-bold" : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"}`}
+                >
+                  {f.value}
                 </button>
               ))}
             </div>

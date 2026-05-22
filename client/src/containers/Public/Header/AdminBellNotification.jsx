@@ -1,16 +1,40 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiGetAdminNotifications, apiReadAdminNotification, apiGetPostHistory } from "../../../services";
+import { 
+  apiGetAdminNotifications, 
+  apiReadAdminNotification, 
+  apiGetPostHistory,
+  apiGetUserNotifications,
+  apiReadUserNotification
+} from "../../../services";
 import { PostHistoryModal } from "../../../components";
 import { path } from "../../../utils/constant";
 import icons from "../../../utils/icons";
 import userAvatar from "../../../assets/user.png";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
 const { IoMdNotificationsOutline } = icons;
 
 const AdminBellNotification = () => {
   const navigate = useNavigate();
+  const { currentData } = useSelector((state) => state.user);
+  const { token } = useSelector((state) => state.auth);
+
+  const tokenRole = React.useMemo(() => {
+    if (!token) return null;
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(base64))?.role?.toLowerCase() || null;
+    } catch {
+      return null;
+    }
+  }, [token]);
+
+  const role = currentData?.role?.toLowerCase() || tokenRole;
+  const isAdmin = role === "admin";
+
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +46,7 @@ const AdminBellNotification = () => {
 
   const fetchNotifs = async () => {
     try {
-      const res = await apiGetAdminNotifications();
+      const res = isAdmin ? await apiGetAdminNotifications() : await apiGetUserNotifications();
       if (res?.data?.err === 0) {
         const list = res.data.data || [];
         setNotifications(list);
@@ -37,7 +61,7 @@ const AdminBellNotification = () => {
     fetchNotifs();
     const interval = setInterval(fetchNotifs, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -50,20 +74,33 @@ const AdminBellNotification = () => {
   const handleItemClick = async (n) => {
     setIsOpen(false);
     if (!n.isRead) {
-      await apiReadAdminNotification(n.id);
+      if (isAdmin) {
+        await apiReadAdminNotification(n.id);
+      } else {
+        await apiReadUserNotification(n.id);
+      }
       fetchNotifs();
     }
     if (!n.postId) {
-      navigate(`/${path.ADMIN}/${path.ADMIN_CONTACTS}`);
+      if (isAdmin) {
+        navigate(`/${path.ADMIN}/${path.ADMIN_CONTACTS}`);
+      } else {
+        navigate(`/${path.SYSTEM}/${path.MY_CONTACTS}`);
+      }
       return;
     }
-    setHistoryPost({ id: n.postId, overview: { code: n.postId?.slice(0, 8).toUpperCase() } });
-    const response = await apiGetPostHistory(n.postId);
-    if (response?.data?.err === 0) {
-      setHistoryData(response.data.data || []);
-      setShowHistoryModal(true);
+    
+    if (isAdmin) {
+      setHistoryPost({ id: n.postId, overview: { code: n.postId?.slice(0, 8).toUpperCase() } });
+      const response = await apiGetPostHistory(n.postId);
+      if (response?.data?.err === 0) {
+        setHistoryData(response.data.data || []);
+        setShowHistoryModal(true);
+      } else {
+        Swal.fire("Không tìm thấy", "Chưa có dữ liệu lịch sử cho tin đăng này.", "info");
+      }
     } else {
-      Swal.fire("Không tìm thấy", "Chưa có dữ liệu lịch sử cho tin đăng này.", "info");
+      navigate(`/${path.SYSTEM}/${path.MANAGE_POST}`);
     }
   };
 
@@ -109,12 +146,14 @@ const AdminBellNotification = () => {
               ))
             )}
           </div>
-          <button 
-            onClick={() => { setIsOpen(false); navigate(`/${path.ADMIN}/${path.ADMIN_NOTIFICATIONS}`); }} 
-            className="text-[11px] text-blue-600 hover:text-blue-700 font-bold text-center pt-2 border-t w-full block hover:underline"
-          >
-            Xem tất cả thông báo
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => { setIsOpen(false); navigate(`/${path.ADMIN}/${path.ADMIN_NOTIFICATIONS}`); }} 
+              className="text-[11px] text-blue-600 hover:text-blue-700 font-bold text-center pt-2 border-t w-full block hover:underline"
+            >
+              Xem tất cả thông báo
+            </button>
+          )}
         </div>
       )}
 

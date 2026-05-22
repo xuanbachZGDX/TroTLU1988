@@ -1,4 +1,4 @@
-import axios from "../axiosConfig";
+import axios from "../lib/axios";
 
 export const apiGetCurrent = () =>
   new Promise(async (resolve, reject) => {
@@ -33,6 +33,32 @@ export const apiGetMyInquiries = () =>
       const response = await axios({
         method: "get",
         url: "/api/v1/users/my-contacts",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetUserNotifications = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "/api/v1/users/notifications",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiReadUserNotification = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "put",
+        url: `/api/v1/users/notifications/${id}/read`,
       });
       resolve(response);
     } catch (error) {

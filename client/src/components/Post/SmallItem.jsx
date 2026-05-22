@@ -4,6 +4,7 @@ import "moment/locale/vi";
 import { Link } from "react-router-dom";
 import { formatVietnameseToString } from "../../utils/Common/formatVietnameseToString";
 import { path } from "../../utils/constant";
+import { optimizeCloudinaryUrl } from "../../utils/Common/imageHelper";
 
 const SmallItem = ({ id, title, price, image, createdAt }) => {
   const formatTime = (createdAt) => {
@@ -25,9 +26,10 @@ const SmallItem = ({ id, title, price, image, createdAt }) => {
       <div className="w-[72px] h-[56px] flex-none rounded-md overflow-hidden bg-gray-100">
         {image?.[0] ? (
           <img
-            src={image[0]}
+            src={optimizeCloudinaryUrl(image[0], { width: 100, height: 80 })}
             alt={title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gray-200" />

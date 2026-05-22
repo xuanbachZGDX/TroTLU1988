@@ -8,6 +8,7 @@ const InputForm = ({
   invalidFields,
   setInvalidFields,
   type,
+  onKeyDown,
 }) => {
   return (
     <div>
@@ -23,6 +24,7 @@ const InputForm = ({
           setValue((prev) => ({ ...prev, [keyPayload]: e.target.value }))
         }
         onFocus={() => setInvalidFields && setInvalidFields([])}
+        onKeyDown={onKeyDown}
       />
       {invalidFields?.some((i) => i.name === keyPayload) && (
         <small className="text-red-500 italic">

@@ -73,12 +73,6 @@ const List = ({ categoryCode }) => {
         >
           Mới đăng
         </span>
-        <span 
-          onClick={() => setSort(2)}
-          className={`cursor-pointer pb-2 transition-all ${sort === 2 ? 'text-black font-bold border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}
-        >
-          Có video
-        </span>
       </div>
       <div className="items">
         {posts?.length > 0 ? (

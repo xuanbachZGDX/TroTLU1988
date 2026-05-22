@@ -20,7 +20,7 @@ const AdminPostFilters = ({ filters, setFilters, categories, provinces, district
         <option value="active">Đang hoạt động</option>
         <option value="expired">Đã hết hạn</option>
         <option value="rejected">Bị từ chối</option>
-        <option value="archived">Kho lưu trữ</option>
+        <option value="archived">Tin đang ẩn (Kho lưu trữ)</option>
       </select>
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"

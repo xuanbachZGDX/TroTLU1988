@@ -159,9 +159,17 @@ const AdminManageContacts = () => {
                   </div>
                 </td>
                 <td className="px-6 py-5 text-center">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${item.status === 'replied' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
-                    {item.status === 'replied' ? 'Đã phản hồi' : 'Đang chờ'}
-                  </span>
+                  {item.status === 'replied' ? (
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-green-100 text-green-600">
+                      Đã phản hồi
+                    </span>
+                  ) : (
+                    <span className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-red-100 text-red-600">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping absolute left-[10px]"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 relative"></span>
+                      Mới / Chưa trả lời
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 py-5 text-center">
                   <span className="text-xs font-medium text-gray-400">

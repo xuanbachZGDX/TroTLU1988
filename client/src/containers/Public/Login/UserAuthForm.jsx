@@ -2,18 +2,53 @@ import React from "react";
 import { InputForm, Button } from "../../../components";
 import { GoogleLogin } from "@react-oauth/google";
 
-const UserAuthForm = ({ 
-  isRegister, 
-  setIsRegister, 
-  payload, 
-  setPayload, 
-  invalidFields, 
-  setInvalidFields, 
-  handleSubmit, 
-  handleGoogleSuccess, 
-  handleGoogleError, 
-  navigate, 
-  path 
+const AccountTypePicker = ({ value, onChange }) => (
+  <div className="flex gap-4">
+    <button
+      type="button"
+      onClick={() => onChange("user")}
+      className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
+        value === "user"
+          ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md"
+          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+      }`}
+    >
+      <span className="font-bold text-base">Người tìm kiếm</span>
+      <span className="text-xs mt-1 text-gray-500">(Người thuê phòng)</span>
+    </button>
+    <button
+      type="button"
+      onClick={() => onChange("landlord")}
+      className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
+        value === "landlord"
+          ? "border-orange-500 bg-orange-50 text-orange-700 shadow-md"
+          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+      }`}
+    >
+      <span className="font-bold text-base">Chủ trọ</span>
+      <span className="text-xs mt-1 text-gray-500">(Đăng tin cho thuê)</span>
+    </button>
+  </div>
+);
+
+const UserAuthForm = ({
+  isRegister,
+  setIsRegister,
+  payload,
+  setPayload,
+  invalidFields,
+  setInvalidFields,
+  handleSubmit,
+  handleGoogleSuccess,
+  handleGoogleError,
+  handleGoogleAccountTypeSubmit,
+  googleAccountType,
+  setGoogleAccountType,
+  googleProfile,
+  navigate,
+  path,
+  resetGoogleSelection,
+  resetFormPayload,
 }) => {
   return (
     <div className="w-full flex items-center justify-center">
@@ -21,44 +56,20 @@ const UserAuthForm = ({
         <h3 className="font-semibold text-2xl mb-3">
           {isRegister ? "Đăng ký tài khoản" : "Đăng nhập"}
         </h3>
-        <div className="w-full flex flex-col gap-5">
+        <form onSubmit={(e) => { e.preventDefault(); }} className="w-full flex flex-col gap-5">
           {isRegister && (
             <>
-              {/* Chọn loại tài khoản */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   LOẠI TÀI KHOẢN BẮT BUỘC
                 </label>
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setPayload(prev => ({ ...prev, accountType: 'user' }))}
-                    className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
-                      payload.accountType === 'user'
-                        ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="font-bold text-base">Người tìm kiếm</span>
-                    <span className="text-xs mt-1 text-gray-500">(Người thuê phòng)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPayload(prev => ({ ...prev, accountType: 'landlord' }))}
-                    className={`flex-1 flex flex-col items-center justify-center border-2 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] ${
-                      payload.accountType === 'landlord'
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="font-bold text-base">Chủ trọ</span>
-                    <span className="text-xs mt-1 text-gray-500">(Đăng tin cho thuê)</span>
-                  </button>
-                </div>
-                {/* Hiển thị lỗi nếu chưa chọn loại tài khoản */}
-                {invalidFields?.find(f => f.name === 'accountType') && (
+                <AccountTypePicker
+                  value={payload.accountType}
+                  onChange={(accountType) => setPayload((prev) => ({ ...prev, accountType }))}
+                />
+                {invalidFields?.find((f) => f.name === "accountType") && (
                   <small className="text-red-500 font-medium">
-                    {invalidFields.find(f => f.name === 'accountType').message}
+                    {invalidFields.find((f) => f.name === "accountType").message}
                   </small>
                 )}
               </div>
@@ -70,6 +81,7 @@ const UserAuthForm = ({
                 value={payload.name}
                 setValue={setPayload}
                 keyPayload={"name"}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
               />
             </>
           )}
@@ -80,6 +92,7 @@ const UserAuthForm = ({
             value={payload.phone}
             setValue={setPayload}
             keyPayload={"phone"}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           />
           <InputForm
             setInvalidFields={setInvalidFields}
@@ -89,6 +102,7 @@ const UserAuthForm = ({
             setValue={setPayload}
             keyPayload={"password"}
             type="password"
+            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           />
           <Button
             text={isRegister ? "Đăng ký" : "Đăng nhập"}
@@ -97,7 +111,7 @@ const UserAuthForm = ({
             fullWidth
             onClick={handleSubmit}
           />
-          
+
           <div className="flex flex-col items-center gap-3 mt-2">
             <div className="flex items-center w-full gap-2">
               <div className="flex-1 h-[1px] bg-gray-300"></div>
@@ -111,11 +125,53 @@ const UserAuthForm = ({
                 theme="outline"
                 size="large"
                 text={isRegister ? "signup_with" : "signin_with"}
-                width="100%"
+                width="360"
               />
             </div>
           </div>
-        </div>
+
+          {googleProfile && (
+            <div className="mt-3 rounded-2xl border border-blue-200 bg-blue-50/70 p-5 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                {googleProfile.picture ? (
+                  <img src={googleProfile.picture} alt="google avatar" className="w-12 h-12 rounded-full object-cover border border-blue-100" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                    {(googleProfile.name || "G").slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold text-gray-800">Hoàn tất tài khoản Google</p>
+                  <p className="text-sm text-gray-500">{googleProfile.email}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  CHỌN LOẠI TÀI KHOẢN
+                </label>
+                <AccountTypePicker value={googleAccountType} onChange={setGoogleAccountType} />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  text="Hoàn tất đăng nhập Google"
+                  bgColor="bg-blue-600"
+                  textColor="text-white"
+                  fullWidth
+                  onClick={handleGoogleAccountTypeSubmit}
+                />
+                <Button
+                  text="Hủy"
+                  bgColor="bg-gray-200"
+                  textColor="text-gray-700"
+                  fullWidth
+                  onClick={resetGoogleSelection}
+                />
+              </div>
+            </div>
+          )}
+        </form>
 
         <div className="mt-7 flex items-center justify-between">
           {isRegister ? (
@@ -124,7 +180,8 @@ const UserAuthForm = ({
               <span
                 onClick={() => {
                   setIsRegister(false);
-                  setPayload({ phone: "", password: "", name: "", accountType: "" });
+                  resetFormPayload();
+                  resetGoogleSelection();
                 }}
                 className="text-blue-500 hover:underline cursor-pointer"
               >
@@ -133,7 +190,7 @@ const UserAuthForm = ({
             </small>
           ) : (
             <>
-              <small 
+              <small
                 className="text-[blue] hover:text-[red] cursor-pointer"
                 onClick={() => navigate(`/${path.FORGOT_PASSWORD}`)}
               >
@@ -142,7 +199,8 @@ const UserAuthForm = ({
               <small
                 onClick={() => {
                   setIsRegister(true);
-                  setPayload({ phone: "", password: "", name: "", accountType: "" });
+                  resetFormPayload();
+                  resetGoogleSelection();
                 }}
                 className="text-[blue] hover:text-[red] cursor-pointer"
               >

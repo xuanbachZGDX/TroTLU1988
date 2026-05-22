@@ -1,5 +1,5 @@
 import axios from "axios";
-import axiosConfig from "../axiosConfig";
+import axiosConfig from "../lib/axios";
 
 export const apiGetAllPosts = () =>
   new Promise(async (resolve, reject) => {

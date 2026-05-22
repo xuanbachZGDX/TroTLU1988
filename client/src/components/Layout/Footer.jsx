@@ -72,8 +72,8 @@ const Footer = () => (
   <footer className="w-full bg-gray-50 border-t-4 border-blue-600 mt-12">
     <div className="w-1100 max-w-full mx-auto px-4 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
 
-      {/* Về Phongtro123.com */}
-      <LinkColumn title="Về Phongtro123.com" links={ABOUT_LINKS} />
+      {/* Về TLU.com */}
+      <LinkColumn title="Về TLU.com" links={ABOUT_LINKS} />
 
       {/* Dành cho khách hàng */}
       <LinkColumn title="Dành cho khách hàng" links={CUSTOMER_LINKS} />
@@ -128,7 +128,7 @@ const Footer = () => (
     {/* Copyright bar */}
     <div className="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
       <div className="w-1100 mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p>© {new Date().getFullYear()} <span className="font-bold text-blue-600">Phongtro123.com</span>. Tất cả quyền được bảo lưu.</p>
+        <p>© {new Date().getFullYear()} <span className="font-bold text-blue-600">TLU.com</span>. Tất cả quyền được bảo lưu.</p>
         <div className="flex gap-8 font-medium">
             <span className="hover:text-blue-600 cursor-pointer">Chính sách</span>
             <span className="hover:text-blue-600 cursor-pointer">Bảo mật</span>
