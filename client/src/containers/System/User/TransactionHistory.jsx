@@ -3,13 +3,15 @@ import { apiGetTransactionHistory } from '../../../services';
 import moment from 'moment';
 import icons from '../../../utils/icons';
 import { useSelector } from 'react-redux';
-import { handlePrintInvoice } from './printInvoice.jsx';
+import InvoiceModal from './InvoiceModal.jsx';
 
 const { MdHistory } = icons;
 
 const TransactionHistory = () => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedTx, setSelectedTx] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { currentData } = useSelector((state) => state.user);
 
     useEffect(() => {
@@ -87,7 +89,10 @@ const TransactionHistory = () => {
                                         <td className="p-4 text-sm text-center">
                                             {tx.status === 'success' && (
                                                 <button
-                                                    onClick={() => handlePrintInvoice(tx, currentData?.name)}
+                                                    onClick={() => {
+                                                        setSelectedTx(tx);
+                                                        setIsModalOpen(true);
+                                                    }}
                                                     className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded border border-blue-200 text-xs font-semibold shadow-sm transition-all"
                                                 >
                                                     🖨️ In biên lai
@@ -101,6 +106,16 @@ const TransactionHistory = () => {
                     )}
                 </div>
             </div>
+
+            <InvoiceModal 
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedTx(null);
+                }}
+                tx={selectedTx}
+                userName={currentData?.name}
+            />
         </div>
     );
 };
