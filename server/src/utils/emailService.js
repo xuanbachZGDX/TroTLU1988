@@ -56,8 +56,8 @@ export const sendPostStatusEmail = async (toEmail, userName, postTitle, postId, 
 
     const isApproved = status === "active";
     const subject = isApproved 
-      ? `[PhongTro123] Tin đăng của bạn đã được duyệt thành công!` 
-      : `[PhongTro123] Yêu cầu duyệt tin đăng của bạn bị từ chối`;
+      ? `[TLU.com] Tin đăng của bạn đã được duyệt thành công!` 
+      : `[TLU.com] Yêu cầu duyệt tin đăng của bạn bị từ chối`;
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 600px; margin: 0 auto; color: #333;">
@@ -85,12 +85,12 @@ export const sendPostStatusEmail = async (toEmail, userName, postTitle, postId, 
           <p>Số tiền phí đăng tin đã được hoàn lại vào tài khoản ví của bạn. Vui lòng kiểm tra lại thông tin, chỉnh sửa bài viết theo lý do trên và gửi duyệt lại.</p>
         `}
 
-        <p style="margin-top: 30px; font-size: 11px; color: #999;">Đây là email tự động từ hệ thống PhongTro123, vui lòng không trả lời trực tiếp email này.</p>
+        <p style="margin-top: 30px; font-size: 11px; color: #999;">Đây là email tự động từ hệ thống TLU.com, vui lòng không trả lời trực tiếp email này.</p>
       </div>
     `;
 
     const mailOptions = {
-      from: '"PhongTro123" <no-reply@phongtro123.com>',
+      from: '"TLU.com" <no-reply@tlu.com>',
       to: toEmail,
       subject,
       html: htmlContent,

@@ -41,7 +41,7 @@ const PaymentResult = () => {
                     <div>
                         <BsCheckCircleFill className="mx-auto h-20 w-20 text-green-500" />
                         <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Giao dịch thành công</h2>
-                        <p className="mt-2 text-sm text-gray-600">Bạn đã nạp tiền thành công vào tài khoản PhongTro123. Số dư của bạn đã được cập nhật.</p>
+                        <p className="mt-2 text-sm text-gray-600">Bạn đã nạp tiền thành công vào tài khoản TLU.com. Số dư của bạn đã được cập nhật.</p>
                     </div>
                 ) : (
                     <div>

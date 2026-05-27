@@ -40,7 +40,7 @@ export const updateUserStatusService = (userId, status, reason = "") =>
       await db.User.update({ status }, { where: { id: userId } });
 
       if (status === "blocked" && user.email) {
-        sendBlockEmail(user.email, user.name, reason || "Vi phạm điều khoản dịch vụ hệ thống PhongTro123.");
+        sendBlockEmail(user.email, user.name, reason || "Vi phạm điều khoản dịch vụ hệ thống TLU.com.");
       }
 
       resolve({ err: 0, msg: "Cập nhật thành công" });

@@ -48,7 +48,7 @@ export const createPaymentUrl = async (req, res) => {
             userId: req.user.id,
             amount: amount,
             type: 'deposit',
-            content: `Nạp tiền vào tài khoản PhongTro123`,
+            content: `Nạp tiền vào tài khoản TLU.com`,
             status: 'pending'
         });
     } catch(err) {
