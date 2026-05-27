@@ -3,7 +3,7 @@ import { apiGetTransactionHistory } from '../../../services';
 import moment from 'moment';
 import icons from '../../../utils/icons';
 import { useSelector } from 'react-redux';
-import { handlePrintInvoice } from './printInvoice';
+import { handlePrintInvoice } from './printInvoice.jsx';
 
 const { MdHistory } = icons;
 
