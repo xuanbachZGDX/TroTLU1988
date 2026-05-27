@@ -16,9 +16,10 @@ export const register = (payload) => async (dispatch) => {
       });
     }
   } catch (error) {
+    const errorMsg = error.response?.data?.msg || error.response?.data?.message || "Đăng ký thất bại. Vui lòng kiểm tra lại kết nối mạng!";
     dispatch({
       type: actionTypes.REGISTER_FAIL,
-      data: null,
+      data: errorMsg,
     });
   }
 };
@@ -38,9 +39,10 @@ export const login = (payload) => async (dispatch) => {
       });
     }
   } catch (error) {
+    const errorMsg = error.response?.data?.msg || error.response?.data?.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại kết nối mạng!";
     dispatch({
       type: actionTypes.LOGIN_FAIL,
-      data: "Đăng nhập thất bại. Vui lòng kiểm tra lại kết nối mạng!",
+      data: errorMsg,
     });
   }
 };

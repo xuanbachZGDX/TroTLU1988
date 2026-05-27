@@ -16,7 +16,7 @@ export const validateBody = (schema) => {
 };
 
 // Biểu thức chính quy cho số điện thoại Việt Nam (10 số, bắt đầu bằng 0 hoặc 84 hoặc +84)
-const phoneRegex = /^(0|\+84|84)?([3|5|7|8|9][0-9]{8})$/;
+const phoneRegex = /^(0|\+84|84)?([0-9]{9})$/;
 
 export const schemas = {
   register: Joi.object({
