@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import html2pdf from 'html2pdf.js';
 
 const InvoiceModal = ({ isOpen, onClose, tx, userName }) => {
   if (!isOpen || !tx) return null;
@@ -13,7 +14,15 @@ const InvoiceModal = ({ isOpen, onClose, tx, userName }) => {
   const customerName = userName || 'Khách hàng hệ thống';
 
   const handlePrint = () => {
-    window.print();
+    const element = document.getElementById('print-invoice-area');
+    const opt = {
+      margin:       10,
+      filename:     `Bien_lai_TLU_${tx.id.slice(0, 8).toUpperCase()}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
   };
 
   return (
