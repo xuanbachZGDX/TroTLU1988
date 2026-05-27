@@ -74,7 +74,7 @@ const List = ({ categoryCode }) => {
           Mới đăng
         </span>
       </div>
-      <div className="items">
+      <div className="items flex flex-col gap-4">
         {posts?.length > 0 ? (
           posts.map((item) => {
             return (
