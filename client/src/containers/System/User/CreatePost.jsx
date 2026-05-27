@@ -85,18 +85,23 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
   };
 
   const handleSubmit = async () => {
-    const final = { ...payload, userId: currentData?.id, priceNumber: +payload.priceNumber / 1000000 };
-    const res = isEdit ? await apiUpdatePost({ ...final, postId: dataEdit?.id }) : await apiCreatePost(final);
-    if (res?.data?.err === 0) {
-      Swal.fire({
-        title: isEdit ? "Cập nhật thành công!" : "Đăng tin thành công!",
-        text: isEdit 
-          ? "Tin đăng của bạn đã được cập nhật và gửi duyệt lại thành công. Vui lòng chờ Admin kiểm duyệt trước khi hiển thị công khai."
-          : res.data.msg,
-        icon: "success"
-      }).then(() => isEdit ? setIsEdit(false) : window.location.reload());
-    } else {
-      Swal.fire("Thất bại!", res?.data?.msg || "Có lỗi xảy ra", "error");
+    try {
+      const final = { ...payload, userId: currentData?.id, priceNumber: +payload.priceNumber / 1000000 };
+      const res = isEdit ? await apiUpdatePost({ ...final, postId: dataEdit?.id }) : await apiCreatePost(final);
+      if (res?.data?.err === 0) {
+        Swal.fire({
+          title: isEdit ? "Cập nhật thành công!" : "Đăng tin thành công!",
+          text: isEdit 
+            ? "Tin đăng của bạn đã được cập nhật và gửi duyệt lại thành công. Vui lòng chờ Admin kiểm duyệt trước khi hiển thị công khai."
+            : res.data.msg,
+          icon: "success"
+        }).then(() => isEdit ? setIsEdit(false) : window.location.reload());
+      } else {
+        Swal.fire("Thất bại!", res?.data?.msg || "Có lỗi xảy ra", "error");
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.msg || error.response?.data?.message || "Có lỗi xảy ra khi gửi tin đăng. Vui lòng thử lại.";
+      Swal.fire("Thất bại!", errorMsg, "error");
     }
   };
 

@@ -103,7 +103,7 @@ export const schemas = {
     districtCode: Joi.string().allow("", null),
     images: Joi.any().optional(),
     features: Joi.any().optional(),
-  }),
+  }).unknown(true),
 
   updatePost: Joi.object({
     postId: Joi.string().required().messages({
@@ -129,5 +129,5 @@ export const schemas = {
     districtCode: Joi.string().allow("", null),
     images: Joi.any().optional(),
     features: Joi.any().optional(),
-  }),
+  }).unknown(true),
 };
