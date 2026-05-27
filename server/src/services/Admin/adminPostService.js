@@ -78,7 +78,10 @@ export const deleteAdminPostService = (postId) =>
 export const approveAdminPostService = (postId) =>
   new Promise(async (resolve, reject) => {
     try {
-      const post = await db.Post.findOne({ where: { id: postId } });
+      const post = await db.Post.findOne({ 
+        where: { id: postId },
+        include: [{ model: db.User, as: "user", attributes: ["id", "email", "name"] }]
+      });
       if (!post) return resolve({ err: 1, msg: "Không tìm thấy" });
 
       await db.sequelize.transaction(async (transaction) => {
@@ -98,6 +101,13 @@ export const approveAdminPostService = (postId) =>
           isRead: false
         }, { transaction });
       });
+
+      // Gửi email thông báo tự động cho chủ trọ
+      if (post.user?.email) {
+        const { sendPostStatusEmail } = require("../../utils/emailService");
+        sendPostStatusEmail(post.user.email, post.user.name, post.title, post.id, "active");
+      }
+
       resolve({ err: 0, msg: "Duyệt thành công" });
     } catch (error) {
       reject(error);
@@ -107,9 +117,13 @@ export const approveAdminPostService = (postId) =>
 export const rejectAdminPostService = (postId, reason = "") =>
   new Promise(async (resolve, reject) => {
     try {
+      const post = await db.Post.findOne({ 
+        where: { id: postId },
+        include: [{ model: db.User, as: "user", attributes: ["id", "email", "name"] }]
+      });
+      if (!post) throw new Error("POST_NOT_FOUND");
+
       await db.sequelize.transaction(async (t) => {
-        const post = await db.Post.findOne({ where: { id: postId }, transaction: t });
-        if (!post) throw new Error("POST_NOT_FOUND");
         if (post.status === 'rejected') return;
 
         // Tìm giao dịch thanh toán gần nhất của tin này để hoàn tiền
@@ -153,6 +167,13 @@ export const rejectAdminPostService = (postId, reason = "") =>
           isRead: false
         }, { transaction: t });
       });
+
+      // Gửi email thông báo tự động cho chủ trọ kèm lý do từ chối
+      if (post.user?.email) {
+        const { sendPostStatusEmail } = require("../../utils/emailService");
+        sendPostStatusEmail(post.user.email, post.user.name, post.title, post.id, "rejected", reason);
+      }
+
       resolve({ err: 0, msg: "Đã từ chối bài đăng và hoàn tiền cho người dùng" });
     } catch (error) {
       if (error.message === "POST_NOT_FOUND") resolve({ err: 1, msg: "Không tìm thấy bài đăng" });

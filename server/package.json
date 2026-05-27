@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon --exec babel-node server.js",
+    "refresh:scraped": "babel-node src/scripts/refreshScrapedData.js",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:status": "sequelize-cli db:migrate:status",
     "grant:admin": "babel-node src/scripts/grantAdmin.js"

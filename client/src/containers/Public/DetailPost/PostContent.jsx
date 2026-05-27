@@ -65,27 +65,29 @@ const PostContent = ({ postDetail, formatDate, descriptions, features }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="text-lg font-bold mb-4">Nổi bật</h2>
-        <div className="grid grid-cols-4 gap-x-4 gap-y-3">
-          {features.map((f) => (
-            <div key={f.label} className="flex items-center gap-2">
-              {f.active ? (
-                <span className="flex-none w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                  <svg viewBox="0 0 20 20" fill="white" className="w-3 h-3">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </span>
-              ) : (
-                <span className="flex-none w-5 h-5 rounded-full border-2 border-gray-300 bg-gray-100" />
-              )}
-              <span className={`text-sm ${f.active ? "text-gray-800" : "text-gray-400"}`}>
-                {f.label}
-              </span>
+      {(() => {
+        const activeFeatures = features.filter((f) => f.active);
+        if (activeFeatures.length === 0) return null;
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h2 className="text-lg font-bold mb-4">Tiện ích nổi bật</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
+              {activeFeatures.map((f) => (
+                <div key={f.label} className="flex items-center gap-2 animate-fade-in">
+                  <span className="flex-none w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg viewBox="0 0 20 20" fill="white" className="w-3 h-3">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                  <span className="text-sm text-gray-800">
+                    {f.label}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
