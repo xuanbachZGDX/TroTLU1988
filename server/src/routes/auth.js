@@ -1,5 +1,6 @@
 import express from "express";
 import * as authController from "../controllers/Auth/authController";
+import { validateBody, schemas } from "../middlewares/validation";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ const router = express.Router();
  *       200:
  *         description: Đăng ký thành công
  */
-router.post("/register", authController.register);
+router.post("/register", validateBody(schemas.register), authController.register);
 
 /**
  * @swagger
@@ -56,7 +57,7 @@ router.post("/register", authController.register);
  *       200:
  *         description: Đăng nhập thành công
  */
-router.post("/login", authController.login);
+router.post("/login", validateBody(schemas.login), authController.login);
 
 /**
  * @swagger
@@ -98,7 +99,7 @@ router.post("/google-login", authController.loginGoogle);
  *       200:
  *         description: Gửi email khôi phục thành công
  */
-router.post("/forgot-password", authController.forgotPassword);
+router.post("/forgot-password", validateBody(schemas.forgotPassword), authController.forgotPassword);
 
 /**
  * @swagger
@@ -121,6 +122,6 @@ router.post("/forgot-password", authController.forgotPassword);
  *       200:
  *         description: Đặt lại mật khẩu thành công
  */
-router.post("/reset-password", authController.resetPassword);
+router.post("/reset-password", validateBody(schemas.resetPassword), authController.resetPassword);
 
 export default router;

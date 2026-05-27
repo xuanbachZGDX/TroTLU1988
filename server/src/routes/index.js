@@ -12,8 +12,14 @@ import adminRouter    from "./admin";
 import paymentRouter  from "./payment";
 import appRouter      from "./app";
 
+import { authLimiter, apiLimiter } from "../middlewares/rateLimiter";
+
 const initRoutes = (app) => {
-  app.use("/api/v1/auth",       authRouter);
+  // Áp dụng giới hạn yêu cầu (rate limit) chung cho toàn bộ API /api/v1
+  app.use("/api/v1", apiLimiter);
+
+  // Áp dụng giới hạn yêu cầu chặt chẽ hơn cho các tuyến xác thực nhạy cảm
+  app.use("/api/v1/auth",       authLimiter, authRouter);
   app.use("/api/v1/seed",       seedRouter);
   app.use("/api/v1/categories", categoryRouter);
   app.use("/api/v1/posts",      postRouter);

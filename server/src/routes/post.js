@@ -1,6 +1,7 @@
 import express from "express";
 import * as postController from "../controllers/Post/postController";
 import verifyToken from "../middlewares/verifyToken.js";
+import { validateBody, schemas } from "../middlewares/validation";
 
 const router = express.Router();
 
@@ -88,7 +89,7 @@ router.use(verifyToken);
  *       200:
  *         description: Tạo bài đăng thành công
  */
-router.post("/create",   postController.createNewPost);
+router.post("/create",   validateBody(schemas.createPost), postController.createNewPost);
 
 /**
  * @swagger
@@ -130,7 +131,7 @@ router.get("/history",   postController.getPostHistory);
  *       200:
  *         description: Cập nhật thành công
  */
-router.put("/update",    postController.updatePost);
+router.put("/update",    validateBody(schemas.updatePost), postController.updatePost);
 
 /**
  * @swagger

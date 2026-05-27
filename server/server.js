@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from "helmet";
 import initRoutes from "./src/routes";
 import connectDb from "./src/config/connectDatabase";
 import seedAdmin from "./src/utils/seedAdmin";
@@ -10,6 +11,12 @@ import { startScheduler } from "./src/utils/postScheduler";
 dotenv.config();
 
 const app = express();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 app.use(
   cors({
