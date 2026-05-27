@@ -10,6 +10,14 @@ export const register = async (req, res) => {
         msg: "Missing inputs!",
       });
 
+    let normalizedPhone = String(phone).replace(/[\s\-\(\)]/g, "");
+    if (normalizedPhone.startsWith("+84")) {
+      normalizedPhone = "0" + normalizedPhone.slice(3);
+    } else if (normalizedPhone.startsWith("84") && normalizedPhone.length > 9) {
+      normalizedPhone = "0" + normalizedPhone.slice(2);
+    }
+    req.body.phone = normalizedPhone;
+
     const response = await authService.registerService(req.body);
     return res.status(200).json(response);
   } catch (error) {
@@ -28,6 +36,14 @@ export const login = async (req, res) => {
         err: 1,
         msg: "Missing inputs!",
       });
+
+    let normalizedPhone = String(phone).replace(/[\s\-\(\)]/g, "");
+    if (normalizedPhone.startsWith("+84")) {
+      normalizedPhone = "0" + normalizedPhone.slice(3);
+    } else if (normalizedPhone.startsWith("84") && normalizedPhone.length > 9) {
+      normalizedPhone = "0" + normalizedPhone.slice(2);
+    }
+    req.body.phone = normalizedPhone;
 
     const response = await authService.loginService(req.body);
     return res.status(200).json(response);
@@ -95,4 +111,3 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
-

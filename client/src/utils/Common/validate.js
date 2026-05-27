@@ -28,7 +28,7 @@ const validate = (payload, setInvalidFields) => {
         if (item[1].length < 6) {
           let invalidObj = {
             name: item[0],
-            message: "Mật khẩu phải có ít nhất 6 ký tự.",
+            message: "Mật khẩu phải chứa ít nhất 6 ký tự",
           };
           invalids.push(invalidObj);
         }

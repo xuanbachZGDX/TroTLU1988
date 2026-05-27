@@ -31,13 +31,33 @@ export const updateUser = (payload, id) =>
       delete sanitizedPayload.balance;
       delete sanitizedPayload.status;
 
+      if (sanitizedPayload.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(sanitizedPayload.email)) {
+          return resolve({ err: 5, msg: "Email không đúng định dạng" });
+        }
+      }
+
       if (sanitizedPayload.password) {
         const bcrypt = require("bcryptjs");
+        const user = await db.User.findByPk(id);
+        if (!user) return resolve({ err: 2, msg: "Người dùng không tồn tại" });
+        
+        if (!sanitizedPayload.oldPassword) {
+          return resolve({ err: 3, msg: "Vui lòng cung cấp mật khẩu cũ" });
+        }
+        
+        const isCorrect = bcrypt.compareSync(sanitizedPayload.oldPassword, user.password);
+        if (!isCorrect) return resolve({ err: 4, msg: "Mật khẩu cũ không chính xác" });
+
         sanitizedPayload.password = bcrypt.hashSync(
           sanitizedPayload.password,
           bcrypt.genSaltSync(12),
         );
       }
+
+      delete sanitizedPayload.oldPassword;
+
       const response = await db.User.update(sanitizedPayload, {
         where: { id },
       });

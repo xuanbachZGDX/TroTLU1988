@@ -4,7 +4,7 @@ import icons from "../../../utils/icons";
 
 const { BsCameraFill, ImBin } = icons;
 
-const PostImages = ({ imagesPreview, setImagesPreview, setPayload, isLoading, handleFiles }) => {
+const PostImages = ({ imagesPreview, setImagesPreview, setPayload, isLoading, handleFiles, invalidFields, setInvalidFields }) => {
   const handleDeleteImage = (image) => {
     setImagesPreview((prev) => prev?.filter((item) => item !== image));
     setPayload((prev) => ({
@@ -16,13 +16,24 @@ const PostImages = ({ imagesPreview, setImagesPreview, setPayload, isLoading, ha
     }));
   };
 
+  React.useEffect(() => {
+    if (imagesPreview?.length > 0 && invalidFields?.some((i) => i.name === "images")) {
+      setInvalidFields((prev) => prev.filter((i) => i.name !== "images"));
+    }
+  }, [imagesPreview, invalidFields, setInvalidFields]);
+
+  const errorObj = invalidFields?.find((item) => item.name === "images");
+
   return (
     <div className="bg-white rounded-md shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-medium mb-6">Hình ảnh</h2>
+      <h2 className="text-xl font-medium mb-2">Hình ảnh</h2>
+      <p className="text-xs text-gray-500 mb-4">Cung cấp ít nhất 1 hình ảnh thực tế của phòng trọ để khách thuê dễ tiếp cận.</p>
       <div className="w-full">
         <label
           htmlFor="file"
-          className="w-full flex flex-col items-center justify-center border-2 border-blue-400 h-[200px] border-dashed rounded-md my-4 cursor-pointer gap-4 bg-blue-50 hover:bg-blue-100 transition-all"
+          className={`w-full flex flex-col items-center justify-center border-2 ${
+            errorObj ? "border-red-400 bg-red-50 hover:bg-red-100" : "border-blue-400 bg-blue-50 hover:bg-blue-100"
+          } h-[200px] border-dashed rounded-md my-4 cursor-pointer gap-4 transition-all`}
         >
           {isLoading ? (
             <Loading />
@@ -34,6 +45,11 @@ const PostImages = ({ imagesPreview, setImagesPreview, setPayload, isLoading, ha
           )}
         </label>
         <input onChange={handleFiles} value="" hidden type="file" id="file" multiple />
+        {errorObj && (
+          <small className="text-red-500 block mt-1 font-medium italic animate-pulse">
+            ⚠️ {errorObj.message}
+          </small>
+        )}
         <div className="w-full mt-6">
           <h3 className="font-medium py-4 ">Ảnh đã chọn</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">

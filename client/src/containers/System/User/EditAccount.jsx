@@ -40,13 +40,26 @@ const EditAccount = () => {
   };
 
   const handleSubmit = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (payload.email && !emailRegex.test(payload.email)) {
+      setInvalidFields([{ name: "email", message: "Email không đúng định dạng" }]);
+      Swal.fire("Lỗi!", "Email không đúng định dạng", "error");
+      return;
+    }
+
     const isChanged = payload.name !== (currentData?.name || "") || payload.email !== (currentData?.email || "") ||
       payload.zalo !== (currentData?.zalo || "") || payload.avatar !== (currentData?.avatar || "") || payload.phone !== (currentData?.phone || "");
 
     if (!isChanged) { Swal.fire("Thông báo", "Bạn chưa thay đổi thông tin nào!", "info"); return; }
     const response = await apiUpdateUser({ ...payload });
-    if (response?.data?.err === 0) Swal.fire("Thành công", response.data.msg, "success").then(() => dispatch(getCurrent()));
-    else Swal.fire("Thất bại", response?.data?.msg || "Có lỗi xảy ra", "error");
+    if (response?.data?.err === 0) {
+      Swal.fire("Thành công", response.data.msg, "success").then(() => dispatch(getCurrent()));
+    } else {
+      if (response?.data?.msg?.includes("Email không đúng định dạng")) {
+        setInvalidFields([{ name: "email", message: "Email không đúng định dạng" }]);
+      }
+      Swal.fire("Thất bại", response?.data?.msg || "Có lỗi xảy ra", "error");
+    }
   };
 
   const handleChangePassword = async () => {
@@ -54,27 +67,29 @@ const EditAccount = () => {
       title: 'Đổi mật khẩu',
       html: `
         <div class="flex flex-col gap-4 mt-2 px-2 text-left">
+          <div><label class="font-medium text-sm text-gray-700" for="swal-input-old">Mật khẩu hiện tại</label><input id="swal-input-old" type="password" class="border border-gray-300 rounded-md p-3 w-full outline-none" placeholder="Nhập mật khẩu hiện tại"></div>
           <div><label class="font-medium text-sm text-gray-700" for="swal-input-new">Mật khẩu mới</label><input id="swal-input-new" type="password" class="border border-gray-300 rounded-md p-3 w-full outline-none" placeholder="Nhập mật khẩu mới"></div>
           <div><label class="font-medium text-sm text-gray-700" for="swal-input-confirm">Xác nhận mật khẩu</label><input id="swal-input-confirm" type="password" class="border border-gray-300 rounded-md p-3 w-full outline-none" placeholder="Nhập lại mật khẩu mới"></div>
           <div class="flex items-center gap-2"><input type="checkbox" id="show-password" class="w-4 h-4"><label for="show-password" class="text-sm text-gray-600">Hiện mật khẩu</label></div>
         </div>
       `,
       didOpen: () => {
-        const cb = document.getElementById('show-password'), p1 = document.getElementById('swal-input-new'), p2 = document.getElementById('swal-input-confirm');
-        cb.addEventListener('change', (e) => { const t = e.target.checked ? 'text' : 'password'; p1.type = t; p2.type = t; });
+        const cb = document.getElementById('show-password'), p0 = document.getElementById('swal-input-old'), p1 = document.getElementById('swal-input-new'), p2 = document.getElementById('swal-input-confirm');
+        cb.addEventListener('change', (e) => { const t = e.target.checked ? 'text' : 'password'; p0.type = t; p1.type = t; p2.type = t; });
       },
       showCancelButton: true, confirmButtonText: 'Cập nhật', cancelButtonText: 'Hủy', confirmButtonColor: '#3b82f6',
       preConfirm: () => {
-        const p1 = document.getElementById('swal-input-new').value, p2 = document.getElementById('swal-input-confirm').value;
-        if (!p1 || !p2) { Swal.showValidationMessage('Vui lòng nhập đầy đủ!'); return false; }
-        if (p1.length < 6) { Swal.showValidationMessage('Tối thiểu 6 ký tự!'); return false; }
-        if (p1 !== p2) { Swal.showValidationMessage('Mật khẩu không khớp!'); return false; }
-        return { newPassword: p1 };
+        const p0 = document.getElementById('swal-input-old').value, p1 = document.getElementById('swal-input-new').value, p2 = document.getElementById('swal-input-confirm').value;
+        if (!p0 || !p1 || !p2) { Swal.showValidationMessage('Vui lòng nhập đầy đủ!'); return false; }
+        if (p1.length < 6) { Swal.showValidationMessage('Mật khẩu mới tối thiểu 6 ký tự!'); return false; }
+        if (p1 === p0) { Swal.showValidationMessage('Mật khẩu mới trùng mật khẩu cũ!'); return false; }
+        if (p1 !== p2) { Swal.showValidationMessage('Mật khẩu xác nhận không khớp!'); return false; }
+        return { oldPassword: p0, newPassword: p1 };
       }
     });
-    if (formValues?.newPassword) {
+    if (formValues?.newPassword && formValues?.oldPassword) {
       setIsLoading(true);
-      const res = await apiUpdateUser({ password: formValues.newPassword });
+      const res = await apiUpdateUser({ password: formValues.newPassword, oldPassword: formValues.oldPassword });
       setIsLoading(false);
       if (res?.data?.err === 0) Swal.fire('Thành công!', 'Mật khẩu đã được đổi.', 'success');
       else Swal.fire('Thất bại', res?.data?.msg || 'Có lỗi xảy ra', 'error');

@@ -8,9 +8,17 @@ export const forgotPasswordService = (email) =>
       const user = await db.User.findOne({ where: { email } });
       if (!user) return resolve({ err: 1, msg: "Email không tồn tại trong hệ thống!" });
 
+      if (user.passwordResetExpires) {
+        const lastSent = new Date(user.passwordResetExpires).getTime() - 1 * 60 * 1000;
+        const diff = Date.now() - lastSent;
+        if (diff < 60 * 1000) {
+          return resolve({ err: 3, msg: "Vui lòng đợi 60 giây trước khi yêu cầu mã OTP mới" });
+        }
+      }
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       user.otp = otp;
-      user.passwordResetExpires = Date.now() + 5 * 60 * 1000; 
+      user.passwordResetExpires = Date.now() + 1 * 60 * 1000; 
       await user.save();
 
       const emailSubject = "[TLU.com] Mã xác thực khôi phục mật khẩu";
@@ -18,7 +26,7 @@ export const forgotPasswordService = (email) =>
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #007bff;">Khôi phục mật khẩu</h2>
           <p>Mã OTP của bạn là: <b style="font-size: 20px; color: #d9534f;">${otp}</b></p>
-          <p>Mã này có hiệu lực trong 5 phút.</p>
+          <p>Mã này có hiệu lực trong 1 phút.</p>
         </div>
       `;
       const isSent = await sendEmail(email, emailSubject, emailHtml);

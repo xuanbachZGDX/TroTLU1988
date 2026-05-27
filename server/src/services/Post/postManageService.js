@@ -33,12 +33,15 @@ export const getPostLimitAdminService = (page, { search, status, ...query }, id)
           db.sequelize.literal(`STR_TO_DATE(overview.expired, '%d/%m/%Y') >= '${todayStr}'`)
         ];
       } else if (status === "expired") {
-        where.status = "active";
+        where.status = { [Op.in]: ["active", "expired"] };
         overviewWhere[Op.and] = [
           db.sequelize.literal(`STR_TO_DATE(overview.expired, '%d/%m/%Y') < '${todayStr}'`)
         ];
-      } else if (status === "pending" || status === "rejected") {
+      } else if (status === "pending" || status === "rejected" || status === "archived" || status === "blocked") {
         where.status = status;
+      } else {
+        // Mặc định không hiển thị tin đã ẩn (archived) ở danh sách chính
+        where.status = { [Op.ne]: "archived" };
       }
 
       const response = await db.Post.findAndCountAll({
@@ -86,13 +89,13 @@ export const extendPostService = (postId, userId, days = 7, newStar = null) =>
         if (!post) throw new Error("POST_NOT_FOUND");
 
         // Tính giá dựa trên số sao (loại tin)
-        // 5 sao: 50k, 4 sao: 30k, 3 sao: 10k, 2 sao: 5k, 0 sao: 2k
-        let pricePerDay = 2000;
+        // 5 sao: 10k, 4 sao: 7k, 3 sao: 5k, 2 sao: 3k, 0 sao: 1k
+        let pricePerDay = 1000;
         const star = newStar !== null ? parseInt(newStar) : (post.star || 0);
-        if (star === 5) pricePerDay = 50000;
-        else if (star === 4) pricePerDay = 30000;
-        else if (star === 3) pricePerDay = 10000;
-        else if (star === 2) pricePerDay = 5000;
+        if (star === 5) pricePerDay = 10000;
+        else if (star === 4) pricePerDay = 7000;
+        else if (star === 3) pricePerDay = 5000;
+        else if (star === 2) pricePerDay = 3000;
 
         const totalPrice = pricePerDay * daysInt;
 

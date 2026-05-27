@@ -13,9 +13,17 @@ import {
 export const updatePost = (postId, payload, actor) =>
   new Promise(async (resolve, reject) => {
     try {
+      if (payload.images && payload.images.length > 10) {
+        throw new Error("EXCEEDED_IMAGE_LIMIT");
+      }
+
       const where = actor?.role === "admin" ? { id: postId } : { id: postId, userId: actor?.id };
       const post = await db.Post.findOne({ where });
       if (!post) return resolve({ err: 1, msg: "Không tìm thấy hoặc không có quyền" });
+
+      if (actor?.role !== "admin" && post.status === "blocked") {
+        return resolve({ err: 2, msg: "Bài viết đã bị khóa, không thể chỉnh sửa." });
+      }
 
       await db.sequelize.transaction(async (transaction) => {
         const isUser = actor?.role !== "admin";
@@ -111,6 +119,19 @@ export const updatePost = (postId, payload, actor) =>
                 : `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()}. Vui lòng duyệt lại.`,
               isRead: false
             }, { transaction });
+
+            // Thông báo cho Chủ trọ nếu tin cập nhật được tự động duyệt
+            if (isAutoApproved) {
+              await db.Notification.create({
+                id: v4(),
+                postId,
+                senderId: null, // Gửi từ Hệ thống
+                recipientId: post.userId, // Gửi cho chủ trọ
+                title: "Tin đăng cập nhật đã được duyệt tự động",
+                content: `Tin đăng #${post.id?.slice(0, 8).toUpperCase()} "${updatePayload.title?.slice(0, 50)}${updatePayload.title?.length > 50 ? '...' : ''}" của bạn sau khi cập nhật đã được hệ thống duyệt tự động thành công.`,
+                isRead: false
+              }, { transaction });
+            }
           }
         }
 
@@ -162,6 +183,8 @@ export const updatePost = (postId, payload, actor) =>
     } catch (error) {
       if (error.message === "NOT_ENOUGH_BALANCE") {
         resolve({ err: 2, msg: "Số dư tài khoản không đủ để thanh toán lại phí đăng tin bị từ chối." });
+      } else if (error.message === "EXCEEDED_IMAGE_LIMIT") {
+        resolve({ err: 3, msg: "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng." });
       } else {
         reject(error);
       }

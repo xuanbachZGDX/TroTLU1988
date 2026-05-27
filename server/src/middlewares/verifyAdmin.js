@@ -5,7 +5,7 @@ const verifyAdmin = (req, res, next) =>
     if (req.user?.role !== "admin") {
       return res.status(403).json({
         err: 1,
-        msg: "Admin permission required",
+        msg: "Bạn không có quyền truy cập chức năng này",
       });
     }
 

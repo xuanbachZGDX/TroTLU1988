@@ -78,6 +78,18 @@ const Login = () => {
   }, [msg, update]);
 
   const handleSubmit = async () => {
+    let rawPhone = payload.phone;
+    if (rawPhone) {
+      let normalized = rawPhone.replace(/[\s\-\(\)]/g, "");
+      if (normalized.startsWith("+84")) {
+        normalized = "0" + normalized.slice(3);
+      } else if (normalized.startsWith("84") && normalized.length > 9) {
+        normalized = "0" + normalized.slice(2);
+      }
+      payload.phone = normalized;
+      setPayload(prev => ({ ...prev, phone: normalized }));
+    }
+
     let finalPayload = isRegister ? payload : { phone: payload.phone, password: payload.password };
     let invalids = validate(finalPayload, setInvalidFields);
 

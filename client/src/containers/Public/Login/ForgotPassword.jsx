@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../../../components";
 import { apiForgotPassword } from "../../../services/authService";
 import Swal from "sweetalert2";
@@ -7,11 +7,24 @@ import { useNavigate } from "react-router-dom";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   const handleSubmit = async () => {
     if (!email) {
       Swal.fire("Lỗi!", "Vui lòng nhập email của bạn!", "error");
+      return;
+    }
+    if (countdown > 0) {
+      Swal.fire("Lỗi!", "Vui lòng đợi 60 giây trước khi yêu cầu mã OTP mới", "error");
       return;
     }
     
@@ -19,10 +32,14 @@ const ForgotPassword = () => {
     try {
       const response = await apiForgotPassword(email);
       if (response?.data?.err === 0) {
+        setCountdown(60);
         Swal.fire("Thành công", response.data.msg, "success").then(() => {
           navigate("/reset-password", { state: { email } });
         });
       } else {
+        if (response?.data?.msg?.includes("Vui lòng đợi")) {
+          setCountdown(60);
+        }
         Swal.fire("Lỗi!", response.data.msg, "error");
       }
     } catch (error) {
@@ -51,12 +68,12 @@ const ForgotPassword = () => {
             />
           </div>
           <Button
-            text={isLoading ? "Đang gửi mã..." : "Gửi mã OTP"}
-            bgColor="bg-blue-600"
+            text={countdown > 0 ? `Gửi lại sau (${countdown}s)` : (isLoading ? "Đang gửi mã..." : "Gửi mã OTP")}
+            bgColor={countdown > 0 ? "bg-gray-400" : "bg-blue-600"}
             textColor="text-white"
             fullWidth
-            onClick={handleSubmit}
-            disabled={isLoading}
+            onClick={countdown > 0 ? null : handleSubmit}
+            disabled={isLoading || countdown > 0}
           />
           <div className="text-center mt-4">
             <span

@@ -104,6 +104,22 @@ const AdminBellNotification = () => {
     }
   };
 
+  const handleMarkAllRead = async (e) => {
+    e.stopPropagation();
+    const unread = notifications.filter(n => !n.isRead);
+    if (unread.length === 0) return;
+    try {
+      if (isAdmin) {
+        await Promise.all(unread.map(n => apiReadAdminNotification(n.id)));
+      } else {
+        await Promise.all(unread.map(n => apiReadUserNotification(n.id)));
+      }
+      fetchNotifs();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="relative flex items-center" ref={bellRef}>
       <button 
@@ -118,12 +134,22 @@ const AdminBellNotification = () => {
           </span>
         )}
       </button>
-
+ 
       {isOpen && (
         <div className="absolute top-[calc(100%+15px)] right-0 w-[320px] bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 flex flex-col gap-2">
           <div className="px-4 pb-2 border-b flex justify-between items-center">
             <span className="text-xs font-bold text-gray-800">Thông báo mới nhận</span>
-            <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">{unreadCount} chưa đọc</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">{unreadCount} chưa đọc</span>
+              {unreadCount > 0 && (
+                <button 
+                  onClick={handleMarkAllRead} 
+                  className="text-[10px] text-blue-600 hover:underline font-bold ml-1 border-none bg-transparent cursor-pointer"
+                >
+                  Đọc tất cả
+                </button>
+              )}
+            </div>
           </div>
           <div className="max-h-[260px] overflow-y-auto flex flex-col">
             {notifications.length === 0 ? (

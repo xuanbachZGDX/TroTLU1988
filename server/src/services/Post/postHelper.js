@@ -71,6 +71,9 @@ export const shouldPostBeAutoApproved = async (postOrBody, userId) => {
   const settings = getSystemSettings();
   if (!settings.autoApprove) return false;
 
+  const user = await db.User.findByPk(userId);
+  if (user && user.role === "admin") return true;
+
   const star = +postOrBody.star || 0;
   // Tầng 1: Nếu là tin đăng VIP thì được tự động duyệt ngay
   if (star > 0) return true;

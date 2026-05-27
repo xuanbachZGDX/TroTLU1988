@@ -47,7 +47,7 @@ export const getAdminPostsService = (page, query) =>
         });
       } else if (status === "expired") {
         rows = rows.filter(item => {
-          if (item.status !== 'active') return false;
+          if (item.status !== 'active' && item.status !== 'expired') return false;
           const expDate = getExpDate(item.overview?.expired);
           return expDate.isValid() && expDate.isBefore(today);
         });

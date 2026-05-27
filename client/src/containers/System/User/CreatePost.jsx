@@ -57,7 +57,19 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
 
   const handleFiles = async (e) => {
     setIsLoading(true);
-    const files = Array.from(e.target.files);
+    let files = Array.from(e.target.files);
+    const currentImagesCount = imagesPreview?.length || 0;
+
+    if (currentImagesCount + files.length > 10) {
+      Swal.fire("Thông báo", "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng", "warning");
+      const allowedCount = 10 - currentImagesCount;
+      if (allowedCount <= 0) {
+        setIsLoading(false);
+        return;
+      }
+      files = files.slice(0, allowedCount);
+    }
+
     try {
       const promises = files.map(file => {
         const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", import.meta.env.VITE_UPLOAD_ASSETS_NAME);
@@ -135,7 +147,17 @@ const CreatePost = ({ isEdit, setIsEdit }) => {
           <div id="khu-vuc" className="scroll-mt-40"><Address payload={payload} setPayload={setPayload} invalidFields={invalidFields} setInvalidFields={setInvalidFields} /></div>
           <div id="thong-tin-mo-ta" className="scroll-mt-40"><Overview payload={payload} setPayload={setPayload} invalidFields={invalidFields} setInvalidFields={setInvalidFields} /></div>
           <FeaturesSection allFeatures={allFeatures} payload={payload} setPayload={setPayload} />
-          <div id="hinh-anh" className="scroll-mt-40"><PostImages imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} setPayload={setPayload} isLoading={isLoading} handleFiles={handleFiles} /></div>
+          <div id="hinh-anh" className="scroll-mt-40">
+            <PostImages 
+              imagesPreview={imagesPreview} 
+              setImagesPreview={setImagesPreview} 
+              setPayload={setPayload} 
+              isLoading={isLoading} 
+              handleFiles={handleFiles} 
+              invalidFields={invalidFields}
+              setInvalidFields={setInvalidFields}
+            />
+          </div>
           <div id="thong-tin-lien-he" className="scroll-mt-40 bg-white rounded-md shadow-sm border border-gray-200 p-6"><h2 className="text-xl font-medium mb-6">Thông tin liên hệ</h2>
             <div className="flex items-center gap-6"><div className="w-1/2"><InputReadOnly label="Tên liên hệ" value={currentData?.name || currentData?.username} /></div><div className="w-1/2"><InputReadOnly label="Điện thoại" value={currentData?.phone || ""} /></div></div>
           </div>

@@ -1,12 +1,21 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { path } from "../../utils/constant";
 import SystemSidebar from "./SystemSidebar";
 import { Navigation } from "../Public";
+import * as actions from "../../store/actions";
 
 const SystemLayout = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(actions.getCurrent());
+    }
+  }, [location.pathname, isLoggedIn, dispatch]);
 
   if (!isLoggedIn) return <Navigate to={`/${path.LOGIN}`} replace={true} />;
 

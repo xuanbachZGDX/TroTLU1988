@@ -14,6 +14,9 @@ import {
 export const createNewPostService = (body, userId) =>
   new Promise(async (resolve, reject) => {
     try {
+      if (body.images && body.images.length > 10) {
+        throw new Error("EXCEEDED_IMAGE_LIMIT");
+      }
       const postId = generateId();
       await db.sequelize.transaction(async (transaction) => {
         const star = +body.star || 0;
@@ -74,10 +77,24 @@ export const createNewPostService = (body, userId) =>
             : `Chủ trọ ${landlordName} đã đăng tin mới #${postId.slice(0, 8).toUpperCase()}. Vui lòng kiểm duyệt.`,
           isRead: false
         }, { transaction });
+
+        // Tạo thông báo cho Chủ trọ nếu được tự động duyệt
+        if (initialStatus === "active") {
+          await db.Notification.create({
+            id: generateId(),
+            postId,
+            senderId: null, // Gửi từ Hệ thống
+            recipientId: userId, // Gửi cho chủ trọ
+            title: "Tin đăng đã được duyệt tự động",
+            content: `Tin đăng #${postId.slice(0, 8).toUpperCase()} "${body.title?.slice(0, 50)}${body.title?.length > 50 ? '...' : ''}" của bạn đã được hệ thống duyệt tự động thành công.`,
+            isRead: false
+          }, { transaction });
+        }
       });
       resolve({ err: 0, msg: "Tạo tin đăng thành công" });
     } catch (error) {
       if (error.message === "NOT_ENOUGH_BALANCE") resolve({ err: 2, msg: "Số dư không đủ." });
+      else if (error.message === "EXCEEDED_IMAGE_LIMIT") resolve({ err: 3, msg: "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng." });
       else reject(error);
     }
   });
