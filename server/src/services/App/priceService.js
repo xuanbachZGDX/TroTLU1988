@@ -1,20 +1,17 @@
-import db from "../../models";
+import { dataPrice } from "../../utils/data";
 
-// GET ALL PRICE
+// GET ALL PRICE (Tối ưu hóa: Trả về dữ liệu tĩnh không qua Database)
 export const getPricesService = () =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await db.Price.findAll({
-        raw: true,
-        attributes: ["code", "value", "order"],
-      });
-      resolve({
-        err: response ? 0 : 1,
-        msg: response ? "OK" : "Failed to get prices",
-        response,
-      });
-    } catch (error) {
-      reject(error);
-    }
+  new Promise((resolve) => {
+    const response = dataPrice.map((item, index) => ({
+      code: item.code,
+      value: item.value,
+      order: index + 1,
+    }));
+    resolve({
+      err: 0,
+      msg: "OK",
+      response,
+    });
   });
 

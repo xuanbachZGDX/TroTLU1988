@@ -25,7 +25,7 @@ export const menuSystem = [
   { id: 4, text: "Bảng giá dịch vụ",          path: `/${path.SYSTEM}/${path.MANAGE_SERVICE_PRICE}`,   icons: <MdOutlinePriceChange />,type: 'landlord' },
   { id: 5, text: "Nạp tiền vào tài khoản",    path: `/${path.SYSTEM}/${path.DEPOSIT}`,                icons: <BsWallet2 />,           type: 'landlord' },
   { id: 6, text: "Lịch sử giao dịch",         path: `/${path.SYSTEM}/${path.TRANSACTION_HISTORY}`,    icons: <MdHistory />,           type: 'landlord' },
-  { id: 7, text: "Góp ý của tôi",             path: `/${path.SYSTEM}/${path.MY_CONTACTS}`,            icons: <RiMessage2Line />,      type: 'landlord' },
+  { id: 7, text: "Hỗ trợ & Góp ý",             path: `/${path.SYSTEM}/${path.MY_CONTACTS}`,            icons: <RiMessage2Line />,      type: 'landlord' },
 
   // Mọi người đã đăng nhập (user tìm kiếm chỉ thấy mục này)
   { id: 3, text: "Sửa thông tin cá nhân",     path: `/${path.SYSTEM}/${path.EDIT_ACCOUNT}`,           icons: <FaRegUserCircle />,     type: 'all' },

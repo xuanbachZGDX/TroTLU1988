@@ -20,8 +20,8 @@ const UserInquiries = () => {
   return (
     <div className="w-full h-full flex flex-col gap-6 p-6 animate-slide-right">
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Góp ý của tôi</h1>
-        <p className="text-gray-500 text-sm mt-1">Danh sách các yêu cầu hỗ trợ và góp ý bạn đã gửi</p>
+        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Hỗ trợ & Góp ý</h1>
+        <p className="text-gray-500 text-sm mt-1">Danh sách các yêu cầu hỗ trợ và góp ý của bạn gửi tới Ban quản trị</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -69,8 +69,8 @@ const UserInquiries = () => {
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center gap-4 text-gray-400">
           <RiMessage2Line size={64} className="opacity-20" />
           <div className="text-center">
-            <p className="font-bold text-gray-500 text-lg">Bạn chưa gửi góp ý nào</p>
-            <p className="text-sm">Mọi ý kiến của bạn đều giúp chúng tôi hoàn thiện hệ thống hơn.</p>
+            <p className="font-bold text-gray-500 text-lg">Bạn chưa gửi yêu cầu hỗ trợ nào</p>
+            <p className="text-sm">Nếu bạn cần trợ giúp về tài khoản, nạp tiền hoặc đăng tin, vui lòng gửi liên hệ cho chúng tôi.</p>
           </div>
         </div>
       )}

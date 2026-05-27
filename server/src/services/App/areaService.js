@@ -1,19 +1,16 @@
-import db from "../../models";
+import { dataArea } from "../../utils/data";
 
-// GET ALL AREA
+// GET ALL AREA (Tối ưu hóa: Trả về dữ liệu tĩnh không qua Database)
 export const getAreasService = () =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await db.Area.findAll({
-        raw: true,
-        attributes: ["code", "value", "order"],
-      });
-      resolve({
-        err: response ? 0 : 1,
-        msg: response ? "OK" : "Failed to get areas",
-        response,
-      });
-    } catch (error) {
-      reject(error);
-    }
+  new Promise((resolve) => {
+    const response = dataArea.map((item, index) => ({
+      code: item.code,
+      value: item.value,
+      order: index + 1,
+    }));
+    resolve({
+      err: 0,
+      msg: "OK",
+      response,
+    });
   });
