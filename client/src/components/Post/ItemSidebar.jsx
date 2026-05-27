@@ -10,7 +10,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-const { GrNext } = icons;
+const { BsChevronRight } = icons;
 
 const ItemSidebar = ({ title, content, isDouble, type }) => {
   const location = useLocation();
@@ -78,7 +78,7 @@ const ItemSidebar = ({ title, content, isDouble, type }) => {
                   key={item.code}
                   className="flex gap-2 items-center cursor-pointer hover:text-orange-600 border-b border-gray-200 pb-1 border-dashed"
                 >
-                  <GrNext size={10} color="#ccc" />
+                  <BsChevronRight size={10} className="text-gray-400" />
                   <p className="text-sm">{item.value}</p>
                 </Link>
               );
@@ -102,7 +102,7 @@ const ItemSidebar = ({ title, content, isDouble, type }) => {
                           isLeftActive ? "text-orange-600 font-bold" : "hover:text-orange-600 text-gray-700"
                         }`}
                       >
-                        <GrNext size={10} className={isLeftActive ? "text-orange-600" : "text-gray-300"} />
+                        <BsChevronRight size={10} className={isLeftActive ? "text-orange-600 font-bold" : "text-gray-400"} />
                         <p className="text-xs">{item.left.value}</p>
                       </div>
                     )}
@@ -113,7 +113,7 @@ const ItemSidebar = ({ title, content, isDouble, type }) => {
                           isRightActive ? "text-orange-600 font-bold" : "hover:text-orange-600 text-gray-700"
                         }`}
                       >
-                        <GrNext size={10} className={isRightActive ? "text-orange-600" : "text-gray-300"} />
+                        <BsChevronRight size={10} className={isRightActive ? "text-orange-600 font-bold" : "text-gray-400"} />
                         <p className="text-xs">{item.right.value}</p>
                       </div>
                     )}
