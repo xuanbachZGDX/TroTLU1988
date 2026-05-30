@@ -21,7 +21,7 @@ export const formatPriceText = (priceNumber = 0) =>
     : `${priceNumber} triệu/tháng`;
 
 export const buildPostDescription = (description) => {
-  if (typeof description === 'string') return description;
+  if (typeof description === "string") return description;
   return JSON.stringify(description || []);
 };
 
@@ -29,16 +29,30 @@ export const syncProvince = async (provinceId, provinceName, transaction) => {
   if (!provinceId || !provinceName) return;
   await db.Province.findOrCreate({
     where: { id: String(provinceId) },
-    defaults: { id: String(provinceId), code: String(provinceId), value: provinceName },
+    defaults: {
+      id: String(provinceId),
+      code: String(provinceId),
+      value: provinceName,
+    },
     transaction,
   });
 };
 
-export const syncDistrict = async (districtId, districtName, provinceId, transaction) => {
+export const syncDistrict = async (
+  districtId,
+  districtName,
+  provinceId,
+  transaction,
+) => {
   if (!districtId || !districtName) return "";
   await db.District.findOrCreate({
     where: { id: String(districtId) },
-    defaults: { id: String(districtId), code: String(districtId), value: districtName, provinceCode: String(provinceId) },
+    defaults: {
+      id: String(districtId),
+      code: String(districtId),
+      value: districtName,
+      provinceCode: String(provinceId),
+    },
     transaction,
   });
   return String(districtId);
@@ -51,19 +65,34 @@ export const syncPostFeatures = async (postId, features = [], transaction) => {
     for (const text of features) {
       if (!text) continue;
       const code = generateCode(text);
-      const [featureRecord] = await db.Feature.findOrCreate({ where: { code }, defaults: { id: generateId(), code, value: text }, transaction });
-      await db.PostFeature.create({ id: generateId(), postId, featureId: featureRecord.id }, { transaction });
+      const [featureRecord] = await db.Feature.findOrCreate({
+        where: { code },
+        defaults: { id: generateId(), code, value: text },
+        transaction,
+      });
+      await db.PostFeature.create(
+        { id: generateId(), postId, featureId: featureRecord.id },
+        { transaction },
+      );
     }
   }
 };
 
 export const getStandardPostInclude = () => [
   { model: db.Image, as: "images", attributes: ["image"] },
-  { model: db.Attribute, as: "attributes", attributes: ["price", "acreage", "published"] },
-  { model: db.User, as: "user", attributes: ["name", "zalo", "phone", "avatar"] },
+  {
+    model: db.User,
+    as: "user",
+    attributes: ["name", "zalo", "phone", "avatar", "kycStatus"],
+  },
   { model: db.Province, as: "province", attributes: ["code", "value"] },
   { model: db.District, as: "district", attributes: ["code", "value"] },
-  { model: db.Feature, as: "features", attributes: ["code", "value"], through: { attributes: [] } },
+  {
+    model: db.Feature,
+    as: "features",
+    attributes: ["code", "value"],
+    through: { attributes: [] },
+  },
 ];
 
 export const shouldPostBeAutoApproved = async (postOrBody, userId) => {
@@ -80,13 +109,12 @@ export const shouldPostBeAutoApproved = async (postOrBody, userId) => {
 
   // Tầng 2: Nếu là tin thường, kiểm tra lịch sử chủ trọ uy tín
   const activeCount = await db.Post.count({
-    where: { userId, status: "active" }
+    where: { userId, status: "active" },
   });
   const rejectedCount = await db.Post.count({
-    where: { userId, status: "rejected" }
+    where: { userId, status: "rejected" },
   });
 
   // Điều kiện uy tín: Có tối thiểu 5 tin đăng hoạt động và chưa từng bị từ chối tin nào
   return activeCount >= 5 && rejectedCount === 0;
 };
-

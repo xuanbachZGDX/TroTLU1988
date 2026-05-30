@@ -8,7 +8,7 @@ const generateCode = (value) => {
     .replace(/[\u0300-\u036f]/g, "")
     .split(" ")
     .join("");
-  let merge = value + process.env.phongtro123;
+  let merge = value + process.env.TroTLU1988;
   let length = merge.length;
 
   for (let i = 0; i < 3; i++) {

@@ -56,7 +56,9 @@ const Login = () => {
           allowOutsideClick: false,
           didClose: () => {
             if (isAdmin) {
-              navigate(`/${path.ADMIN}/${path.ADMIN_DASHBOARD}`, { replace: true });
+              navigate(`/${path.ADMIN}/${path.ADMIN_DASHBOARD}`, {
+                replace: true,
+              });
             } else {
               navigate("/", { replace: true });
             }
@@ -87,10 +89,12 @@ const Login = () => {
         normalized = "0" + normalized.slice(2);
       }
       payload.phone = normalized;
-      setPayload(prev => ({ ...prev, phone: normalized }));
+      setPayload((prev) => ({ ...prev, phone: normalized }));
     }
 
-    let finalPayload = isRegister ? payload : { phone: payload.phone, password: payload.password };
+    let finalPayload = isRegister
+      ? payload
+      : { phone: payload.phone, password: payload.password };
     let invalids = validate(finalPayload, setInvalidFields);
 
     if (isRegister && !payload.accountType) {
@@ -103,21 +107,34 @@ const Login = () => {
 
     if (invalids.length === 0) {
       if (isRegister) {
-        const response = await apiRegister(payload);
-        if (response?.data?.err === 0) {
-          const roleLabel = payload.accountType === "landlord" ? "Chủ trọ" : "Khách hàng";
+        try {
+          const response = await apiRegister(payload);
+          if (response?.data?.err === 0) {
+            const roleLabel =
+              payload.accountType === "landlord" ? "Chủ trọ" : "Khách hàng";
 
-          Swal.fire({
-            title: "Đăng ký thành công!",
-            text: `Đã tạo tài khoản ${roleLabel} thành công. Vui lòng đăng nhập lại để sử dụng.`,
-            icon: "success",
-            confirmButtonText: "Đăng nhập ngay",
-          }).then(() => {
-            setIsRegister(false);
-            setPayload({ ...emptyPayload, phone: payload.phone });
-          });
-        } else {
-          Swal.fire("Thất bại", response?.data?.msg || "Đăng ký thất bại", "error");
+            Swal.fire({
+              title: "Đăng ký thành công!",
+              text: `Đã tạo tài khoản ${roleLabel} thành công. Vui lòng đăng nhập lại để sử dụng.`,
+              icon: "success",
+              confirmButtonText: "Đăng nhập ngay",
+            }).then(() => {
+              setIsRegister(false);
+              setPayload({ ...emptyPayload, phone: payload.phone });
+            });
+          } else {
+            Swal.fire(
+              "Thất bại",
+              response?.data?.msg || "Đăng ký thất bại",
+              "error",
+            );
+          }
+        } catch (error) {
+          console.error("Register Error:", error);
+          const errorMsg =
+            error?.response?.data?.msg ||
+            "Đăng ký thất bại do dữ liệu không hợp lệ!";
+          Swal.fire("Thất bại", errorMsg, "error");
         }
       } else {
         dispatch(actions.login(finalPayload));
@@ -145,22 +162,33 @@ const Login = () => {
 
   const handleGoogleAccountTypeSubmit = async () => {
     if (!googleCredential) {
-      Swal.fire("Thông báo", "Không tìm thấy phiên đăng nhập Google. Vui lòng thử lại.", "warning");
+      Swal.fire(
+        "Thông báo",
+        "Không tìm thấy phiên đăng nhập Google. Vui lòng thử lại.",
+        "warning",
+      );
       return;
     }
 
     if (!googleAccountType) {
-      Swal.fire("Thông báo", "Vui lòng chọn loại tài khoản trước khi tiếp tục.", "warning");
+      Swal.fire(
+        "Thông báo",
+        "Vui lòng chọn loại tài khoản trước khi tiếp tục.",
+        "warning",
+      );
       return;
     }
 
-    const result = await dispatch(actions.loginGoogle(googleCredential, googleAccountType));
+    const result = await dispatch(
+      actions.loginGoogle(googleCredential, googleAccountType),
+    );
     if (result?.err === 0 && result?.token) {
       resetGoogleSelection();
     }
   };
 
-  const handleGoogleError = () => Swal.fire("Lỗi!", "Đăng nhập Google thất bại.", "error");
+  const handleGoogleError = () =>
+    Swal.fire("Lỗi!", "Đăng nhập Google thất bại.", "error");
 
   if (isAdminLogin) {
     return (

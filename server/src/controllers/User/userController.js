@@ -17,7 +17,8 @@ export const updateUser = async (req, res) => {
   const { id } = req.user;
   const payload = req.body;
   try {
-    if (!payload) return res.status(400).json({ err: 1, msg: "Missing payload" });
+    if (!payload)
+      return res.status(400).json({ err: 1, msg: "Missing payload" });
     const response = await services.updateUser(payload, id);
     return res.status(200).json(response);
   } catch (error) {
@@ -58,13 +59,38 @@ export const readNotification = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
   try {
-    if (!id) return res.status(400).json({ err: 1, msg: "Missing notification id" });
+    if (!id)
+      return res.status(400).json({ err: 1, msg: "Missing notification id" });
     const response = await services.readUserNotificationService(id, userId);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
       err: -1,
       msg: "Failed at user controller: " + error,
+    });
+  }
+};
+
+export const submitKyc = async (req, res) => {
+  const { id } = req.user;
+  const { cccdNumber, cccdFront, cccdBack } = req.body;
+  try {
+    if (!cccdNumber || !cccdFront || !cccdBack) {
+      return res.status(400).json({
+        err: 1,
+        msg: "Vui lòng điền số CCCD và tải lên hình ảnh mặt trước/sau",
+      });
+    }
+    const response = await services.submitKycService(id, {
+      cccdNumber,
+      cccdFront,
+      cccdBack,
+    });
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      err: -1,
+      msg: "Failed at user controller: " + (error.message || error),
     });
   }
 };

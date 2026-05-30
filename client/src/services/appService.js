@@ -132,3 +132,16 @@ export const apiPostContact = (payload) =>
       reject(error);
     }
   });
+
+export const apiGetAllPackages = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "/api/v1/packages/all",
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

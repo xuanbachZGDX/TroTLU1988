@@ -1,30 +1,32 @@
 import actionTypes from "./actionType";
 import * as api from "../../services";
 
-export const getAllCategories = () => async (dispatch, getState) => {
-  const { app } = getState();
-  if (app?.categories?.length > 0) return;
-  try {
-    const response = await api.apiGetAllCategories();
-    if (response?.data.err === 0) {
+export const getAllCategories =
+  (force = false) =>
+  async (dispatch, getState) => {
+    const { app } = getState();
+    if (!force && app?.categories?.length > 0) return;
+    try {
+      const response = await api.apiGetAllCategories();
+      if (response?.data.err === 0) {
+        dispatch({
+          type: actionTypes.GET_CATEGORIES,
+          categories: response.data.response,
+        });
+      } else {
+        dispatch({
+          type: actionTypes.GET_CATEGORIES,
+          msg: response.data.msg,
+          categories: null,
+        });
+      }
+    } catch (error) {
       dispatch({
         type: actionTypes.GET_CATEGORIES,
-        categories: response.data.response,
-      });
-    } else {
-      dispatch({
-        type: actionTypes.GET_CATEGORIES,
-        msg: response.data.msg,
         categories: null,
       });
     }
-  } catch (error) {
-    dispatch({
-      type: actionTypes.GET_CATEGORIES,
-      categories: null,
-    });
-  }
-};
+  };
 
 export const getPrices = () => async (dispatch, getState) => {
   const { app } = getState();
@@ -92,9 +94,9 @@ export const getProvinces = () => async (dispatch, getState) => {
     if (response?.status === 200) {
       dispatch({
         type: actionTypes.GET_PROVINCES,
-        provinces: response.data.map(p => ({
+        provinces: response.data.map((p) => ({
           code: p.code,
-          value: p.name
+          value: p.name,
         })),
         msg: "",
       });
@@ -139,11 +141,11 @@ export const apiGetDistricts = (provinceCode) => async (dispatch) => {
       return {
         data: {
           err: 0,
-          response: (response.data.districts || []).map(d => ({
+          response: (response.data.districts || []).map((d) => ({
             code: d.code,
-            value: d.name
-          }))
-        }
+            value: d.name,
+          })),
+        },
       };
     }
     return { data: { err: 1, response: [] } };

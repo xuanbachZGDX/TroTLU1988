@@ -1,13 +1,13 @@
 import moment from "moment";
 import db from "../../../models";
-import { 
-  formatPriceText, 
-  formatCategoryType, 
-  buildPostDescription, 
-  syncProvince, 
-  syncDistrict, 
+import {
+  formatPriceText,
+  formatCategoryType,
+  buildPostDescription,
+  syncProvince,
+  syncDistrict,
   syncPostFeatures,
-  shouldPostBeAutoApproved
+  shouldPostBeAutoApproved,
 } from "../postHelper";
 
 export const updatePost = (postId, payload, actor) =>
@@ -17,71 +17,153 @@ export const updatePost = (postId, payload, actor) =>
         throw new Error("EXCEEDED_IMAGE_LIMIT");
       }
 
-      const where = actor?.role === "admin" ? { id: postId } : { id: postId, userId: actor?.id };
+      const where =
+        actor?.role === "admin"
+          ? { id: postId }
+          : { id: postId, userId: actor?.id };
       const post = await db.Post.findOne({ where });
-      if (!post) return resolve({ err: 1, msg: "Không tìm thấy hoặc không có quyền" });
+      if (!post)
+        return resolve({ err: 1, msg: "Không tìm thấy hoặc không có quyền" });
 
       if (actor?.role !== "admin" && post.status === "blocked") {
-        return resolve({ err: 2, msg: "Bài viết đã bị khóa, không thể chỉnh sửa." });
+        return resolve({
+          err: 2,
+          msg: "Bài viết đã bị khóa, không thể chỉnh sửa.",
+        });
       }
 
       await db.sequelize.transaction(async (transaction) => {
         const isUser = actor?.role !== "admin";
 
         if (isUser && post.status === "rejected") {
-          const overview = await db.Overview.findOne({ where: { postId }, transaction });
           let duration = 3;
-          if (overview) {
-            const exp = moment(overview.expired, "DD/MM/YYYY");
-            const pub = moment(overview.published, "DD/MM/YYYY");
-            if (exp.isValid() && pub.isValid()) {
-              duration = Math.max(1, exp.diff(pub, 'days'));
-            }
+          const exp = moment(post.expired, "DD/MM/YYYY");
+          const pub = moment(post.published, "DD/MM/YYYY");
+          if (exp.isValid() && pub.isValid()) {
+            duration = Math.max(1, exp.diff(pub, "days"));
           }
           const star = +post.star || 0;
-          const pricePerDay = star === 5 ? 10000 : star === 4 ? 7000 : star === 3 ? 5000 : star === 2 ? 3000 : 1000;
+
+          // Fetch package price from database dynamically
+          const targetPackage = await db.Package.findOne({
+            where: { star },
+            transaction,
+          });
+          const pricePerDay = targetPackage
+            ? targetPackage.price
+            : star === 5
+              ? 10000
+              : star === 4
+                ? 7000
+                : star === 3
+                  ? 5000
+                  : star === 2
+                    ? 3000
+                    : 1000;
           const postPrice = pricePerDay * duration;
 
-          const user = await db.User.findOne({ 
-            where: { id: post.userId }, 
+          const user = await db.User.findOne({
+            where: { id: post.userId },
             transaction,
-            lock: transaction.LOCK.UPDATE 
+            lock: transaction.LOCK.UPDATE,
           });
-          if (!user || (user.balance || 0) < postPrice) throw new Error("NOT_ENOUGH_BALANCE");
+          if (!user || (user.balance || 0) < postPrice)
+            throw new Error("NOT_ENOUGH_BALANCE");
 
           const { v4 } = require("uuid");
-          await db.User.update({ balance: (user.balance || 0) - postPrice }, { where: { id: post.userId }, transaction });
-          await db.Transaction.create({ 
-            id: v4(), 
-            userId: post.userId, 
-            amount: postPrice, 
-            type: 'payment', 
-            content: `Thanh toán lại phí đăng tin bị từ chối - Mã tin: ${postId.slice(0,8)}`, 
-            status: 'success' 
-          }, { transaction });
+          await db.User.update(
+            { balance: (user.balance || 0) - postPrice },
+            { where: { id: post.userId }, transaction },
+          );
+          await db.Transaction.create(
+            {
+              id: v4(),
+              userId: post.userId,
+              amount: postPrice,
+              type: "payment",
+              content: `Thanh toán lại phí đăng tin bị từ chối - Mã tin: ${postId.slice(0, 8)}`,
+              status: "success",
+            },
+            { transaction },
+          );
         }
-        
-        const isAutoApproved = isUser ? await shouldPostBeAutoApproved({ ...post.get({ plain: true }), ...payload }, post.userId) : false;
+
+        const isAutoApproved = isUser
+          ? await shouldPostBeAutoApproved(
+              { ...post.get({ plain: true }), ...payload },
+              post.userId,
+            )
+          : false;
 
         const updatePayload = {
           title: payload.title || post.title,
           address: payload.address || post.address,
           categoryCode: payload.categoryCode || post.categoryCode,
-          description: payload.description ? buildPostDescription(payload.description) : post.description,
+          description: payload.description
+            ? buildPostDescription(payload.description)
+            : post.description,
           areaCode: payload.areaCode || post.areaCode,
           priceCode: payload.priceCode || post.priceCode,
           provinceCode: payload.provinceId || post.provinceCode,
           districtCode: payload.districtId || post.districtCode,
-          priceNumber: payload.priceNumber !== undefined ? payload.priceNumber : post.priceNumber,
-          areaNumber: payload.areaNumber !== undefined ? payload.areaNumber : post.areaNumber,
-          star: isUser ? post.star : (payload.star !== undefined ? payload.star : post.star), 
-          status: isUser 
-            ? (isAutoApproved ? "active" : "pending") 
-            : (payload.status || post.status)
+          priceNumber:
+            payload.priceNumber !== undefined
+              ? payload.priceNumber
+              : post.priceNumber,
+          areaNumber:
+            payload.areaNumber !== undefined
+              ? payload.areaNumber
+              : post.areaNumber,
+          star: isUser
+            ? post.star
+            : payload.star !== undefined
+              ? payload.star
+              : post.star,
+          status: isUser
+            ? isAutoApproved
+              ? "active"
+              : "pending"
+            : payload.status || post.status,
+          price: formatPriceText(
+            payload.priceNumber !== undefined
+              ? payload.priceNumber
+              : post.priceNumber,
+          ),
+          acreage: `${payload.areaNumber !== undefined ? payload.areaNumber : post.areaNumber} m2`,
         };
 
+        const star = +updatePayload.star;
+        if (!isUser) {
+          updatePayload.type = formatCategoryType(updatePayload.categoryCode);
+          updatePayload.bonus = star > 0 ? `Tin VIP ${star}` : "Tin thường";
+          if (payload.postingDuration) {
+            updatePayload.expired = moment()
+              .add(+payload.postingDuration, "days")
+              .format("DD/MM/YYYY");
+          }
+        } else {
+          updatePayload.type = formatCategoryType(updatePayload.categoryCode);
+          if (isAutoApproved) {
+            updatePayload.published = moment().format("DD/MM/YYYY");
+            const expiredDays =
+              star === 5
+                ? 30
+                : star === 4
+                  ? 15
+                  : star === 3
+                    ? 10
+                    : star === 2
+                      ? 7
+                      : 3;
+            updatePayload.expired = moment()
+              .add(expiredDays, "days")
+              .format("DD/MM/YYYY");
+            updatePayload.bonus = star > 0 ? `Tin VIP ${star}` : "Tin thường";
+          }
+        }
+
         // Lưu lịch sử chỉnh sửa nếu có bất kỳ thông tin chính nào thay đổi
-        const hasChanged = 
+        const hasChanged =
           updatePayload.title !== post.title ||
           updatePayload.priceNumber !== post.priceNumber ||
           updatePayload.areaNumber !== post.areaNumber ||
@@ -90,101 +172,102 @@ export const updatePost = (postId, payload, actor) =>
 
         if (hasChanged) {
           const { v4 } = require("uuid");
-          await db.PostHistory.create({
-            id: v4(),
-            postId,
-            editorId: actor?.id,
-            oldTitle: post.title,
-            newTitle: updatePayload.title,
-            oldPrice: post.priceNumber,
-            newPrice: updatePayload.priceNumber,
-            oldArea: post.areaNumber,
-            newArea: updatePayload.areaNumber,
-            oldDescription: post.description,
-            newDescription: updatePayload.description,
-            oldAddress: post.address,
-            newAddress: updatePayload.address
-          }, { transaction });
+          await db.PostHistory.create(
+            {
+              id: v4(),
+              postId,
+              editorId: actor?.id,
+              oldTitle: post.title,
+              newTitle: updatePayload.title,
+              oldPrice: post.priceNumber,
+              newPrice: updatePayload.priceNumber,
+              oldArea: post.areaNumber,
+              newArea: updatePayload.areaNumber,
+              oldDescription: post.description,
+              newDescription: updatePayload.description,
+              oldAddress: post.address,
+              newAddress: updatePayload.address,
+            },
+            { transaction },
+          );
 
           if (isUser) {
             const userRecord = await db.User.findByPk(actor?.id || post.userId);
             const landlordName = userRecord?.name || "Chủ trọ";
-            await db.Notification.create({
-              id: v4(),
-              postId,
-              senderId: actor?.id || post.userId,
-              title: isAutoApproved ? "Tin đăng cập nhật đã tự động duyệt" : "Tin đăng đã được cập nhật",
-              content: isAutoApproved
-                ? `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()} (đã được tự động duyệt).`
-                : `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()}. Vui lòng duyệt lại.`,
-              isRead: false
-            }, { transaction });
+            await db.Notification.create(
+              {
+                id: v4(),
+                postId,
+                senderId: actor?.id || post.userId,
+                title: isAutoApproved
+                  ? "Tin đăng cập nhật đã tự động duyệt"
+                  : "Tin đăng đã được cập nhật",
+                content: isAutoApproved
+                  ? `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()} (đã được tự động duyệt).`
+                  : `Chủ trọ ${landlordName} đã cập nhật tin đăng #${post.id?.slice(0, 8).toUpperCase()}. Vui lòng duyệt lại.`,
+                isRead: false,
+              },
+              { transaction },
+            );
 
             // Thông báo cho Chủ trọ nếu tin cập nhật được tự động duyệt
             if (isAutoApproved) {
-              await db.Notification.create({
-                id: v4(),
-                postId,
-                senderId: null, // Gửi từ Hệ thống
-                recipientId: post.userId, // Gửi cho chủ trọ
-                title: "Tin đăng cập nhật đã được duyệt tự động",
-                content: `Tin đăng #${post.id?.slice(0, 8).toUpperCase()} "${updatePayload.title?.slice(0, 50)}${updatePayload.title?.length > 50 ? '...' : ''}" của bạn sau khi cập nhật đã được hệ thống duyệt tự động thành công.`,
-                isRead: false
-              }, { transaction });
+              await db.Notification.create(
+                {
+                  id: v4(),
+                  postId,
+                  senderId: null, // Gửi từ Hệ thống
+                  recipientId: post.userId, // Gửi cho chủ trọ
+                  title: "Tin đăng cập nhật đã được duyệt tự động",
+                  content: `Tin đăng #${post.id?.slice(0, 8).toUpperCase()} "${updatePayload.title?.slice(0, 50)}${updatePayload.title?.length > 50 ? "..." : ""}" của bạn sau khi cập nhật đã được hệ thống duyệt tự động thành công.`,
+                  isRead: false,
+                },
+                { transaction },
+              );
             }
           }
         }
 
-        await db.Post.update(updatePayload, { where: { id: postId }, transaction });
-
-        await db.Attribute.update({ 
-          price: formatPriceText(updatePayload.priceNumber), 
-          acreage: `${updatePayload.areaNumber} m2` 
-        }, { where: { postId }, transaction });
+        await db.Post.update(updatePayload, {
+          where: { id: postId },
+          transaction,
+        });
 
         if (payload.images) {
-          await db.Image.update({ image: JSON.stringify(payload.images) }, { where: { postId }, transaction });
-        }
-        
-        const star = +updatePayload.star;
-        if (!isUser) {
-          const overviewUpdate = {
-            type: formatCategoryType(updatePayload.categoryCode),
-            bonus: star > 0 ? `Tin VIP ${star}` : "Tin thường",
-            status: updatePayload.status
-          };
-          if (payload.postingDuration) {
-            overviewUpdate.expired = moment().add(+payload.postingDuration, 'days').format("DD/MM/YYYY");
-          }
-          await db.Overview.update(overviewUpdate, { where: { postId }, transaction });
-        } else {
-          const overviewUpdate = {
-            type: formatCategoryType(updatePayload.categoryCode),
-          };
-          if (isAutoApproved) {
-            overviewUpdate.published = moment().format("DD/MM/YYYY");
-            const expiredDays = star === 5 ? 30 : star === 4 ? 15 : star === 3 ? 10 : star === 2 ? 7 : 3;
-            overviewUpdate.expired = moment().add(expiredDays, 'days').format("DD/MM/YYYY");
-            overviewUpdate.bonus = star > 0 ? `Tin VIP ${star}` : "Tin thường";
-            
-            // Cập nhật ngày đăng ở Attribute
-            await db.Attribute.update({ 
-              published: moment().format("DD/MM/YYYY")
-            }, { where: { postId }, transaction });
-          }
-          await db.Overview.update(overviewUpdate, { where: { postId }, transaction });
+          await db.Image.update(
+            { image: JSON.stringify(payload.images) },
+            { where: { postId }, transaction },
+          );
         }
 
-        if (payload.provinceId) await syncProvince(payload.provinceId, payload.provinceName, transaction);
-        if (payload.districtId) await syncDistrict(payload.districtId, payload.districtName, payload.provinceId, transaction);
-        if (payload.features) await syncPostFeatures(postId, payload.features, transaction);
+        if (payload.provinceId)
+          await syncProvince(
+            payload.provinceId,
+            payload.provinceName,
+            transaction,
+          );
+        if (payload.districtId)
+          await syncDistrict(
+            payload.districtId,
+            payload.districtName,
+            payload.provinceId,
+            transaction,
+          );
+        if (payload.features)
+          await syncPostFeatures(postId, payload.features, transaction);
       });
       resolve({ err: 0, msg: "Cập nhật thành công" });
     } catch (error) {
       if (error.message === "NOT_ENOUGH_BALANCE") {
-        resolve({ err: 2, msg: "Số dư tài khoản không đủ để thanh toán lại phí đăng tin bị từ chối." });
+        resolve({
+          err: 2,
+          msg: "Số dư tài khoản không đủ để thanh toán lại phí đăng tin bị từ chối.",
+        });
       } else if (error.message === "EXCEEDED_IMAGE_LIMIT") {
-        resolve({ err: 3, msg: "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng." });
+        resolve({
+          err: 3,
+          msg: "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng.",
+        });
       } else {
         reject(error);
       }

@@ -5,9 +5,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "PhongTro123 API Documentation",
+      title: "TroTLU1988 API Documentation",
       version: "1.0.0",
-      description: "Tài liệu API cho dự án PhongTro123",
+      description: "Tài liệu API cho dự án TroTLU1988",
     },
     servers: [
       {

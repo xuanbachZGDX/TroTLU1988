@@ -1,7 +1,7 @@
 import path from "path";
 import { spawn } from "child_process";
 import db from "../models";
-import { insertService, createPricesAndAreas } from "../services/App/insertService";
+import { insertService } from "../services/App/insertService";
 
 const runCrawler = () =>
   new Promise((resolve, reject) => {
@@ -23,7 +23,6 @@ const refresh = async () => {
   try {
     await runCrawler();
     console.log("Scrape stage completed. Data has been saved to server/data.");
-    await createPricesAndAreas();
     await insertService();
     console.log("Refresh scraped data completed.");
   } catch (error) {

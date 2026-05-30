@@ -8,7 +8,7 @@ const DEFAULT_CATEGORY_LIMIT = 7;
 const resolveFileName = (category) => {
   if (category.slug) return `${category.slug}.json`;
   const pathname = new URL(category.link).pathname.split("/").filter(Boolean);
-  return `${pathname.pop() || "phongtro123.com"}.json`;
+  return `${pathname.pop() || "TroTLU1988.com"}.json`;
 };
 
 const scrapeController = async (browserInstance) => {
@@ -46,7 +46,10 @@ const scrapeController = async (browserInstance) => {
         console.log(`Saved: ${outputPath}`);
         savedCount++;
       } catch (err) {
-        console.error(`Failed to scrape category ${category.link}:`, err.message);
+        console.error(
+          `Failed to scrape category ${category.link}:`,
+          err.message,
+        );
       }
     }
 

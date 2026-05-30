@@ -61,7 +61,7 @@ export const apiUploadImages = (images) =>
       const response = await axios({
         method: "post",
         url: `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`,
-        data: images
+        data: images,
       });
       resolve(response);
     } catch (error) {
@@ -75,7 +75,7 @@ export const apiCreatePost = (payload) =>
       const response = await axiosConfig({
         method: "post",
         url: `/api/v1/posts/create`,
-        data: payload
+        data: payload,
       });
       resolve(response);
     } catch (error) {
@@ -89,7 +89,7 @@ export const apiUpdatePost = (payload) =>
       const response = await axiosConfig({
         method: "put",
         url: `/api/v1/posts/update`,
-        data: payload
+        data: payload,
       });
       resolve(response);
     } catch (error) {
@@ -160,6 +160,48 @@ export const apiGetPostHistory = (postId) =>
         method: "get",
         url: `/api/v1/posts/history`,
         params: { postId },
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiCreateReport = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "post",
+        url: `/api/v1/reports`,
+        data: payload,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetReports = (query) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: `/api/v1/reports/admin`,
+        params: query,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiHandleReport = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "put",
+        url: `/api/v1/reports/admin/handle`,
+        data: payload,
       });
       resolve(response);
     } catch (error) {

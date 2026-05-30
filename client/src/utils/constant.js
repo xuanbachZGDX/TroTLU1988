@@ -24,6 +24,10 @@ export const path = {
   ADMIN_USERS: "quan-ly-nguoi-dung",
   ADMIN_CONTACTS: "quan-ly-lien-he",
   ADMIN_NOTIFICATIONS: "quan-ly-thong-bao",
+  ADMIN_REPORTS: "quan-ly-bao-cao",
+  ADMIN_KYC: "phe-duyet-kyc",
+  ADMIN_CATEGORIES: "quan-ly-danh-muc",
+  ADMIN_PACKAGES: "quan-ly-bang-gia",
   CONTACT: "lien-he",
   DETAIL: "chi-tiet",
   TIN_DA_LUU: "tin-da-luu",
@@ -34,6 +38,7 @@ export const path = {
   TRANSACTION_HISTORY: "lich-su-giao-dich",
   MY_CONTACTS: "gop-y-cua-toi",
   EXTEND_POST: "gia-han-tin-dang/:postId",
+  USER_KYC: "xac-minh-tai-khoan",
 };
 
 export const text = {
@@ -43,19 +48,84 @@ export const text = {
 };
 
 export const priceList = [
-  { name: "Tin VIP Nổi Bật", price: "50.000đ", week: "300.000đ", month: "1.200.000đ", color: "text-red-600", star: 5, benefit: "Vị trí đầu tiên, tiêu đề Đỏ In Hoa, nhãn VIP Nổi bật" },
-  { name: "Tin VIP 1", price: "30.000đ", week: "180.000đ", month: "700.000đ", color: "text-[#E13491]", star: 4, benefit: "Vị trí sau VIP Nổi bật, tiêu đề Hồng, nhãn VIP 1" },
-  { name: "Tin VIP 2", price: "10.000đ", week: "60.000đ", month: "250.000đ", color: "text-[#F57C00]", star: 3, benefit: "Vị trí sau VIP 1, tiêu đề Cam, nhãn VIP 2" },
-  { name: "Tin VIP 3", price: "5.000đ", week: "30.000đ", month: "120.000đ", color: "text-[#1976D2]", star: 2, benefit: "Vị trí sau VIP 2, tiêu đề Xanh, nhãn VIP 3" },
-  { name: "Tin thường", price: "2.000đ", week: "10.000đ", month: "40.000đ", color: "text-gray-600", star: 0, benefit: "Vị trí sau cùng, tiêu đề xanh mặc định" },
+  {
+    name: "Tin VIP Nổi Bật",
+    price: "50.000đ",
+    week: "300.000đ",
+    month: "1.200.000đ",
+    color: "text-red-600",
+    star: 5,
+    benefit: "Vị trí đầu tiên, tiêu đề Đỏ In Hoa, nhãn VIP Nổi bật",
+  },
+  {
+    name: "Tin VIP 1",
+    price: "30.000đ",
+    week: "180.000đ",
+    month: "700.000đ",
+    color: "text-[#E13491]",
+    star: 4,
+    benefit: "Vị trí sau VIP Nổi bật, tiêu đề Hồng, nhãn VIP 1",
+  },
+  {
+    name: "Tin VIP 2",
+    price: "10.000đ",
+    week: "60.000đ",
+    month: "250.000đ",
+    color: "text-[#F57C00]",
+    star: 3,
+    benefit: "Vị trí sau VIP 1, tiêu đề Cam, nhãn VIP 2",
+  },
+  {
+    name: "Tin VIP 3",
+    price: "5.000đ",
+    week: "30.000đ",
+    month: "120.000đ",
+    color: "text-[#1976D2]",
+    star: 2,
+    benefit: "Vị trí sau VIP 2, tiêu đề Xanh, nhãn VIP 3",
+  },
+  {
+    name: "Tin thường",
+    price: "2.000đ",
+    week: "10.000đ",
+    month: "40.000đ",
+    color: "text-gray-600",
+    star: 0,
+    benefit: "Vị trí sau cùng, tiêu đề xanh mặc định",
+  },
 ];
 
 export const demoPosts = [
-  { id: "v5", star: 5, title: "VIP NỔI BẬT: Căn hộ Penthouse view toàn cảnh thành phố, nội thất siêu sang", color: "text-red-600" },
-  { id: "v1", star: 4, title: "VIP 1: Chung cư cao cấp 2 phòng ngủ, đầy đủ tiện ích, gần trung tâm", color: "text-[#E13491]" },
-  { id: "v2", star: 3, title: "VIP 2: Nhà nguyên căn chính chủ, hẻm xe hơi, an ninh tốt", color: "text-[#F57C00]" },
-  { id: "v3", star: 2, title: "VIP 3: Phòng trọ studio khép kín, ban công thoáng mát", color: "text-[#1976D2]" },
-  { id: "v0", star: 0, title: "Tin thường: Tìm nam ở ghép, phòng sạch sẽ, giá sinh viên", color: "text-gray-600" },
+  {
+    id: "v5",
+    star: 5,
+    title:
+      "VIP NỔI BẬT: Căn hộ Penthouse view toàn cảnh thành phố, nội thất siêu sang",
+    color: "text-red-600",
+  },
+  {
+    id: "v1",
+    star: 4,
+    title:
+      "VIP 1: Chung cư cao cấp 2 phòng ngủ, đầy đủ tiện ích, gần trung tâm",
+    color: "text-[#E13491]",
+  },
+  {
+    id: "v2",
+    star: 3,
+    title: "VIP 2: Nhà nguyên căn chính chủ, hẻm xe hơi, an ninh tốt",
+    color: "text-[#F57C00]",
+  },
+  {
+    id: "v3",
+    star: 2,
+    title: "VIP 3: Phòng trọ studio khép kín, ban công thoáng mát",
+    color: "text-[#1976D2]",
+  },
+  {
+    id: "v0",
+    star: 0,
+    title: "Tin thường: Tìm nam ở ghép, phòng sạch sẽ, giá sinh viên",
+    color: "text-gray-600",
+  },
 ];
-
-

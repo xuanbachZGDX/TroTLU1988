@@ -25,7 +25,7 @@ router.use(verifyToken);
  *       200:
  *         description: Thành công
  */
-router.get("/me",  userController.getCurrent);
+router.get("/me", userController.getCurrent);
 
 /**
  * @swagger
@@ -39,9 +39,10 @@ router.get("/me",  userController.getCurrent);
  *       200:
  *         description: Cập nhật thành công
  */
-router.put("/me",  userController.updateUser);
+router.put("/me", userController.updateUser);
 router.get("/my-contacts", userController.getMyContacts);
 router.get("/notifications", userController.getNotifications);
 router.put("/notifications/:id/read", userController.readNotification);
+router.put("/kyc", userController.submitKyc);
 
 export default router;

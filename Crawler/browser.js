@@ -7,6 +7,8 @@ const startBrowser = async () => {
       headless: true,
       ignoreHTTPSErrors: true,
       args: [
+        "--enable-features=DNSOverHTTPS",
+        "--dns-over-https-templates=https://dns.google/dns-query{?dns}",
         "--disable-setuid-sandbox",
         "--no-sandbox",
         "--disable-dev-shm-usage",

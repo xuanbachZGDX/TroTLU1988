@@ -99,7 +99,7 @@ router.put("/posts/:postId/approve", adminController.approvePost);
  *       200:
  *         description: Thành công
  */
-router.put("/posts/:postId/reject",  adminController.rejectPost);
+router.put("/posts/:postId/reject", adminController.rejectPost);
 
 /**
  * @swagger
@@ -173,5 +173,16 @@ router.get("/notifications", adminController.getNotifications);
 router.put("/notifications/:id/read", adminController.readNotification);
 router.get("/settings", adminController.getSettings);
 router.put("/settings", adminController.updateSettings);
+router.get("/kyc-pending", adminController.getKycPendingUsers);
+router.put("/kyc-handle", adminController.handleKyc);
+
+// Categories CRUD
+router.post("/categories", adminController.createCategory);
+router.put("/categories/:id", adminController.updateCategory);
+router.delete("/categories/:id", adminController.deleteCategory);
+
+// Packages CRUD
+router.get("/packages", adminController.getPackages);
+router.put("/packages/:id", adminController.updatePackage);
 
 export default router;

@@ -5,6 +5,7 @@ import helmet from "helmet";
 import initRoutes from "./src/routes";
 import connectDb from "./src/config/connectDatabase";
 import seedAdmin from "./src/utils/seedAdmin";
+import seedPackages from "./src/utils/seedPackages";
 import setupSwagger from "./src/config/swagger";
 import { startScheduler } from "./src/utils/postScheduler";
 
@@ -15,7 +16,7 @@ const app = express();
 app.use(
   helmet({
     contentSecurityPolicy: false,
-  })
+  }),
 );
 
 app.use(
@@ -30,15 +31,25 @@ app.use(express.urlencoded({ extended: true }));
 
 setupSwagger(app);
 initRoutes(app);
-connectDb();
-seedAdmin();
-startScheduler();
 
-const port = process.env.PORT || 8888;
-if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-}
+const startServer = async () => {
+  try {
+    await connectDb();
+    await seedAdmin();
+    await seedPackages();
+    startScheduler();
+
+    const port = process.env.PORT || 8888;
+    if (process.env.NODE_ENV !== "test") {
+      app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi khi khởi động server:", error);
+  }
+};
+
+startServer();
 
 export default app;

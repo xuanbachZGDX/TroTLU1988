@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
-import { BsBookmarkStarFill } from "react-icons/bs";
-import { RiHeartLine, RiHeartFill, RiShareForwardLine, RiFlagLine } from "react-icons/ri";
+import {
+  RiHeartLine,
+  RiHeartFill,
+  RiShareForwardLine,
+  RiFlagLine,
+  RiShieldCheckFill,
+} from "react-icons/ri";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { apiCreateReport } from "../../../services/postService";
+import {
+  handleShareLink,
+  handleReportPost,
+} from "../../../utils/contactHelpers";
 
-const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink, formatJoinDate }) => {
+const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink }) => {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state.auth);
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -13,40 +27,7 @@ const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink, formatJoinDat
   }, [postId]);
 
   const handleShare = () => {
-    const currentUrl = window.location.href;
-    Swal.fire({
-      title: "Chia sẻ tin đăng",
-      text: "Đường dẫn tin đăng của bạn:",
-      input: "text",
-      inputValue: currentUrl,
-      inputAttributes: {
-        readonly: true
-      },
-      showCancelButton: true,
-      confirmButtonText: "Sao chép Link",
-      cancelButtonText: "Đóng",
-      footer: '<span style="color: #666; font-size: 12px;">Bạn có thể copy link này để gửi cho bạn bè</span>',
-      preConfirm: () => {
-        navigator.clipboard.writeText(currentUrl);
-        
-        // Tạo một thông báo nhỏ (Toast) thủ công để không làm đóng Popup
-        const toast = document.createElement("div");
-        toast.innerText = "Đã sao chép link!";
-        toast.style.cssText = `
-          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-          background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
-          z-index: 9999; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          transition: opacity 0.5s;
-        `;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-          toast.style.opacity = "0";
-          setTimeout(() => document.body.removeChild(toast), 500);
-        }, 1500);
-
-        return false; // Giữ popup mở
-      }
-    });
+    handleShareLink(window.location.href);
   };
 
   const handleSave = () => {
@@ -88,7 +69,16 @@ const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink, formatJoinDat
       )}
 
       <div>
-        <p className="font-bold text-base text-gray-800">{user?.name || "---"}</p>
+        <p className="font-bold text-base text-gray-800 flex items-center justify-center gap-1">
+          {user?.name || "---"}
+          {user?.kycStatus === "verified" && (
+            <RiShieldCheckFill
+              className="text-green-500"
+              title="Chủ trọ đã xác minh danh tính"
+              size={18}
+            />
+          )}
+        </p>
         <p className="flex items-center justify-center gap-1.5 text-sm text-gray-500 mt-1">
           <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
           Đang hoạt động
@@ -112,15 +102,17 @@ const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink, formatJoinDat
       </a>
 
       <div className="w-full border-t border-gray-100 pt-4 flex items-center justify-around">
-        <button 
+        <button
           onClick={handleSave}
           className={`flex flex-col items-center gap-1 transition ${isSaved ? "text-red-500" : "text-gray-500 hover:text-red-500"}`}
         >
           {isSaved ? <RiHeartFill size={24} /> : <RiHeartLine size={24} />}
-          <span className="text-[11px] font-bold uppercase">{isSaved ? "Đã lưu" : "Lưu tin"}</span>
+          <span className="text-[11px] font-bold uppercase">
+            {isSaved ? "Đã lưu" : "Lưu tin"}
+          </span>
         </button>
 
-        <button 
+        <button
           onClick={handleShare}
           className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-500 transition"
         >
@@ -128,7 +120,12 @@ const SidebarContact = ({ user, postId, getPhoneLink, getZaloLink, formatJoinDat
           <span className="text-[11px] font-bold uppercase">Chia sẻ</span>
         </button>
 
-        <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-orange-500 transition">
+        <button
+          onClick={() =>
+            handleReportPost(postId, isLoggedIn, navigate, apiCreateReport)
+          }
+          className="flex flex-col items-center gap-1 text-gray-500 hover:text-orange-500 transition"
+        >
           <RiFlagLine size={24} />
           <span className="text-[11px] font-bold uppercase">Báo xấu</span>
         </button>

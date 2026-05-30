@@ -65,3 +65,17 @@ export const apiReadUserNotification = (id) =>
       reject(error);
     }
   });
+
+export const apiSubmitKyc = (payload) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "put",
+        url: "/api/v1/users/kyc",
+        data: payload,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

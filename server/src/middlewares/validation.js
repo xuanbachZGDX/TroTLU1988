@@ -5,7 +5,9 @@ export const validateBody = (schema) => {
   return (req, res, next) => {
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
-      const errorMessages = error.details.map((detail) => detail.message).join(", ");
+      const errorMessages = error.details
+        .map((detail) => detail.message)
+        .join(", ");
       return res.status(400).json({
         err: 1,
         msg: `Dữ liệu không hợp lệ: ${errorMessages}`,
@@ -35,6 +37,10 @@ export const schemas = {
       "string.empty": "Mật khẩu không được để trống.",
       "string.min": "Mật khẩu phải có ít nhất 6 ký tự.",
       "any.required": "Mật khẩu là bắt buộc.",
+    }),
+    accountType: Joi.string().valid("user", "landlord").required().messages({
+      "string.empty": "Loại tài khoản không được để trống.",
+      "any.required": "Loại tài khoản là bắt buộc.",
     }),
     role: Joi.string().optional(),
   }),
