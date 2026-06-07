@@ -43,8 +43,6 @@ module.exports = (sequelize, DataTypes) => {
       categoryCode: DataTypes.STRING,
       provinceCode: DataTypes.STRING,
       districtCode: DataTypes.STRING,
-      priceCode: DataTypes.STRING,
-      areaCode: DataTypes.STRING,
       priceNumber: DataTypes.FLOAT,
       areaNumber: DataTypes.FLOAT,
       status: DataTypes.STRING,
@@ -52,9 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       note: DataTypes.TEXT,
 
       // Inline columns instead of separate tables
-      price: DataTypes.STRING,
-      acreage: DataTypes.STRING,
-      overviewCode: DataTypes.STRING,
+      sourcePostRef: DataTypes.STRING,
       type: DataTypes.STRING,
       target: DataTypes.STRING,
       bonus: DataTypes.STRING,
@@ -65,9 +61,15 @@ module.exports = (sequelize, DataTypes) => {
       attributes: {
         type: DataTypes.VIRTUAL,
         get() {
+          const priceVal = this.priceNumber || 0;
+          const priceText =
+            priceVal < 1
+              ? `${priceVal * 1000000} đồng/tháng`
+              : `${priceVal} triệu/tháng`;
+          const acreageText = this.areaNumber ? `${this.areaNumber} m2` : "";
           return {
-            price: this.price,
-            acreage: this.acreage,
+            price: priceText,
+            acreage: acreageText,
             published: this.published,
           };
         },
@@ -76,7 +78,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.VIRTUAL,
         get() {
           return {
-            code: this.overviewCode,
+            code: this.sourcePostRef,
             type: this.type,
             target: this.target,
             bonus: this.bonus,
@@ -92,8 +94,6 @@ module.exports = (sequelize, DataTypes) => {
       indexes: [
         { fields: ["provinceCode"] },
         { fields: ["districtCode"] },
-        { fields: ["priceCode"] },
-        { fields: ["areaCode"] },
         { fields: ["status"] },
         { fields: ["userId"] },
       ],

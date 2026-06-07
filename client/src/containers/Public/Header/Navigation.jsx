@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { formatVietnameseToString } from "../../../utils/Common/formatVietnameseToString";
 import { useDispatch, useSelector } from "react-redux";
 import * as action from "../../../store/actions";
-import {path} from "../../../utils/constant";
+import { path } from "../../../utils/constant";
 import logo from "../../../assets/TLU.jpg";
 
 const notActive =
@@ -25,13 +25,20 @@ const Navigation = ({ isAdmin, showLogo }) => {
     dispatch(action.getProvinces());
   }, [dispatch]);
 
+  const hasNewCategory = categories?.length > 7;
+
   return (
     <div
       className={`w-full flex items-center h-[60px] bg-gradient-to-r from-blue-700 to-blue-800 shadow-lg z-30`}
     >
-      <div className={`w-full ${showLogo ? "px-6" : "max-w-[1100px] mx-auto"} flex h-full items-center text-[13px] font-semibold tracking-tight`}>
+      <div
+        className={`w-full ${showLogo ? "px-6" : "max-w-[1100px] mx-auto"} flex h-full items-center text-[13px] font-semibold tracking-tight`}
+      >
         {showLogo && (
-          <NavLink to="/" className="flex items-center mr-10 flex-none hover:scale-105 transition-transform duration-200">
+          <NavLink
+            to="/"
+            className="flex items-center mr-10 flex-none hover:scale-105 transition-transform duration-200"
+          >
             <div className="bg-white p-1 rounded-xl shadow-md border border-white/20 flex items-center justify-center">
               <img
                 src={logo}
@@ -41,8 +48,10 @@ const Navigation = ({ isAdmin, showLogo }) => {
             </div>
           </NavLink>
         )}
-        <div className="flex h-full items-center overflow-x-auto hide-scrollbar">
-          <div className="h-full flex justify-center items-center">
+        <div
+          className={`flex-1 flex h-full items-center overflow-x-auto select-none ${hasNewCategory ? "custom-scrollbar" : "hide-scrollbar"}`}
+        >
+          <div className="h-full flex justify-center items-center flex-none">
             <NavLink
               to={`/`}
               className={({ isActive }) => (isActive ? active : notActive)}
@@ -50,38 +59,40 @@ const Navigation = ({ isAdmin, showLogo }) => {
               TRANG CHỦ
             </NavLink>
           </div>
-            {categories?.length > 0 &&
-              categories.map((item) => {
-                return (
-                  <div
-                    key={item.code}
-                    className="h-full flex justify-center items-center"
+          {categories?.length > 0 &&
+            categories.map((item) => {
+              return (
+                <div
+                  key={item.code}
+                  className="h-full flex justify-center items-center flex-none"
+                >
+                  <NavLink
+                    to={`/${formatVietnameseToString(item.value)}`}
+                    className={({ isActive }) =>
+                      isActive ? active : notActive
+                    }
                   >
-                    <NavLink
-                      to={`/${formatVietnameseToString(item.value)}`}
-                      className={({ isActive }) => (isActive ? active : notActive)}
-                    >
-                      {item.value.toUpperCase()}
-                    </NavLink>
-                  </div>
-                );
-              })}
-            <div className="h-full flex justify-center items-center">
-              <NavLink
-                to={`/${path.CONTACT}`}
-                className={({ isActive }) => (isActive ? active : notActive)}
-              >
-                LIÊN HỆ
-              </NavLink>
-            </div>
-            <div className="h-full flex justify-center items-center">
-              <NavLink
-                to={`/${path.BANG_GIA}`}
-                className={({ isActive }) => (isActive ? active : notActive)}
-              >
-                BẢNG GIÁ
-              </NavLink>
-            </div>
+                    {item.value.toUpperCase()}
+                  </NavLink>
+                </div>
+              );
+            })}
+          <div className="h-full flex justify-center items-center flex-none">
+            <NavLink
+              to={`/${path.CONTACT}`}
+              className={({ isActive }) => (isActive ? active : notActive)}
+            >
+              LIÊN HỆ
+            </NavLink>
+          </div>
+          <div className="h-full flex justify-center items-center flex-none">
+            <NavLink
+              to={`/${path.BANG_GIA}`}
+              className={({ isActive }) => (isActive ? active : notActive)}
+            >
+              BẢNG GIÁ
+            </NavLink>
+          </div>
         </div>
       </div>
     </div>

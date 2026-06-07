@@ -1,11 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
-  font-family: 'Inter', sans-serif !important;
+html,
+body,
+#root {
+  font-family: "Inter", sans-serif !important;
   scroll-behavior: smooth;
 }
 
@@ -103,6 +105,27 @@ input[type="range"]::-ms-thumb:active {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Custom scrollbar for horizontal scrolling menus */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2.5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2.5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+.custom-scrollbar {
+  -ms-overflow-style: auto; /* IE and Edge */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.15);
 }

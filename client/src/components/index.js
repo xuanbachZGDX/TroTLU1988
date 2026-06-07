@@ -6,6 +6,7 @@ export { default as PaginationAdmin } from "./Common/PaginationAdmin";
 export { default as Province } from "./Common/Province";
 export { default as ProvinceBtn } from "./Common/ProvinceBtn";
 export { default as ScrollToTop } from "./Common/ScrollToTop";
+export { default as BackToTop } from "./Common/BackToTop";
 
 // Post Components
 export { default as Item } from "./Post/Item";

@@ -86,6 +86,7 @@ const Contact = () => {
                 id="description"
                 cols="30"
                 rows="3"
+                maxLength={500}
                 value={payload.description}
                 onChange={(e) =>
                   setPayload((prev) => ({
@@ -94,11 +95,21 @@ const Contact = () => {
                   }))
                 }
               />
-              {invalidFields?.some((i) => i.name === "description") && (
-                <small className="text-red-500 italic">
-                  {invalidFields.find((i) => i.name === "description")?.message}
-                </small>
-              )}
+              <div className="flex justify-between items-center mt-1">
+                {invalidFields?.some((i) => i.name === "description") ? (
+                  <small className="text-red-500 italic">
+                    {
+                      invalidFields.find((i) => i.name === "description")
+                        ?.message
+                    }
+                  </small>
+                ) : (
+                  <span></span>
+                )}
+                <span className="text-xs text-gray-500 font-medium">
+                  {payload.description?.length || 0}/500 ký tự
+                </span>
+              </div>
             </div>
             <Button
               text="Gửi thông tin"

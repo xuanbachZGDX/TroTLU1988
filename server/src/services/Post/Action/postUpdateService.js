@@ -102,8 +102,6 @@ export const updatePost = (postId, payload, actor) =>
           description: payload.description
             ? buildPostDescription(payload.description)
             : post.description,
-          areaCode: payload.areaCode || post.areaCode,
-          priceCode: payload.priceCode || post.priceCode,
           provinceCode: payload.provinceId || post.provinceCode,
           districtCode: payload.districtId || post.districtCode,
           priceNumber:
@@ -124,12 +122,6 @@ export const updatePost = (postId, payload, actor) =>
               ? "active"
               : "pending"
             : payload.status || post.status,
-          price: formatPriceText(
-            payload.priceNumber !== undefined
-              ? payload.priceNumber
-              : post.priceNumber,
-          ),
-          acreage: `${payload.areaNumber !== undefined ? payload.areaNumber : post.areaNumber} m2`,
         };
 
         const star = +updatePayload.star;

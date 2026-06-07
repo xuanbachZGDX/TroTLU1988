@@ -4,9 +4,10 @@ import { apiUploadImages } from "../../../services/postService";
 import { apiSubmitKyc } from "../../../services/userService";
 import { getCurrent } from "../../../store/actions";
 import Swal from "sweetalert2";
-import { RiLoader4Line, RiUpload2Line } from "react-icons/ri";
+import { RiLoader4Line } from "react-icons/ri";
 import KycVerified from "./Kyc/KycVerified";
 import KycPending from "./Kyc/KycPending";
+import KycUploadBox from "./Kyc/KycUploadBox";
 
 const UserKyc = () => {
   const { currentData } = useSelector((state) => state.user);
@@ -30,6 +31,15 @@ const UserKyc = () => {
   const handleUploadImage = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire(
+        "Lỗi!",
+        "Dung lượng ảnh vượt quá giới hạn cho phép (tối đa 5MB).",
+        "error",
+      );
+      return;
+    }
 
     const isFront = type === "front";
     if (isFront) setIsUploadingFront(true);
@@ -130,105 +140,20 @@ const UserKyc = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-6 mt-2">
-            {/* Front Image */}
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-gray-700 text-sm">
-                Mặt trước CCCD <span className="text-red-500">*</span>
-              </span>
-              <div className="border-2 border-dashed border-gray-200 hover:border-blue-500 rounded-2xl h-48 relative overflow-hidden flex flex-col items-center justify-center bg-gray-50/50 transition-all">
-                {cccdFront ? (
-                  <>
-                    <img
-                      src={cccdFront}
-                      alt="CCCD Mặt trước"
-                      className="w-full h-full object-cover"
-                    />
-                    <label className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer">
-                      Thay đổi
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => handleUploadImage(e, "front")}
-                      />
-                    </label>
-                  </>
-                ) : (
-                  <label className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-blue-500 transition-colors">
-                    {isUploadingFront ? (
-                      <RiLoader4Line
-                        size={32}
-                        className="animate-spin text-blue-500"
-                      />
-                    ) : (
-                      <>
-                        <RiUpload2Line size={32} />
-                        <span className="text-xs font-semibold">
-                          Tải lên mặt trước
-                        </span>
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      disabled={isUploadingFront}
-                      onChange={(e) => handleUploadImage(e, "front")}
-                    />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* Back Image */}
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-gray-700 text-sm">
-                Mặt sau CCCD <span className="text-red-500">*</span>
-              </span>
-              <div className="border-2 border-dashed border-gray-200 hover:border-blue-500 rounded-2xl h-48 relative overflow-hidden flex flex-col items-center justify-center bg-gray-50/50 transition-all">
-                {cccdBack ? (
-                  <>
-                    <img
-                      src={cccdBack}
-                      alt="CCCD Mặt sau"
-                      className="w-full h-full object-cover"
-                    />
-                    <label className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer">
-                      Thay đổi
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => handleUploadImage(e, "back")}
-                      />
-                    </label>
-                  </>
-                ) : (
-                  <label className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-blue-500 transition-colors">
-                    {isUploadingBack ? (
-                      <RiLoader4Line
-                        size={32}
-                        className="animate-spin text-blue-500"
-                      />
-                    ) : (
-                      <>
-                        <RiUpload2Line size={32} />
-                        <span className="text-xs font-semibold">
-                          Tải lên mặt sau
-                        </span>
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      disabled={isUploadingBack}
-                      onChange={(e) => handleUploadImage(e, "back")}
-                    />
-                  </label>
-                )}
-              </div>
-            </div>
+            <KycUploadBox
+              label="Mặt trước CCCD"
+              imageUrl={cccdFront}
+              isUploading={isUploadingFront}
+              onChange={handleUploadImage}
+              type="front"
+            />
+            <KycUploadBox
+              label="Mặt sau CCCD"
+              imageUrl={cccdBack}
+              isUploading={isUploadingBack}
+              onChange={handleUploadImage}
+              type="back"
+            />
           </div>
 
           <button

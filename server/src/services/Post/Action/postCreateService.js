@@ -45,7 +45,19 @@ export const createNewPostService = (body, userId) =>
           transaction,
           lock: transaction.LOCK.UPDATE,
         });
-        if (!user || (user.balance || 0) < postPrice)
+        if (!user) throw new Error("USER_NOT_FOUND");
+
+        if (user.kycStatus !== "verified") {
+          const postCount = await db.Post.count({
+            where: { userId },
+            transaction,
+          });
+          if (postCount >= 3) {
+            throw new Error("KYC_REQUIRED_EXCEEDED_POSTS");
+          }
+        }
+
+        if ((user.balance || 0) < postPrice)
           throw new Error("NOT_ENOUGH_BALANCE");
 
         await db.User.update(
@@ -81,8 +93,6 @@ export const createNewPostService = (body, userId) =>
         const bonus = star > 0 ? `Tin VIP ${star}` : "Tin thường";
         const published = moment().format("DD/MM/YYYY");
         const expired = moment().add(duration, "days").format("DD/MM/YYYY");
-        const price = formatPriceText(body.priceNumber);
-        const acreage = `${body.areaNumber} m2`;
 
         await db.Post.create(
           {
@@ -91,9 +101,6 @@ export const createNewPostService = (body, userId) =>
             address: body.address,
             categoryCode: body.categoryCode,
             description: buildPostDescription(body.description),
-            userId,
-            areaCode: body.areaCode,
-            priceCode: body.priceCode,
             provinceCode: body.provinceId,
             districtCode: body.districtId,
             priceNumber: body.priceNumber || 0,
@@ -101,9 +108,7 @@ export const createNewPostService = (body, userId) =>
             star: body.star || 0,
             status: initialStatus,
 
-            price,
-            acreage,
-            overviewCode,
+            sourcePostRef: overviewCode,
             type,
             target,
             bonus,
@@ -168,6 +173,11 @@ export const createNewPostService = (body, userId) =>
         resolve({
           err: 3,
           msg: "Bạn chỉ được tải lên tối đa 10 hình ảnh cho mỗi tin đăng.",
+        });
+      else if (error.message === "KYC_REQUIRED_EXCEEDED_POSTS")
+        resolve({
+          err: 4,
+          msg: "Tài khoản chưa xác minh danh tính chỉ được đăng tối đa 3 bài viết. Vui lòng hoàn tất xác thực danh tính (KYC) để tiếp tục đăng tin không giới hạn.",
         });
       else reject(error);
     }

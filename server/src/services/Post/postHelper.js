@@ -1,6 +1,7 @@
 import db from "../../models";
 import { v4 as generateId } from "uuid";
 import generateCode from "../../utils/generateCode.js";
+import { getSystemSettings } from "../../utils/systemSettings";
 
 export const CATEGORY_TYPE_MAP = {
   PHONGTRO: "Phòng trọ",
@@ -96,7 +97,6 @@ export const getStandardPostInclude = () => [
 ];
 
 export const shouldPostBeAutoApproved = async (postOrBody, userId) => {
-  const { getSystemSettings } = require("../../utils/systemSettings");
   const settings = getSystemSettings();
   if (!settings.autoApprove) return false;
 

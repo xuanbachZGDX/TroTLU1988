@@ -38,7 +38,7 @@ import {
 import LandlordGuard from "./containers/System/LandlordGuard";
 import ManageServicePrice from "./containers/System/ManageServicePrice";
 import { useSelector } from "react-redux";
-import { Loading, ScrollToTop } from "./components";
+import { Loading, ScrollToTop, BackToTop } from "./components";
 
 function App() {
   const { isLoading } = useSelector((state) => state.app);
@@ -46,6 +46,7 @@ function App() {
   return (
     <div className="bg-primary relative">
       <ScrollToTop />
+      <BackToTop />
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-overlay-70 z-50 flex items-center justify-center">
           <Loading />
@@ -74,6 +75,7 @@ function App() {
           <Route path={path.BANG_GIA} element={<ServicePrice />} />
           <Route path={path.FORGOT_PASSWORD} element={<ForgotPassword />} />
           <Route path={path.RESET_PASSWORD} element={<ResetPassword />} />
+          <Route path=":category" element={<Rental />} />
           <Route path="*" element={<HomePage />} />
         </Route>
 

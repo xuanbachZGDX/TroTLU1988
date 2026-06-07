@@ -65,6 +65,8 @@ export const getAdminPostsService = (page, query) =>
         rows = rows.filter((item) => item.status === "rejected");
       } else if (status === "archived") {
         rows = rows.filter((item) => item.status === "archived");
+      } else if (status === "blocked") {
+        rows = rows.filter((item) => item.status === "blocked");
       }
 
       resolve({

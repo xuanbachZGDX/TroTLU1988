@@ -1,4 +1,5 @@
 import * as postService from "../../services/Post/postService";
+import { dataPrice, dataArea } from "../../utils/data";
 
 export const getPostById = async (req, res) => {
   const { id } = req.query;
@@ -31,9 +32,12 @@ export const getPostsLimit = async (req, res) => {
     areaNumber,
     "priceNumber[]": priceNumberArray,
     "areaNumber[]": areaNumberArray,
+    priceCode,
+    areaCode,
+    priceRange,
+    areaRange,
     ...query
   } = req.query;
-  const cleanQuery = {};
 
   const normalizeRange = (value) => {
     if (!value) return undefined;
@@ -44,6 +48,26 @@ export const getPostsLimit = async (req, res) => {
     return normalized.length ? normalized : undefined;
   };
 
+  let resolvedPrice = normalizeRange(priceNumberArray || priceNumber);
+  let resolvedArea = normalizeRange(areaNumberArray || areaNumber);
+
+  const pCode = priceCode || priceRange;
+  if (!resolvedPrice && pCode) {
+    const foundPrice = dataPrice.find((p) => p.code === pCode);
+    if (foundPrice) {
+      resolvedPrice = [foundPrice.min, foundPrice.max];
+    }
+  }
+
+  const aCode = areaCode || areaRange;
+  if (!resolvedArea && aCode) {
+    const foundArea = dataArea.find((a) => a.code === aCode);
+    if (foundArea) {
+      resolvedArea = [foundArea.min, foundArea.max];
+    }
+  }
+
+  const cleanQuery = {};
   Object.keys(query).forEach((key) => {
     if (key.endsWith("[]")) {
       cleanQuery[key.replace("[]", "")] = query[key];
@@ -54,8 +78,8 @@ export const getPostsLimit = async (req, res) => {
 
   try {
     const response = await postService.getPostsLimitService(page, cleanQuery, {
-      priceNumber: normalizeRange(priceNumberArray || priceNumber),
-      areaNumber: normalizeRange(areaNumberArray || areaNumber),
+      priceNumber: resolvedPrice,
+      areaNumber: resolvedArea,
     });
     return res.status(200).json(response);
   } catch (error) {

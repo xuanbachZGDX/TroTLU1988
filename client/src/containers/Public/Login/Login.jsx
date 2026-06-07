@@ -9,6 +9,8 @@ import { path } from "../../../utils/constant";
 import AdminLoginForm from "./AdminLoginForm";
 import UserAuthForm from "./UserAuthForm";
 import { getRoleFromToken, normalizeRole } from "../../../utils/Common/role";
+import { normalizePhone } from "../../../utils/Common/phone";
+import { useGoogleAuth } from "./useGoogleAuth";
 
 const emptyPayload = { phone: "", password: "", name: "", accountType: "" };
 
@@ -23,21 +25,22 @@ const Login = () => {
   const [isRegister, setIsRegister] = useState(location.state?.flag);
   const [invalidFields, setInvalidFields] = useState([]);
   const [payload, setPayload] = useState(emptyPayload);
-  const [googleCredential, setGoogleCredential] = useState("");
-  const [googleAccountType, setGoogleAccountType] = useState("");
-  const [googleProfile, setGoogleProfile] = useState(null);
+
+  const {
+    googleAccountType,
+    setGoogleAccountType,
+    googleProfile,
+    handleGoogleSuccess,
+    handleGoogleAccountTypeSubmit,
+    handleGoogleError,
+    resetGoogleSelection,
+  } = useGoogleAuth();
 
   useEffect(() => {
     setIsRegister(location.state?.flag);
   }, [location.state?.flag]);
 
   const hasShownSuccessRef = useRef(false);
-
-  const resetGoogleSelection = () => {
-    setGoogleCredential("");
-    setGoogleAccountType("");
-    setGoogleProfile(null);
-  };
 
   useEffect(() => {
     if (isLoggedIn && currentData?.id) {
@@ -82,12 +85,7 @@ const Login = () => {
   const handleSubmit = async () => {
     let rawPhone = payload.phone;
     if (rawPhone) {
-      let normalized = rawPhone.replace(/[\s\-\(\)]/g, "");
-      if (normalized.startsWith("+84")) {
-        normalized = "0" + normalized.slice(3);
-      } else if (normalized.startsWith("84") && normalized.length > 9) {
-        normalized = "0" + normalized.slice(2);
-      }
+      let normalized = normalizePhone(rawPhone);
       payload.phone = normalized;
       setPayload((prev) => ({ ...prev, phone: normalized }));
     }
@@ -141,54 +139,6 @@ const Login = () => {
       }
     }
   };
-
-  const handleGoogleSuccess = async (response) => {
-    const result = await dispatch(actions.loginGoogle(response.credential));
-    if (!result) return;
-
-    if (result.requiresAccountType) {
-      setGoogleCredential(response.credential);
-      setGoogleAccountType("");
-      setGoogleProfile(result.profile || null);
-      Swal.fire({
-        title: "Hoàn tất tài khoản",
-        text: "Email Google này chưa có tài khoản. Hãy chọn vai trò để tiếp tục.",
-        icon: "info",
-        timer: 1800,
-        showConfirmButton: false,
-      });
-    }
-  };
-
-  const handleGoogleAccountTypeSubmit = async () => {
-    if (!googleCredential) {
-      Swal.fire(
-        "Thông báo",
-        "Không tìm thấy phiên đăng nhập Google. Vui lòng thử lại.",
-        "warning",
-      );
-      return;
-    }
-
-    if (!googleAccountType) {
-      Swal.fire(
-        "Thông báo",
-        "Vui lòng chọn loại tài khoản trước khi tiếp tục.",
-        "warning",
-      );
-      return;
-    }
-
-    const result = await dispatch(
-      actions.loginGoogle(googleCredential, googleAccountType),
-    );
-    if (result?.err === 0 && result?.token) {
-      resetGoogleSelection();
-    }
-  };
-
-  const handleGoogleError = () =>
-    Swal.fire("Lỗi!", "Đăng nhập Google thất bại.", "error");
 
   if (isAdminLogin) {
     return (

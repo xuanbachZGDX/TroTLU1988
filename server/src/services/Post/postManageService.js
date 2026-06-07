@@ -36,14 +36,14 @@ export const getPostLimitAdminService = (
         where.status = "active";
         where[Op.and] = [
           db.sequelize.literal(
-            `STR_TO_DATE(expired, '%d/%m/%Y') >= '${todayStr}'`,
+            `STR_TO_DATE(SUBSTRING_INDEX(TRIM(expired), ' ', -1), '%d/%m/%Y') >= '${todayStr}'`,
           ),
         ];
       } else if (status === "expired") {
         where.status = { [Op.in]: ["active", "expired"] };
         where[Op.and] = [
           db.sequelize.literal(
-            `STR_TO_DATE(expired, '%d/%m/%Y') < '${todayStr}'`,
+            `STR_TO_DATE(SUBSTRING_INDEX(TRIM(expired), ' ', -1), '%d/%m/%Y') < '${todayStr}'`,
           ),
         ];
       } else if (
@@ -53,6 +53,8 @@ export const getPostLimitAdminService = (
         status === "blocked"
       ) {
         where.status = status;
+      } else if (status === "all") {
+        // Do not filter by status, return all posts
       } else {
         // Mặc định không hiển thị tin đã ẩn (archived) ở danh sách chính
         where.status = { [Op.ne]: "archived" };
@@ -143,7 +145,7 @@ export const extendPostService = (postId, userId, days = 7, newStar = null) =>
             userId,
             amount: totalPrice,
             type: "payment",
-            content: `Gia hạn ${newStar !== null ? "& Nâng cấp" : ""} tin ${post.overviewCode || post.id.slice(0, 8)} thêm ${daysInt} ngày`,
+            content: `Gia hạn ${newStar !== null ? "& Nâng cấp" : ""} tin ${post.sourcePostRef || post.id.slice(0, 8)} thêm ${daysInt} ngày`,
             status: "success",
           },
           { transaction },
@@ -198,27 +200,41 @@ export const rejectPostService = (postId) =>
         });
 
         if (lastTransaction) {
-          // Hoàn tiền cho user
-          const user = await db.User.findOne({
-            where: { id: post.userId },
+          // Kiểm tra xem đã có giao dịch hoàn tiền cho tin này sau giao dịch thanh toán hay chưa
+          const refundTx = await db.Transaction.findOne({
+            where: {
+              userId: post.userId,
+              type: "refund",
+              status: "success",
+              content: { [Op.like]: `%${shortId}%` },
+              createdAt: { [Op.gt]: lastTransaction.createdAt },
+            },
             transaction: t,
           });
-          if (user) {
-            await db.User.update(
-              { balance: (user.balance || 0) + lastTransaction.amount },
-              { where: { id: post.userId }, transaction: t },
-            );
-            await db.Transaction.create(
-              {
-                id: generateId(),
-                userId: post.userId,
-                amount: lastTransaction.amount,
-                type: "refund",
-                content: `Hoàn tiền tin đăng bị từ chối: ${shortId}`,
-                status: "success",
-              },
-              { transaction: t },
-            );
+
+          if (!refundTx) {
+            // Hoàn tiền cho user
+            const user = await db.User.findOne({
+              where: { id: post.userId },
+              transaction: t,
+            });
+            if (user) {
+              await db.User.update(
+                { balance: (user.balance || 0) + lastTransaction.amount },
+                { where: { id: post.userId }, transaction: t },
+              );
+              await db.Transaction.create(
+                {
+                  id: generateId(),
+                  userId: post.userId,
+                  amount: lastTransaction.amount,
+                  type: "refund",
+                  content: `Hoàn tiền tin đăng bị từ chối: ${shortId}`,
+                  status: "success",
+                },
+                { transaction: t },
+              );
+            }
           }
         }
 

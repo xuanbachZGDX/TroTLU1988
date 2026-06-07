@@ -1,6 +1,13 @@
-import React from 'react';
+import React from "react";
 
-const AdminPostFilters = ({ filters, setFilters, categories, provinces, districts, handleApplyFilters }) => {
+const AdminPostFilters = ({
+  filters,
+  setFilters,
+  categories,
+  provinces,
+  districts,
+  handleApplyFilters,
+}) => {
   return (
     <div className="grid grid-cols-1 gap-3 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
       <input
@@ -8,12 +15,16 @@ const AdminPostFilters = ({ filters, setFilters, categories, provinces, district
         placeholder="Tìm tiêu đề/địa chỉ/mã..."
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.search}
-        onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, search: e.target.value }))
+        }
       />
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.status}
-        onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, status: e.target.value }))
+        }
       >
         <option value="">Trạng thái</option>
         <option value="pending">Chờ duyệt</option>
@@ -21,11 +32,14 @@ const AdminPostFilters = ({ filters, setFilters, categories, provinces, district
         <option value="expired">Đã hết hạn</option>
         <option value="rejected">Bị từ chối</option>
         <option value="archived">Tin đang ẩn (Kho lưu trữ)</option>
+        <option value="blocked">Bị khóa</option>
       </select>
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.star || ""}
-        onChange={(e) => setFilters(prev => ({ ...prev, star: e.target.value }))}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, star: e.target.value }))
+        }
       >
         <option value="">Chọn gói tin</option>
         <option value="5">VIP Nổi bật</option>
@@ -37,27 +51,49 @@ const AdminPostFilters = ({ filters, setFilters, categories, provinces, district
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.categoryCode}
-        onChange={(e) => setFilters(prev => ({ ...prev, categoryCode: e.target.value }))}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, categoryCode: e.target.value }))
+        }
       >
         <option value="">Danh mục</option>
-        {categories.map(item => <option key={item.code} value={item.code}>{item.value}</option>)}
+        {categories.map((item) => (
+          <option key={item.code} value={item.code}>
+            {item.value}
+          </option>
+        ))}
       </select>
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.provinceCode}
-        onChange={(e) => setFilters(prev => ({ ...prev, provinceCode: e.target.value, districtCode: "" }))}
+        onChange={(e) =>
+          setFilters((prev) => ({
+            ...prev,
+            provinceCode: e.target.value,
+            districtCode: "",
+          }))
+        }
       >
         <option value="">Tỉnh/Thành</option>
-        {provinces.map(item => <option key={item.code} value={item.code}>{item.value}</option>)}
+        {provinces.map((item) => (
+          <option key={item.code} value={item.code}>
+            {item.value}
+          </option>
+        ))}
       </select>
       <select
         className="rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 text-sm"
         value={filters.districtCode}
         disabled={!filters.provinceCode}
-        onChange={(e) => setFilters(prev => ({ ...prev, districtCode: e.target.value }))}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, districtCode: e.target.value }))
+        }
       >
         <option value="">Quận/Huyện</option>
-        {districts.map(item => <option key={item.code} value={item.code}>{item.value}</option>)}
+        {districts.map((item) => (
+          <option key={item.code} value={item.code}>
+            {item.value}
+          </option>
+        ))}
       </select>
       <button
         onClick={handleApplyFilters}

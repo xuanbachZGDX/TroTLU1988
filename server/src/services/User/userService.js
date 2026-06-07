@@ -140,16 +140,31 @@ export const submitKycService = (userId, { cccdNumber, cccdFront, cccdBack }) =>
       const user = await db.User.findByPk(userId);
       if (!user) return resolve({ err: 1, msg: "Người dùng không tồn tại" });
 
-      await db.User.update(
-        {
-          cccdNumber,
-          cccdFront,
-          cccdBack,
-          kycStatus: "pending",
-          kycNote: null,
-        },
-        { where: { id: userId } },
-      );
+      await db.sequelize.transaction(async (transaction) => {
+        await db.User.update(
+          {
+            cccdNumber,
+            cccdFront,
+            cccdBack,
+            kycStatus: "pending",
+            kycNote: null,
+          },
+          { where: { id: userId }, transaction },
+        );
+
+        const { v4 } = require("uuid");
+        await db.Notification.create(
+          {
+            id: v4(),
+            senderId: userId,
+            recipientId: null, // Gửi cho Admin
+            title: "Yêu cầu xác minh danh tính (KYC)",
+            content: `Chủ trọ ${user.name || "Chủ trọ"} (SĐT: ${user.phone}) đã gửi yêu cầu xác minh danh tính (KYC) cần phê duyệt.`,
+            isRead: false,
+          },
+          { transaction },
+        );
+      });
 
       resolve({
         err: 0,

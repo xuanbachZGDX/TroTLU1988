@@ -1,10 +1,20 @@
 import db from "../../models";
 import moment from "moment";
 import { v4 as generateId } from "uuid";
+import { getSystemSettings } from "../../utils/systemSettings";
 
 export const sweepPendingPostsService = () =>
   new Promise(async (resolve, reject) => {
     try {
+      const settings = getSystemSettings();
+      if (!settings.autoApprove) {
+        return resolve({
+          err: 0,
+          msg: "Chế độ tự động duyệt tin đang tắt.",
+          approvedCount: 0,
+        });
+      }
+
       const pendingPosts = await db.Post.findAll({
         where: { status: "pending" },
       });

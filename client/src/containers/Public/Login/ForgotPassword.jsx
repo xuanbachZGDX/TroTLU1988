@@ -23,11 +23,20 @@ const ForgotPassword = () => {
       Swal.fire("Lỗi!", "Vui lòng nhập email của bạn!", "error");
       return;
     }
-    if (countdown > 0) {
-      Swal.fire("Lỗi!", "Vui lòng đợi 60 giây trước khi yêu cầu mã OTP mới", "error");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Swal.fire("Lỗi!", "Email không đúng định dạng!", "error");
       return;
     }
-    
+    if (countdown > 0) {
+      Swal.fire(
+        "Lỗi!",
+        "Vui lòng đợi 60 giây trước khi yêu cầu mã OTP mới",
+        "error",
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await apiForgotPassword(email);
@@ -51,24 +60,41 @@ const ForgotPassword = () => {
   return (
     <div className="w-full flex items-center justify-center py-10">
       <div className="bg-white w-[500px] p-[30px] rounded-md shadow-sm border border-gray-200">
-        <h3 className="font-semibold text-2xl mb-2 text-center text-blue-600">Quên mật khẩu?</h3>
+        <h3 className="font-semibold text-2xl mb-2 text-center text-blue-600">
+          Quên mật khẩu?
+        </h3>
         <p className="text-gray-500 text-sm mb-6 text-center">
           Nhập Email của bạn và chúng tôi sẽ gửi mã OTP xác thực qua Email.
         </p>
-        <form onSubmit={(e) => { e.preventDefault(); }} className="w-full flex flex-col gap-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+          className="w-full flex flex-col gap-5"
+        >
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold uppercase text-gray-700">Email khôi phục</label>
+            <label className="text-xs font-bold uppercase text-gray-700">
+              Email khôi phục
+            </label>
             <input
               type="email"
               className="outline-none bg-[#e8f0fe] p-2 rounded-md w-full focus:ring-2 focus:ring-blue-300 transition-all"
               placeholder="example@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSubmit();
+              }}
             />
           </div>
           <Button
-            text={countdown > 0 ? `Gửi lại sau (${countdown}s)` : (isLoading ? "Đang gửi mã..." : "Gửi mã OTP")}
+            text={
+              countdown > 0
+                ? `Gửi lại sau (${countdown}s)`
+                : isLoading
+                  ? "Đang gửi mã..."
+                  : "Gửi mã OTP"
+            }
             bgColor={countdown > 0 ? "bg-gray-400" : "bg-blue-600"}
             textColor="text-white"
             fullWidth

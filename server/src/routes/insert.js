@@ -1,6 +1,8 @@
 import express from "express";
 import * as insertController from "../controllers/App/insertController";
 
+import verifyAdmin from "../middlewares/verifyAdmin";
+
 const router = express.Router();
 /**
  * @swagger
@@ -19,6 +21,6 @@ const router = express.Router();
  *       200:
  *         description: Thành công
  */
-router.post("/", insertController.insert);
+router.post("/", verifyAdmin, insertController.insert);
 
 export default router;
