@@ -1,68 +1,48 @@
-const { openPage, scrapePostDetail } = require("./detailScraper");
-
-const DEFAULT_TIMEOUT = 30000;
+const { JSDOM } = require("jsdom");
+const { fetchHtml, scrapePostDetail } = require("./detailScraper");
 
 const scrapeCategory = async (browser, url) => {
-  const page = await openPage(browser, url);
-  try {
-    await page.waitForSelector("#webpage", { timeout: DEFAULT_TIMEOUT });
+  // Support both (browser, url) and (url) signatures
+  const targetUrl = typeof browser === "string" ? browser : url;
+  const html = await fetchHtml(targetUrl);
+  const dom = new JSDOM(html, { url: targetUrl });
+  const document = dom.window.document;
 
-    return await page.$$eval(".pt123__nav > ul > li", (elements) =>
-      elements
-        .map((item) => {
-          const link = item.querySelector("a");
-          const href = link?.href?.trim() || "";
-          return {
-            category: link?.innerText?.trim() || "",
-            link: href,
-            slug: href
-              ? new URL(href).pathname.split("/").filter(Boolean).pop() ||
-                "TroTLU1988.com"
-              : "",
-          };
-        })
-        .filter((item) => item.link),
-    );
-  } finally {
-    await page.close();
-  }
-};
-
-const scrapeListingPage = async (page) => {
-  await page.waitForSelector("main", { timeout: DEFAULT_TIMEOUT });
-
-  const header = await page.$eval("main header", (element) => ({
-    title: element.querySelector("h1")?.innerText?.trim() || "",
-    description: element.querySelector("p")?.innerText?.trim() || "",
-  }));
-
-  const detailLinks = await page.$$eval(
-    "main ul.post__listing > li h3 > a",
-    (elements) =>
-      Array.from(new Set(elements.map((item) => item.href).filter(Boolean))),
-  );
-
-  const nextPage = await page
-    .$eval(
-      ".pagination .page-item.active + .page-item a",
-      (element) => element.href,
-    )
-    .catch(() => null);
-
-  return { header, detailLinks, nextPage };
+  return Array.from(document.querySelectorAll(".pt123__nav > ul > li"))
+    .map((item) => {
+      const link = item.querySelector("a");
+      const href = link?.getAttribute("href")?.trim() || "";
+      const fullHref = href ? new URL(href, targetUrl).href : "";
+      return {
+        category: link?.textContent?.trim() || "",
+        link: fullHref,
+        slug: fullHref
+          ? new URL(fullHref).pathname.split("/").filter(Boolean).pop() ||
+            "TroTLU1988.com"
+          : "",
+      };
+    })
+    .filter((item) => item.link);
 };
 
 const scraper = async (browser, url, options = {}) => {
+  // Support both (browser, url, options) and (url, options) signatures
+  let targetUrl = url;
+  let targetOptions = options;
+  if (typeof browser === "string") {
+    targetUrl = browser;
+    targetOptions = url || {};
+  }
+
   const maxPages = Number(
-    options.maxPages || process.env.SCRAPE_MAX_PAGES || 1,
+    targetOptions.maxPages || process.env.SCRAPE_MAX_PAGES || 1,
   );
-  const listingPage = await openPage(browser, url);
 
   try {
     const details = [];
     const visitedLinks = new Set();
     const visitedListingUrls = new Set();
-    let currentUrl = url;
+    let currentUrl = targetUrl;
     let currentPage = 1;
     let categoryHeader = { title: "", description: "" };
 
@@ -70,30 +50,52 @@ const scraper = async (browser, url, options = {}) => {
       visitedListingUrls.add(currentUrl);
 
       if (currentPage > 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // sleep 1s between page listings
-        await listingPage.goto(currentUrl, {
-          waitUntil: "domcontentloaded",
-          timeout: DEFAULT_TIMEOUT,
-        });
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Sleep 500ms between page listings
       }
 
-      const pageData = await scrapeListingPage(listingPage);
-      if (currentPage === 1) categoryHeader = pageData.header;
+      const html = await fetchHtml(currentUrl);
+      const dom = new JSDOM(html, { url: currentUrl });
+      const document = dom.window.document;
 
-      const postLinks = pageData.detailLinks.filter(
-        (link) => !visitedLinks.has(link),
+      const headerElement = document.querySelector("main header");
+      const header = headerElement
+        ? {
+            title: headerElement.querySelector("h1")?.textContent?.trim() || "",
+            description:
+              headerElement.querySelector("p")?.textContent?.trim() || "",
+          }
+        : { title: "", description: "" };
+
+      if (currentPage === 1) {
+        categoryHeader = header;
+      }
+
+      const detailLinks = Array.from(
+        new Set(
+          Array.from(
+            document.querySelectorAll("main ul.post__listing > li h3 > a"),
+          )
+            .map((item) => {
+              const href = item.getAttribute("href");
+              return href ? new URL(href, currentUrl).href : "";
+            })
+            .filter(Boolean),
+        ),
       );
+
+      const postLinks = detailLinks.filter((link) => !visitedLinks.has(link));
       postLinks.forEach((link) => visitedLinks.add(link));
 
-      const CHUNK_SIZE = 2; // Concurrency of 2 is safe and twice as fast now that loading is optimized
+      // Scraping concurrency chunking (5 is safe, fast, and light with fetch)
+      const CHUNK_SIZE = 5;
       for (let i = 0; i < postLinks.length; i += CHUNK_SIZE) {
         const chunk = postLinks.slice(i, i + CHUNK_SIZE);
         const chunkResults = await Promise.all(
           chunk.map(async (link) => {
-            // Random delay between 1500ms and 3000ms to mimic human browsing behavior
-            const randomDelay = Math.floor(Math.random() * 1500) + 1500;
+            // Polite delay between 100ms and 400ms to avoid slamming the server
+            const randomDelay = Math.floor(Math.random() * 300) + 100;
             await new Promise((resolve) => setTimeout(resolve, randomDelay));
-            return scrapePostDetail(browser, link).catch((err) => {
+            return scrapePostDetail(null, link).catch((err) => {
               console.warn(`Lỗi khi scrape ${link}:`, err.message);
               return null;
             });
@@ -102,25 +104,31 @@ const scraper = async (browser, url, options = {}) => {
         details.push(...chunkResults.filter(Boolean));
       }
 
+      const nextPageElement = document.querySelector(
+        ".pagination .page-item.active + .page-item a",
+      );
+      const nextPage = nextPageElement
+        ? new URL(nextPageElement.getAttribute("href"), currentUrl).href
+        : null;
+
       currentUrl =
-        pageData.nextPage && !visitedListingUrls.has(pageData.nextPage)
-          ? pageData.nextPage
-          : null;
+        nextPage && !visitedListingUrls.has(nextPage) ? nextPage : null;
       currentPage += 1;
     }
 
     return {
       header: categoryHeader,
       metadata: {
-        sourceUrl: url,
+        sourceUrl: targetUrl,
         scrapedAt: new Date().toISOString(),
         pages: Math.min(currentPage - 1, maxPages),
         totalPosts: details.length,
       },
       body: details,
     };
-  } finally {
-    await listingPage.close();
+  } catch (error) {
+    console.error(`Error scraping category ${targetUrl}:`, error);
+    throw error;
   }
 };
 

@@ -107,6 +107,7 @@ export const createNewPostService = (body, userId) =>
             areaNumber: body.areaNumber || 0,
             star: body.star || 0,
             status: initialStatus,
+            userId,
 
             sourcePostRef: overviewCode,
             type,

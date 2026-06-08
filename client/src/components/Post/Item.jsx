@@ -18,7 +18,7 @@ const Item = ({
   attributes,
   address,
   id,
-  expired
+  expired,
 }) => {
   const [isHoverHeart, setIsHoverHeart] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -61,7 +61,9 @@ const Item = ({
   const handleStar = () => {
     let stars = [];
     for (let i = 0; i < +star; i++) {
-      stars.push(<GrStar key={i} className="star-item" size={14} color="#febb02" />);
+      stars.push(
+        <GrStar key={i} className="star-item" size={14} color="#febb02" />,
+      );
     }
     return stars;
   };
@@ -90,7 +92,11 @@ const Item = ({
       >
         <div className="flex-1 h-full">
           <img
-            src={images[0] ? optimizeCloudinaryUrl(images[0], { width: 450, height: 300 }) : "https://via.placeholder.com/400x300?text=No+Image"}
+            src={
+              images[0]
+                ? optimizeCloudinaryUrl(images[0], { width: 450, height: 300 })
+                : "https://via.placeholder.com/400x300?text=No+Image"
+            }
             alt="preview"
             className="w-full h-full object-cover"
             loading="lazy"
@@ -98,13 +104,23 @@ const Item = ({
         </div>
         <div className="w-[35%] flex flex-col gap-[2px] h-full">
           <img
-            src={optimizeCloudinaryUrl(images[1] || images[0], { width: 200, height: 150 }) || "https://via.placeholder.com/200x150?text=No+Image"}
+            src={
+              optimizeCloudinaryUrl(images[1] || images[0], {
+                width: 200,
+                height: 150,
+              }) || "https://via.placeholder.com/200x150?text=No+Image"
+            }
             alt="preview"
             className="w-full h-[119px] object-cover"
             loading="lazy"
           />
           <img
-            src={optimizeCloudinaryUrl(images[2] || images[0], { width: 200, height: 150 }) || "https://via.placeholder.com/200x150?text=No+Image"}
+            src={
+              optimizeCloudinaryUrl(images[2] || images[0], {
+                width: 200,
+                height: 150,
+              }) || "https://via.placeholder.com/200x150?text=No+Image"
+            }
             alt="preview"
             className="w-full h-[119px] object-cover"
             loading="lazy"
@@ -133,7 +149,9 @@ const Item = ({
             <span className="font-bold text-[#16C784] text-lg">
               {attributes?.price}
             </span>
-            <span className="text-gray-600 font-medium">{attributes?.acreage}</span>
+            <span className="text-gray-600 font-medium">
+              {attributes?.acreage}
+            </span>
           </div>
 
           <div className="mt-1 flex items-center gap-1 text-gray-500">
@@ -151,24 +169,26 @@ const Item = ({
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-gray-100">
           <div className="flex items-center gap-2">
             <img
-              src={user?.avatar ? optimizeCloudinaryUrl(user?.avatar, { width: 80, height: 80 }) : anonAvatar}
+              src={
+                user?.avatar
+                  ? optimizeCloudinaryUrl(user?.avatar, {
+                      width: 80,
+                      height: 80,
+                    })
+                  : anonAvatar
+              }
               alt="avatar"
               className="w-10 h-10 object-cover rounded-full border border-gray-100 shadow-sm"
               loading="lazy"
             />
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-800">{user?.name}</span>
+              <span className="text-sm font-semibold text-gray-800">
+                {user?.name}
+              </span>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-gray-400 italic">Mới đăng</span>
-                {expired && (
-                    <span className="text-[11px] text-red-500 font-medium">
-                        • Hết hạn: {(() => {
-                            if (expired.includes('/')) return expired;
-                            const d = new Date(expired);
-                            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-                        })()}
-                    </span>
-                )}
+                <span className="text-[11px] text-gray-400 italic">
+                  Mới đăng
+                </span>
               </div>
             </div>
           </div>
@@ -186,8 +206,11 @@ const Item = ({
               onMouseLeave={() => setIsHoverHeart(false)}
               onClick={handleToggleWishlist}
             >
-              {(isHoverHeart || isSaved) ? (
-                <RiHeartFill size={22} color={isSaved ? "#f73859" : "#f73859"} />
+              {isHoverHeart || isSaved ? (
+                <RiHeartFill
+                  size={22}
+                  color={isSaved ? "#f73859" : "#f73859"}
+                />
               ) : (
                 <RiHeartLine size={22} />
               )}

@@ -51,9 +51,9 @@ const Footer = () => {
   return (
     <footer className="w-full bg-gray-50 border-t-4 border-blue-600 mt-12">
       <div className="w-1100 max-w-full mx-auto px-4 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
-        {/* Về TLU.com */}
+        {/* Về TroTLU1988.com */}
         <LinkColumn
-          title="Về TLU.com"
+          title="Về TroTLU1988.com"
           links={ABOUT_LINKS}
           onLinkClick={handleOpenDoc}
         />
@@ -110,7 +110,7 @@ const Footer = () => {
           </div>
           <div className="mt-4 p-4 rounded-lg bg-blue-50 border border-blue-100">
             <p className="text-xs text-blue-800 leading-relaxed font-medium">
-              Kênh thông tin phòng trọ số 1 Việt Nam - Uy tín, Hiệu quả.
+              Kênh thông tin phòng trọ uy tín Việt Nam - Uy tín, Hiệu quả.
             </p>
           </div>
         </div>
@@ -121,8 +121,8 @@ const Footer = () => {
         <div className="w-1100 mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>
             © {new Date().getFullYear()}{" "}
-            <span className="font-bold text-blue-600">TLU.com</span>. Tất cả
-            quyền được bảo lưu.
+            <span className="font-bold text-blue-600">TroTLU1988.com</span>. Tất
+            cả quyền được bảo lưu.
           </p>
           <div className="flex gap-8 font-medium">
             <span

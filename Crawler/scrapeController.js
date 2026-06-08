@@ -11,14 +11,11 @@ const resolveFileName = (category) => {
   return `${pathname.pop() || "TroTLU1988.com"}.json`;
 };
 
-const scrapeController = async (browserInstance) => {
+const scrapeController = async () => {
   const url = "https://phongtro123.com/";
 
   try {
-    const browser = await browserInstance;
-    if (!browser) throw new Error("Browser could not be started");
-
-    const categories = await scrapers.scrapeCategory(browser, url);
+    const categories = await scrapers.scrapeCategory(url);
     const selectedCategories = categories.slice(0, DEFAULT_CATEGORY_LIMIT);
     let savedCount = 0;
 
@@ -27,7 +24,7 @@ const scrapeController = async (browserInstance) => {
     for (const category of selectedCategories) {
       console.log(`Scraping category: ${category.link}`);
       try {
-        const result = await scrapers.scraper(browser, category.link, {
+        const result = await scrapers.scraper(category.link, {
           maxPages: process.env.SCRAPE_MAX_PAGES || 3,
         });
 
@@ -53,7 +50,6 @@ const scrapeController = async (browserInstance) => {
       }
     }
 
-    await browser.close();
     console.log(
       `Scrape completed successfully. Saved ${savedCount} category files to ${DATA_DIRECTORY}`,
     );

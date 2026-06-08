@@ -19,7 +19,7 @@ export const createNewPost = async (req, res) => {
 };
 
 export const getPostLimitAdmin = async (req, res) => {
-  const { page, ...query } = req.query;
+  const { page, limit, ...query } = req.query;
   const { id } = req.user;
   try {
     if (!id)

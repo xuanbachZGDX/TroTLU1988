@@ -8,7 +8,23 @@ export const getPostsService = () =>
       const response = await db.Post.findAll({
         where: { status: "active" },
         include: getStandardPostInclude(),
-        attributes: ["id", "title", "star", "address", "description"],
+        attributes: [
+          "id",
+          "title",
+          "star",
+          "address",
+          "description",
+          "priceNumber",
+          "areaNumber",
+          "published",
+          "expired",
+          "sourcePostRef",
+          "type",
+          "target",
+          "bonus",
+          "attributes",
+          "overview",
+        ],
       });
       resolve({
         err: response ? 0 : 1,
@@ -101,7 +117,23 @@ export const getPostsLimitService = (
           where: { id: { [Op.in]: postIds } },
           order: sortOrder,
           include: getStandardPostInclude(),
-          attributes: ["id", "title", "star", "address", "description"],
+          attributes: [
+            "id",
+            "title",
+            "star",
+            "address",
+            "description",
+            "priceNumber",
+            "areaNumber",
+            "published",
+            "expired",
+            "sourcePostRef",
+            "type",
+            "target",
+            "bonus",
+            "attributes",
+            "overview",
+          ],
         });
       }
 

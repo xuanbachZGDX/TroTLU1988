@@ -28,6 +28,7 @@ export const getPosts = async (req, res) => {
 export const getPostsLimit = async (req, res) => {
   const {
     page,
+    limit,
     priceNumber,
     areaNumber,
     "priceNumber[]": priceNumberArray,
@@ -77,10 +78,14 @@ export const getPostsLimit = async (req, res) => {
   });
 
   try {
-    const response = await postService.getPostsLimitService(page, cleanQuery, {
-      priceNumber: resolvedPrice,
-      areaNumber: resolvedArea,
-    });
+    const response = await postService.getPostsLimitService(
+      page,
+      { ...cleanQuery, limitPost: limit },
+      {
+        priceNumber: resolvedPrice,
+        areaNumber: resolvedArea,
+      },
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res

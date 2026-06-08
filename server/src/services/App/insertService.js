@@ -53,6 +53,14 @@ const normalizePhone = (phone) =>
     .replace(/^tel:/i, "")
     .replace(/[^\d+]/g, "")
     .trim();
+const anonymizePhone = (phone, uniqueIndex) => {
+  if (!phone) return "";
+  const cleanPhone = phone.replace(/[^\d]/g, "");
+  const isPlus = phone.startsWith("+");
+  const prefix = isPlus ? cleanPhone.slice(0, 4) : cleanPhone.slice(0, 3);
+  const suffix = String(uniqueIndex).padStart(7, "0");
+  return `${isPlus ? "+" : ""}${prefix}${suffix}`;
+};
 const inferRoomType = (mainTitle, fallbackValue) =>
   ROOM_TYPE_MAP.find((item) => mainTitle?.includes(item.key))?.value ||
   fallbackValue ||
@@ -129,22 +137,29 @@ export const insertService = () =>
         const posts = payload?.data?.body || [];
         for (const item of posts) {
           // Sync User
-          const phone = normalizePhone(item?.contactInfo?.content?.phone?.text);
+          const rawPhone = normalizePhone(
+            item?.contactInfo?.content?.phone?.text,
+          );
           let userId;
-          if (phone) {
-            if (userMap.has(phone)) {
-              userId = userMap.get(phone);
+          if (rawPhone) {
+            if (userMap.has(rawPhone)) {
+              const mapped = userMap.get(rawPhone);
+              userId = mapped.userId;
             } else {
               userId = v4();
+              const phone = anonymizePhone(rawPhone, userMap.size + 1);
+              const rawZalo = item?.contactInfo?.content?.zalo?.url?.trim();
+              const zalo = rawZalo ? `https://zalo.me/${phone}` : null;
+
               bulkUsers.push({
                 id: userId,
                 name: item?.contactInfo?.content?.name?.trim() || "Chưa rõ",
                 role: "user",
                 password: defaultPassword,
                 phone,
-                zalo: item?.contactInfo?.content?.zalo?.url?.trim() || null,
+                zalo,
               });
-              userMap.set(phone, userId);
+              userMap.set(rawPhone, { userId, phone });
             }
           }
 

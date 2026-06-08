@@ -4,7 +4,7 @@ import { formatVietnameseToString } from "../../../utils/Common/formatVietnamese
 import { useDispatch, useSelector } from "react-redux";
 import * as action from "../../../store/actions";
 import { path } from "../../../utils/constant";
-import logo from "../../../assets/TLU.jpg";
+import logo from "../../../assets/logo_TroTLU1988.jpg";
 
 const notActive =
   "relative h-full flex items-center px-3 lg:px-4 text-white opacity-90 hover:opacity-100 transition-all duration-300 whitespace-nowrap " +
@@ -43,7 +43,7 @@ const Navigation = ({ isAdmin, showLogo }) => {
               <img
                 src={logo}
                 alt="logo"
-                className="h-[38px] w-auto object-contain"
+                className="h-[38px] w-auto object-contain mix-blend-multiply"
               />
             </div>
           </NavLink>

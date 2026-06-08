@@ -56,7 +56,7 @@ export const updateUserStatusService = (userId, status, reason = "") =>
         sendBlockEmail(
           user.email,
           user.name,
-          reason || "Vi phạm điều khoản dịch vụ hệ thống TLU.com.",
+          reason || "Vi phạm điều khoản dịch vụ hệ thống TroTLU1988.com.",
         );
       }
 

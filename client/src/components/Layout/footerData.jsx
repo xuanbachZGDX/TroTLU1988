@@ -63,8 +63,8 @@ export const SOCIAL_LINKS = [
 
 export const DOCS_CONTENT = {
   "gioi-thieu": {
-    title: "Giới thiệu về TroTLU1988",
-    content: `TroTLU1988 (trước đây là TLU.com) là hệ thống kết nối phòng trọ và nhà cho thuê hàng đầu dành cho sinh viên và người đi làm.
+    title: "Giới thiệu về TroTLU1988.com",
+    content: `TroTLU1988.com là hệ thống kết nối phòng trọ và nhà cho thuê hàng đầu dành cho sinh viên và người đi làm.
 
 Chúng tôi cung cấp nền tảng tìm kiếm, đăng tin cho thuê căn hộ, phòng trọ, mặt bằng, ở ghép với thông tin chính xác, hình ảnh chân thực và vị trí rõ ràng. Hệ thống kiểm duyệt tin đăng nghiêm ngặt giúp hạn chế tối đa tin đăng ảo hoặc lừa đảo, đem lại trải nghiệm tìm kiếm an toàn và nhanh chóng nhất cho người thuê.`,
   },

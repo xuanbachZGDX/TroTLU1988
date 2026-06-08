@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Gradient for background -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" /> <!-- Deep Blue -->
+      <stop offset="100%" stop-color="#06b6d4" /> <!-- Cyan -->
+    </linearGradient>
+    <!-- Accent gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c" /> <!-- Orange-600 -->
+      <stop offset="100%" stop-color="#f97316" /> <!-- Orange-500 -->
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer rounded rectangle with gradient -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bgGrad)" />
+  
+  <!-- Shadow/Glow effect for the house -->
+  <path d="M256 120 L130 240 H200 V380 H312 V240 H382 Z" fill="#000000" opacity="0.15" transform="translate(0, 8)" />
+  
+  <!-- Minimalist House Shape in White -->
+  <path d="M256 120 L130 240 H200 V380 H312 V240 H382 Z" fill="#ffffff" />
+  
+  <!-- Door and Window accent in Orange -->
+  <rect x="236" y="290" width="40" height="90" rx="8" fill="url(#accentGrad)" />
+  <circle cx="256" cy="200" r="24" fill="url(#accentGrad)" />
+</svg>

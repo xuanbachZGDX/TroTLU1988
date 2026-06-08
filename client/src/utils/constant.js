@@ -42,9 +42,9 @@ export const path = {
 };
 
 export const text = {
-  HOME_TITLE: "Kênh thông tin Phòng Trọ số 1 Việt Nam",
+  HOME_TITLE: "Kênh thông tin Phòng Trọ uy tín Việt Nam",
   HOME_DESCRIPTION:
-    "TLU.com – Kênh thông tin phòng trọ số 1 Việt Nam. Website đăng tin cho thuê phòng trọ miễn phí, tiếp cận hơn 2.5 triệu lượt xem mỗi tháng, uy tín, hiệu quả cao.",
+    "TroTLU1988.com – Kênh thông tin phòng trọ uy tín Việt Nam. Website đăng tin cho thuê phòng trọ miễn phí, tiếp cận hơn 2.5 triệu lượt xem mỗi tháng, uy tín, hiệu quả cao.",
 };
 
 export const priceList = [

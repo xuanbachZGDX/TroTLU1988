@@ -46,10 +46,10 @@ const List = ({ categoryCode }) => {
     }
 
     if (categoryCode) searchParamsObject.categoryCode = categoryCode;
-    
+
     // Truyền tham số sắp xếp đơn giản
-    if (sort === 1) searchParamsObject.order = 'new';
-    if (sort === 0) searchParamsObject.order = 'star';
+    if (sort === 1) searchParamsObject.order = "new";
+    if (sort === 0) searchParamsObject.order = "star";
 
     dispatch(getAllPostsLimit(searchParamsObject));
   }, [dispatch, searchParams, categoryCode, sort]);
@@ -61,15 +61,15 @@ const List = ({ categoryCode }) => {
         <span>Cập nhật: {moment().format("HH:mm DD/MM/YYYY")}</span>
       </div>
       <div className="flex items-center gap-6 my-4 border-b border-gray-100 pb-2">
-        <span 
+        <span
           onClick={() => setSort(0)}
-          className={`cursor-pointer pb-2 transition-all ${sort === 0 ? 'text-black font-bold border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}
+          className={`cursor-pointer pb-2 transition-all ${sort === 0 ? "text-black font-bold border-b-2 border-black" : "text-gray-500 hover:text-black"}`}
         >
           Đề xuất
         </span>
-        <span 
+        <span
           onClick={() => setSort(1)}
-          className={`cursor-pointer pb-2 transition-all ${sort === 1 ? 'text-black font-bold border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}
+          className={`cursor-pointer pb-2 transition-all ${sort === 1 ? "text-black font-bold border-b-2 border-black" : "text-gray-500 hover:text-black"}`}
         >
           Mới đăng
         </span>
@@ -88,13 +88,19 @@ const List = ({ categoryCode }) => {
                 title={item?.title}
                 user={item?.user}
                 id={item?.id}
+                expired={item?.expired}
               />
             );
           })
         ) : (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <p className="text-gray-500 text-lg font-medium">Không tìm thấy kết quả phù hợp nào với tiêu chí tìm kiếm của bạn.</p>
-            <p className="text-gray-400 text-sm mt-1">Vui lòng thử thay đổi các bộ lọc (khu vực, mức giá, diện tích) để tìm được phòng ưng ý hơn nhé!</p>
+            <p className="text-gray-500 text-lg font-medium">
+              Không tìm thấy kết quả phù hợp nào với tiêu chí tìm kiếm của bạn.
+            </p>
+            <p className="text-gray-400 text-sm mt-1">
+              Vui lòng thử thay đổi các bộ lọc (khu vực, mức giá, diện tích) để
+              tìm được phòng ưng ý hơn nhé!
+            </p>
           </div>
         )}
       </div>

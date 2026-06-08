@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import logo from "../../../assets/TLU.jpg";
+import logo from "../../../assets/logo_TroTLU1988.jpg";
 import icons from "../../../utils/icons";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { path } from "../../../utils/constant";
@@ -117,7 +117,7 @@ const Header = () => {
           <img
             src={logo}
             alt="logo"
-            className="h-[48px] w-auto object-contain hover:scale-105 transition-transform duration-200"
+            className="h-[48px] w-auto object-contain hover:scale-105 transition-transform duration-200 mix-blend-multiply"
           />
         </Link>
 
