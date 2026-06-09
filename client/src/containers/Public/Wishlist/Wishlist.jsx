@@ -47,10 +47,14 @@ const Wishlist = () => {
         ) : posts.length > 0 ? (
           posts.map((item) => {
             let images = [];
-            try {
-              images = JSON.parse(item?.images?.image || "[]");
-            } catch (error) {
-              images = [];
+            if (Array.isArray(item?.images)) {
+              images = item.images.map((img) => img.image).filter(Boolean);
+            } else {
+              try {
+                images = JSON.parse(item?.images?.image || "[]");
+              } catch (error) {
+                images = [];
+              }
             }
             const getDescription = (desc) => {
               try {

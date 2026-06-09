@@ -226,10 +226,16 @@ export const updatePost = (postId, payload, actor) =>
         });
 
         if (payload.images) {
-          await db.Image.update(
-            { image: JSON.stringify(payload.images) },
-            { where: { postId }, transaction },
-          );
+          await db.Image.destroy({ where: { postId }, transaction });
+          if (payload.images.length > 0) {
+            const { v4: generateId } = require("uuid");
+            const imageRecords = payload.images.map((img) => ({
+              id: generateId(),
+              postId,
+              image: img,
+            }));
+            await db.Image.bulkCreate(imageRecords, { transaction });
+          }
         }
 
         if (payload.provinceId)

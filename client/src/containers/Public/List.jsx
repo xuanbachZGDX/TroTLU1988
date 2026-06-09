@@ -15,10 +15,13 @@ const parseDescription = (desc) => {
   }
 };
 
-const parseImages = (imgStr) => {
-  if (!imgStr) return [];
+const parseImages = (images) => {
+  if (!images) return [];
+  if (Array.isArray(images)) {
+    return images.map((img) => img.image).filter(Boolean);
+  }
   try {
-    return JSON.parse(imgStr) || [];
+    return JSON.parse(images) || [];
   } catch {
     return [];
   }
@@ -83,7 +86,7 @@ const List = ({ categoryCode }) => {
                 address={item?.address}
                 attributes={item?.attributes}
                 description={parseDescription(item?.description)}
-                images={parseImages(item?.images?.image)}
+                images={parseImages(item?.images)}
                 star={+item?.star}
                 title={item?.title}
                 user={item?.user}

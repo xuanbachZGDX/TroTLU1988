@@ -195,7 +195,10 @@ export const insertService = () =>
 
           const pPrice = item?.header?.class?.price || "";
           const pAcreage = item?.header?.class?.area || "";
-          const pPublished = item?.header?.class?.updated || "";
+          const pPublished =
+            item?.header?.table?.publishedDate?.content ||
+            item?.header?.class?.updated ||
+            "";
           const pOverviewCode = item?.header?.table?.postId?.content || "";
           const pType = roomType;
           const pTarget = buildTargetGender(roomType, item);
@@ -223,13 +226,15 @@ export const insertService = () =>
             expired: pExpired,
           });
 
-          bulkImages.push({
-            id: v4(),
-            postId,
-            image: JSON.stringify(
-              Array.isArray(item?.images) ? item.images.filter(Boolean) : [],
-            ),
-          });
+          if (Array.isArray(item?.images) && item.images.length > 0) {
+            item.images.filter(Boolean).forEach((imgUrl) => {
+              bulkImages.push({
+                id: v4(),
+                postId,
+                image: imgUrl,
+              });
+            });
+          }
 
           // Features
           const features = item?.highLight?.content || [];

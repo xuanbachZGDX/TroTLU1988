@@ -119,14 +119,14 @@ export const createNewPostService = (body, userId) =>
           { transaction },
         );
 
-        await db.Image.create(
-          {
+        if (body.images && body.images.length > 0) {
+          const imageRecords = body.images.map((img) => ({
             id: generateId(),
             postId,
-            image: JSON.stringify(body.images || []),
-          },
-          { transaction },
-        );
+            image: img,
+          }));
+          await db.Image.bulkCreate(imageRecords, { transaction });
+        }
 
         await syncPostFeatures(postId, body.features, transaction);
 

@@ -24,7 +24,11 @@ const RelatePost = () => {
             title={item.title}
             price={item?.attributes?.price}
             createdAt={item.createdAt}
-            image={JSON.parse(item.images.image)}
+            image={
+              Array.isArray(item?.images)
+                ? item.images.map((img) => img.image).filter(Boolean)
+                : JSON.parse(item?.images?.image || "[]")
+            }
           />
         ))}
       </div>

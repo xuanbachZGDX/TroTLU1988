@@ -5,7 +5,11 @@ export const getInitialPayload = (isEdit, dataEdit) => {
     title: d?.title || "",
     priceNumber: (d?.priceNumber || 0) * 1000000,
     areaNumber: d?.areaNumber || 0,
-    images: d?.images?.image ? JSON.parse(d?.images?.image) : [],
+    images: Array.isArray(d?.images)
+      ? d.images.map((img) => img.image).filter(Boolean)
+      : d?.images?.image
+        ? JSON.parse(d?.images?.image)
+        : [],
     address: d?.address || "",
     priceCode: d?.priceCode || "",
     areaCode: d?.areaCode || "",

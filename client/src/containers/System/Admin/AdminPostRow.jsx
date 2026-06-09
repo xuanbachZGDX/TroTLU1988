@@ -13,10 +13,14 @@ const AdminPostRow = ({
   handleViewHistory,
 }) => {
   let images = [];
-  try {
-    images = JSON.parse(item?.images?.image || "[]");
-  } catch (error) {
-    images = [];
+  if (Array.isArray(item?.images)) {
+    images = item.images.map((img) => img.image).filter(Boolean);
+  } else {
+    try {
+      images = JSON.parse(item?.images?.image || "[]");
+    } catch (error) {
+      images = [];
+    }
   }
 
   const isArchived = item.status === "archived";
@@ -130,7 +134,9 @@ const AdminPostRow = ({
         {item?.attributes?.price}
       </td>
       <td className="px-4 py-4">{renderStar(item.star)}</td>
-      <td className="px-4 py-4">{formatDateVN(item?.createdAt)}</td>
+      <td className="px-4 py-4">
+        {formatDateVN(item?.published || item?.createdAt)}
+      </td>
       <td className="px-4 py-4">
         {(() => {
           const expiredStr = item?.overview?.expired;

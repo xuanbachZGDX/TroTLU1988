@@ -83,6 +83,11 @@ const ServicePrice = () => {
                       attributes={examplePost.attributes}
                       user={examplePost.user}
                       images={(() => {
+                        if (Array.isArray(examplePost?.images)) {
+                          return examplePost.images
+                            .map((img) => img.image)
+                            .filter(Boolean);
+                        }
                         try {
                           return JSON.parse(examplePost.images?.image);
                         } catch (e) {

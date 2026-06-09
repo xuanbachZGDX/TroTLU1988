@@ -20,6 +20,10 @@ const DetailPost = () => {
   }, [postId, dispatch]);
 
   const getImages = (post) => {
+    if (!post?.images) return [];
+    if (Array.isArray(post.images)) {
+      return post.images.map((img) => img.image).filter(Boolean);
+    }
     try {
       return JSON.parse(post?.images?.image) || [];
     } catch {
@@ -42,12 +46,12 @@ const DetailPost = () => {
   const selectedFeatures = postDetail?.features || [];
   const features = (allFeatures || []).map((f) => ({
     label: f.value,
-    active: selectedFeatures.some(sf => sf.code === f.code),
+    active: selectedFeatures.some((sf) => sf.code === f.code),
   }));
 
   const formatDate = (date) => {
     if (!date) return "---";
-    if (typeof date === 'string' && date.includes('/')) return date;
+    if (typeof date === "string" && date.includes("/")) return date;
     moment.locale("vi");
     return moment(date).format("dddd, HH:mm DD/MM/YYYY");
   };
@@ -77,7 +81,7 @@ const DetailPost = () => {
         </div>
 
         <div className="w-[32%]">
-          <SidebarContact 
+          <SidebarContact
             user={postDetail?.user}
             postId={postId}
             getPhoneLink={getPhoneLink}
@@ -89,7 +93,7 @@ const DetailPost = () => {
 
       <div className="flex gap-4">
         <div className="w-[68%] flex flex-col gap-4">
-          <PostContent 
+          <PostContent
             postDetail={postDetail}
             formatDate={formatDate}
             descriptions={descriptions}
@@ -103,12 +107,21 @@ const DetailPost = () => {
             <h2 className="text-lg font-bold mb-4">Thông tin liên hệ</h2>
             <div className="flex items-center gap-4">
               {postDetail?.user?.avatar ? (
-                <img src={postDetail.user.avatar} alt="Avatar" className="w-14 h-14 rounded-full object-cover" />
+                <img
+                  src={postDetail.user.avatar}
+                  alt="Avatar"
+                  className="w-14 h-14 rounded-full object-cover"
+                />
               ) : (
-                <FaRegUserCircle size={56} className="text-gray-300 flex-none" />
+                <FaRegUserCircle
+                  size={56}
+                  className="text-gray-300 flex-none"
+                />
               )}
               <div>
-                <p className="font-semibold">{postDetail?.user?.name || "---"}</p>
+                <p className="font-semibold">
+                  {postDetail?.user?.name || "---"}
+                </p>
                 <p className="flex items-center gap-1 text-sm text-gray-500">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
                   Đang hoạt động
@@ -122,7 +135,10 @@ const DetailPost = () => {
                   📞 {postDetail?.user?.phone || "---"}
                 </a>
                 <a
-                  href={getZaloLink(postDetail?.user?.zalo, postDetail?.user?.phone)}
+                  href={getZaloLink(
+                    postDetail?.user?.zalo,
+                    postDetail?.user?.phone,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition"
