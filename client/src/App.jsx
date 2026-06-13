@@ -34,6 +34,7 @@ import {
   UserKyc,
   AdminManageCategories,
   AdminManagePackages,
+  AdminManageTransactions,
 } from "./containers/System";
 import LandlordGuard from "./containers/System/LandlordGuard";
 import ManageServicePrice from "./containers/System/ManageServicePrice";
@@ -186,6 +187,10 @@ function App() {
             element={<AdminManageCategories />}
           />
           <Route path={path.ADMIN_PACKAGES} element={<AdminManagePackages />} />
+          <Route
+            path={path.ADMIN_TRANSACTIONS}
+            element={<AdminManageTransactions />}
+          />
         </Route>
       </Routes>
     </div>

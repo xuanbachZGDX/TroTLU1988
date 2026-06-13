@@ -17,6 +17,7 @@ export { default as AdminManageReports } from "./Admin/AdminManageReports";
 export { default as AdminManageKyc } from "./Admin/AdminManageKyc";
 export { default as AdminManageCategories } from "./Admin/AdminManageCategories";
 export { default as AdminManagePackages } from "./Admin/AdminManagePackages";
+export { default as AdminManageTransactions } from "./Admin/AdminManageTransactions";
 
 export { default as ManageServicePrice } from "./ManageServicePrice";
 export { default as CreatePost } from "./User/CreatePost";

@@ -8,6 +8,7 @@ export * from "./adminPostController";
 export * from "./adminKycController";
 export * from "./adminContactController";
 export * from "./adminConfigController";
+export * from "./adminTransactionController";
 
 export const getDashboard = async (req, res) => {
   try {

@@ -28,6 +28,7 @@ export const path = {
   ADMIN_KYC: "phe-duyet-kyc",
   ADMIN_CATEGORIES: "quan-ly-danh-muc",
   ADMIN_PACKAGES: "quan-ly-bang-gia",
+  ADMIN_TRANSACTIONS: "quan-ly-giao-dich",
   CONTACT: "lien-he",
   DETAIL: "chi-tiet",
   TIN_DA_LUU: "tin-da-luu",

@@ -86,6 +86,13 @@ export const menuSystem = [
     icons: <MdOutlinePriceChange />,
     type: "admin",
   },
+  {
+    id: 19,
+    text: "Quản lý giao dịch",
+    path: `/${path.ADMIN}/${path.ADMIN_TRANSACTIONS}`,
+    icons: <BsWallet2 />,
+    type: "admin",
+  },
 
   // Chủ trọ + Admin
   {

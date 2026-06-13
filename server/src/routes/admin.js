@@ -185,4 +185,7 @@ router.delete("/categories/:id", adminController.deleteCategory);
 router.get("/packages", adminController.getPackages);
 router.put("/packages/:id", adminController.updatePackage);
 
+// Transactions Management
+router.get("/transactions", adminController.getTransactions);
+
 export default router;

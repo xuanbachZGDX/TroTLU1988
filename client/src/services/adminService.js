@@ -284,3 +284,17 @@ export const apiUpdatePackage = (id, data) =>
       reject(error);
     }
   });
+
+export const apiGetAdminTransactions = (params) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: "/api/v1/admin/transactions",
+        params,
+      });
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
